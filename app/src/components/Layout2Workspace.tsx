@@ -940,7 +940,7 @@ function ValidationCards({
                 <div className="mt-4 flex items-end justify-between gap-3">
                   <div className="min-w-0">
                     <p className="font-label text-[0.6875rem] font-medium tracking-[0.14em] text-muted uppercase">
-                      Match Score
+                      DTS Score
                     </p>
                     <p className={`mt-1 font-mono text-2xl font-medium tracking-[-0.03em] tabular-nums ${scoreToneText[scoreTone(run)]}`}>
                       {run.score.toFixed(1)}%

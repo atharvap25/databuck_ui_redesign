@@ -152,7 +152,7 @@ export default function QualityDetail({ validationId }: { validationId: string }
       <header className="flex shrink-0 flex-wrap items-start justify-between gap-4 border-b border-line px-6 py-5">
         <div className="flex min-w-0 items-start gap-4">
           <div className="shrink-0">
-            <p className="font-label text-[0.6875rem] font-medium tracking-[0.16em] text-muted uppercase">Match Score</p>
+            <p className="font-label text-[0.6875rem] font-medium tracking-[0.16em] text-muted uppercase">DTS Score</p>
             <p className={`mt-1 font-mono text-4xl font-medium tracking-[-0.04em] tabular-nums ${toneText[scoreTone(run)]}`}>
               {run.score.toFixed(1)}%
             </p>
