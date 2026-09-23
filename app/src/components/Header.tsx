@@ -12,7 +12,9 @@ import {
 const workspace = 'Acme Corp — Production'
 
 const iconButtonClass =
-  'relative inline-flex size-11 shrink-0 items-center justify-center rounded-md text-ink transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo'
+  'relative inline-flex size-11 shrink-0 items-center justify-center rounded-md text-ink transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo active:scale-[0.97]'
+
+const dividerClass = 'hidden h-6 w-px shrink-0 bg-line sm:block'
 
 export default function Header({ onLogout }: { onLogout: () => void }) {
   const [menuOpen, setMenuOpen] = useState(false)
@@ -51,7 +53,7 @@ export default function Header({ onLogout }: { onLogout: () => void }) {
             onClick={() => setMenuOpen((open) => !open)}
           >
             <span className="truncate">{workspace}</span>
-            <span className="shrink-0">
+            <span className={`shrink-0 text-muted transition-transform duration-150 ease-databuck ${menuOpen ? 'rotate-180' : ''}`}>
               <ChevronIcon />
             </span>
           </button>
@@ -75,6 +77,8 @@ export default function Header({ onLogout }: { onLogout: () => void }) {
           ) : null}
         </div>
 
+        <span className={dividerClass} aria-hidden="true" />
+
         <div className="min-w-0 flex-1 overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           <div className="ml-auto flex w-max items-center gap-2">
           <button
@@ -84,7 +88,7 @@ export default function Header({ onLogout }: { onLogout: () => void }) {
             onClick={() => setNoticeOpen(true)}
           >
             <BellIcon />
-            <span className="absolute top-2 right-2 size-2 rounded-full bg-danger" />
+            <span className="absolute top-2 right-2 size-2 rounded-full bg-danger ring-2 ring-canvas" />
           </button>
           <button
             type="button"
@@ -94,10 +98,11 @@ export default function Header({ onLogout }: { onLogout: () => void }) {
           >
             <SunIcon />
           </button>
+          <span className={`mx-1 ${dividerClass}`} aria-hidden="true" />
           <button
             type="button"
             onClick={() => setNoticeOpen(true)}
-            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md bg-indigo px-3 font-label text-xs font-medium tracking-[0.08em] text-white uppercase transition-colors duration-150 ease-databuck hover:bg-indigo-hover active:bg-indigo-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
+            className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md bg-indigo px-3 font-label text-xs font-medium tracking-[0.08em] text-white uppercase transition-colors duration-150 ease-databuck hover:bg-indigo-hover active:scale-[0.97] active:bg-indigo-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
           >
             <SparkIcon />
             Data Trust Agent

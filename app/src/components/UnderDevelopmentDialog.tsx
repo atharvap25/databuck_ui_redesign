@@ -1,5 +1,7 @@
 import { useEffect, useId, useRef } from 'react'
 import { createPortal } from 'react-dom'
+import { ClockIcon } from './icons.tsx'
+import IconBox from './IconBox.tsx'
 
 export default function UnderDevelopmentDialog({
   onClose,
@@ -61,9 +63,17 @@ export default function UnderDevelopmentDialog({
         style={{ animation: 'db-modal-in 200ms ease-out' }}
       >
         <div className="flex items-start justify-between gap-4">
-          <h2 id={titleId} className="font-sans text-lg font-bold tracking-[-0.02em] text-ink">
-            Under Development
-          </h2>
+          <div className="flex items-start gap-3">
+            <IconBox size="lg">
+              <ClockIcon />
+            </IconBox>
+            <div>
+              <h2 id={titleId} className="font-sans text-lg font-bold tracking-[-0.02em] text-ink">
+                Under Development
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-muted">This area is not available yet.</p>
+            </div>
+          </div>
           <button
             ref={closeRef}
             type="button"

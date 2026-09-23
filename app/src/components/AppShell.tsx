@@ -1,5 +1,7 @@
 import { useEffect, useState } from 'react'
+import EmptyState from './EmptyState.tsx'
 import Header from './Header.tsx'
+import { ClockIcon } from './icons.tsx'
 import Layout1Workspace, { type WorkspaceId } from './Layout1Workspace.tsx'
 import Sidebar from './Sidebar.tsx'
 
@@ -92,10 +94,12 @@ export default function AppShell({
         {layout === 'layout-1' && isWorkspace(activeId) ? (
           <Layout1Workspace screen={activeId} />
         ) : (
-          <div className="flex-1 overflow-auto bg-surface p-8">
-            <h1 className="font-sans text-2xl font-bold tracking-[-0.02em] text-ink">
-              {underDevelopment.has(activeId) ? 'Under Development' : layoutTitle[layout]}
-            </h1>
+          <div className="flex flex-1 items-center justify-center overflow-auto bg-surface p-8">
+            <EmptyState
+              icon={<ClockIcon />}
+              title={underDevelopment.has(activeId) ? 'Under Development' : layoutTitle[layout]}
+              description="This area is not available yet."
+            />
           </div>
         )}
       </div>

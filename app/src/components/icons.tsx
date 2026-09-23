@@ -1,10 +1,10 @@
 import type { ReactNode } from 'react'
 
-function Glyph({ children }: { children: ReactNode }) {
+function Glyph({ children, size = 20 }: { children: ReactNode; size?: number }) {
   return (
     <svg
-      width="20"
-      height="20"
+      width={size}
+      height={size}
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
@@ -127,9 +127,9 @@ export function LogoutIcon() {
   )
 }
 
-export function ChevronIcon() {
+export function ChevronIcon({ size = 20 }: { size?: number }) {
   return (
-    <Glyph>
+    <Glyph size={size}>
       <path d="m6 9 6 6 6-6" />
     </Glyph>
   )
@@ -158,6 +158,72 @@ export function ExportIcon() {
       <path d="M12 4v10" />
       <path d="m8 10 4 4 4-4" />
       <path d="M5 19h14" />
+    </Glyph>
+  )
+}
+
+export function DatabaseIcon({ size = 20 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <ellipse cx="12" cy="7" rx="6.5" ry="2.75" />
+      <path d="M5.5 7v9c0 1.6 2.9 2.75 6.5 2.75s6.5-1.15 6.5-2.75V7" />
+      <path d="M5.5 11.5c0 1.5 2.9 2.5 6.5 2.5s6.5-1 6.5-2.5" />
+    </Glyph>
+  )
+}
+
+export function TableIcon({ size = 20 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <rect x="4" y="5" width="16" height="14" rx="2" />
+      <path d="M4 9.5h16" />
+      <path d="M9 9.5V19" />
+    </Glyph>
+  )
+}
+
+export function EllipsisIcon({ size = 20 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <circle cx="6" cy="12" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.15" fill="currentColor" stroke="none" />
+      <circle cx="18" cy="12" r="1.15" fill="currentColor" stroke="none" />
+    </Glyph>
+  )
+}
+
+export function BackIcon() {
+  return (
+    <Glyph>
+      <path d="M15 6 9 12l6 6" />
+    </Glyph>
+  )
+}
+
+export function PlusIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <path d="M12 5v14" />
+      <path d="M5 12h14" />
+    </Glyph>
+  )
+}
+
+export function ClockIcon({ size = 20 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3.2 2" />
+    </Glyph>
+  )
+}
+
+export function InboxIcon({ size = 20 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <path d="M4 12.5 6.6 5h10.8l2.6 7.5" />
+      <path d="M4 12.5V18a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 18v-5.5" />
+      <path d="M4 12.5h5.2c.3 1.4 1.4 2.3 2.8 2.3s2.5-.9 2.8-2.3H20" />
     </Glyph>
   )
 }

@@ -82,7 +82,7 @@ export default function Sidebar({
           )}
         </div>
 
-        <nav className="flex-1 overflow-y-auto px-2 py-3" aria-label="Primary">
+        <nav className="db-scroll flex-1 overflow-y-auto px-2 py-3" aria-label="Primary">
           <ul className="flex flex-col gap-1">
             {items.map((item) => {
               const active = item.id === activeId
@@ -93,7 +93,7 @@ export default function Sidebar({
                     aria-label={item.label}
                     aria-current={active ? 'page' : undefined}
                     onClick={() => onSelect(item.id)}
-                    className={`flex h-11 w-full items-center rounded-md transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo md:h-10 ${
+                    className={`relative flex h-11 w-full items-center rounded-md transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo md:h-10 ${
                       expanded ? 'gap-3 px-3' : 'justify-center'
                     } ${
                       active
@@ -101,6 +101,12 @@ export default function Sidebar({
                         : 'text-muted hover:bg-surface hover:text-ink'
                     }`}
                   >
+                    {active ? (
+                      <span
+                        aria-hidden="true"
+                        className="absolute inset-y-1.5 left-0 w-[3px] rounded-full bg-indigo"
+                      />
+                    ) : null}
                     <span className="shrink-0">{item.icon}</span>
                     {expanded ? (
                       <span className="font-label text-xs font-medium tracking-[0.08em] whitespace-nowrap uppercase">
@@ -115,7 +121,7 @@ export default function Sidebar({
         </nav>
 
         {expanded ? (
-          <p className="px-4 pb-4 font-sans text-xs whitespace-nowrap text-outline">
+          <p className="border-t border-line px-4 py-4 font-sans text-xs whitespace-nowrap text-outline">
             2026 © FirstEigen
           </p>
         ) : null}
