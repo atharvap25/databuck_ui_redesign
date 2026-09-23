@@ -250,6 +250,15 @@ export function FilterIcon({ size = 16 }: { size?: number }) {
   )
 }
 
+export function SidebarIcon({ size = 20 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M9 3v18" />
+    </Glyph>
+  )
+}
+
 export function InboxIcon({ size = 20 }: { size?: number }) {
   return (
     <Glyph size={size}>

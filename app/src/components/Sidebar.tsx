@@ -10,6 +10,7 @@ import {
   MatchingIcon,
   ObservabilityIcon,
   QualityIcon,
+  SidebarIcon,
   TableIcon,
 } from './icons.tsx'
 
@@ -36,26 +37,35 @@ function navigation(layout: LayoutId): NavItem[] {
 export default function Sidebar({
   layout,
   expanded,
+  pinned,
   narrow,
   activeId,
   onSelect,
   onToggle,
+  onPinToggle,
   onHoverChange,
 }: {
   layout: LayoutId
   expanded: boolean
+  pinned: boolean
   narrow: boolean
   activeId: string
   onSelect: (id: string) => void
   onToggle: () => void
+  onPinToggle: () => void
   onHoverChange: (hovered: boolean) => void
 }) {
+  const docked = pinned && !narrow
   const items = navigation(layout)
   return (
-    <div className="relative z-30 h-full w-[72px] shrink-0">
+    <div
+      className={`relative z-30 h-full shrink-0 transition-[width] duration-150 ease-databuck ${
+        docked ? 'w-60' : 'w-[72px]'
+      }`}
+    >
       <aside
-        className={`absolute inset-y-0 left-0 flex h-full flex-col overflow-hidden border-r border-line bg-canvas transition-[width] duration-150 ease-databuck ${
-          expanded ? 'w-60' : 'w-[72px]'
+        className={`flex h-full flex-col overflow-hidden border-r border-line bg-canvas transition-[width] duration-150 ease-databuck ${
+          docked ? 'relative w-full' : `absolute inset-y-0 left-0 ${expanded ? 'w-60' : 'w-[72px]'}`
         }`}
         onMouseEnter={() => {
           if (!narrow) onHoverChange(true)
@@ -66,7 +76,7 @@ export default function Sidebar({
       >
         <div
           className={`flex h-16 shrink-0 items-center border-b border-line ${
-            expanded ? 'gap-3 px-4' : 'justify-center'
+            expanded ? 'justify-between gap-3 px-4' : 'justify-center'
           }`}
         >
           {narrow ? (
@@ -87,7 +97,7 @@ export default function Sidebar({
               ) : null}
             </button>
           ) : (
-            <div className={`flex items-center ${expanded ? 'gap-3' : ''}`}>
+            <div className={`flex min-w-0 items-center ${expanded ? 'gap-3' : ''}`}>
               <Mark />
               {expanded ? (
                 <span className="font-sans text-lg font-bold tracking-[-0.04em] whitespace-nowrap text-ink">
@@ -96,6 +106,21 @@ export default function Sidebar({
               ) : null}
             </div>
           )}
+          {expanded && !narrow ? (
+            <button
+              type="button"
+              aria-pressed={pinned}
+              aria-label={pinned ? 'Collapse sidebar' : 'Keep sidebar open'}
+              onClick={onPinToggle}
+              className={`inline-flex size-8 shrink-0 items-center justify-center rounded-md transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
+                pinned
+                  ? 'bg-secondary-fixed text-indigo'
+                  : 'text-muted hover:bg-surface hover:text-ink'
+              }`}
+            >
+              <SidebarIcon size={16} />
+            </button>
+          ) : null}
         </div>
 
         <nav className="db-scroll flex-1 overflow-y-auto px-2 py-3" aria-label="Primary">

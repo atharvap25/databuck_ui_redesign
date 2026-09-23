@@ -56,10 +56,11 @@ export default function AppShell({
 }) {
   const narrow = useNarrow()
   const [hovered, setHovered] = useState(false)
+  const [pinned, setPinned] = useState(false)
   const [open, setOpen] = useState(false)
   const [activeId, setActiveId] = useState('executive-dashboard')
 
-  const expanded = narrow ? open : hovered
+  const expanded = narrow ? open : pinned || hovered
 
   useEffect(() => {
     if (!narrow) setOpen(false)
@@ -89,10 +90,12 @@ export default function AppShell({
       <Sidebar
         layout={layout}
         expanded={expanded}
+        pinned={pinned}
         narrow={narrow}
         activeId={activeId}
         onSelect={setActiveId}
         onToggle={() => setOpen((current) => !current)}
+        onPinToggle={() => setPinned((current) => !current)}
         onHoverChange={setHovered}
       />
       <div className="flex min-w-0 flex-1 flex-col">
