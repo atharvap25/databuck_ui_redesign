@@ -218,6 +218,38 @@ export function ClockIcon({ size = 20 }: { size?: number }) {
   )
 }
 
+export function ListIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <path d="M9 6h12" />
+      <path d="M9 12h12" />
+      <path d="M9 18h12" />
+      <circle cx="4" cy="6" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="12" r="1.1" fill="currentColor" stroke="none" />
+      <circle cx="4" cy="18" r="1.1" fill="currentColor" stroke="none" />
+    </Glyph>
+  )
+}
+
+export function CardIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <rect x="3.5" y="3.5" width="7" height="7" rx="1" />
+      <rect x="13.5" y="3.5" width="7" height="7" rx="1" />
+      <rect x="3.5" y="13.5" width="7" height="7" rx="1" />
+      <rect x="13.5" y="13.5" width="7" height="7" rx="1" />
+    </Glyph>
+  )
+}
+
+export function FilterIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <path d="M4 5h16l-6.2 7.2V19l-3.6-1.8v-5L4 5z" />
+    </Glyph>
+  )
+}
+
 export function InboxIcon({ size = 20 }: { size?: number }) {
   return (
     <Glyph size={size}>

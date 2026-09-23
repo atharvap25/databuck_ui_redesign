@@ -3,6 +3,7 @@ import EmptyState from './EmptyState.tsx'
 import Header from './Header.tsx'
 import { ClockIcon } from './icons.tsx'
 import Layout1Workspace, { type WorkspaceId } from './Layout1Workspace.tsx'
+import Layout2Workspace, { type Layout2Screen } from './Layout2Workspace.tsx'
 import Sidebar from './Sidebar.tsx'
 
 export type LayoutId = 'layout-1' | 'layout-2'
@@ -23,6 +24,10 @@ const layout1Workspaces = new Set<WorkspaceId>(['connections', 'data-quality', '
 
 function isWorkspace(id: string): id is WorkspaceId {
   return layout1Workspaces.has(id as WorkspaceId)
+}
+
+function isLayout2Screen(id: string): id is Layout2Screen {
+  return id === 'data-sources' || id === 'tables' || id === 'data-quality'
 }
 
 function useNarrow() {
@@ -82,6 +87,7 @@ export default function AppShell({
         />
       ) : null}
       <Sidebar
+        layout={layout}
         expanded={expanded}
         narrow={narrow}
         activeId={activeId}
@@ -93,6 +99,8 @@ export default function AppShell({
         <Header onLogout={onLogout} />
         {layout === 'layout-1' && isWorkspace(activeId) ? (
           <Layout1Workspace screen={activeId} />
+        ) : layout === 'layout-2' && isLayout2Screen(activeId) ? (
+          <Layout2Workspace screen={activeId} />
         ) : (
           <div className="flex flex-1 items-center justify-center overflow-auto bg-surface p-8">
             <EmptyState

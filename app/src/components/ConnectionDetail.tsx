@@ -154,12 +154,14 @@ export default function ConnectionDetail({
   onSaveSource,
   onSaveTable,
   onAddTable,
+  onCreateValidation,
 }: {
   sources: DataSource[]
   selection: SourceSelection
   onSaveSource: (source: DataSource) => void
   onSaveTable: (sourceId: string, table: SourceTable) => void
   onAddTable: () => void
+  onCreateValidation?: () => void
 }) {
   const source =
     selection.kind === 'source'
@@ -200,7 +202,12 @@ export default function ConnectionDetail({
       />
       <div className="db-scroll min-h-0 flex-1 overflow-auto p-6">
         {table ? (
-          <TableBody tab={tab as TableTab} table={table} onSave={(next) => onSaveTable(source.id, next)} />
+          <TableBody
+            tab={tab as TableTab}
+            table={table}
+            onSave={(next) => onSaveTable(source.id, next)}
+            onCreateValidation={onCreateValidation}
+          />
         ) : tab === 'configure' ? (
           <SourceForm source={source} onSave={onSaveSource} />
         ) : (
@@ -416,13 +423,28 @@ function TableBody({
   tab,
   table,
   onSave,
+  onCreateValidation,
 }: {
   tab: TableTab
   table: SourceTable
   onSave: (table: SourceTable) => void
+  onCreateValidation?: () => void
 }) {
   if (tab === 'validations') {
-    return <EmptyState icon={<InboxIcon />} title="No validations yet." className="min-h-48" />
+    return (
+      <EmptyState
+        icon={<InboxIcon />}
+        title="No validations yet."
+        action={
+          onCreateValidation ? (
+            <button type="button" onClick={onCreateValidation} className={primaryButton}>
+              Create validation
+            </button>
+          ) : undefined
+        }
+        className="min-h-48"
+      />
+    )
   }
   if (tab === 'configure') return <TableForm table={table} onSave={onSave} />
   if (tab === 'profile') return <Profile table={table} />

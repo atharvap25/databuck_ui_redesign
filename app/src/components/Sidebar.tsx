@@ -1,18 +1,26 @@
 import type { ReactNode } from 'react'
+import type { LayoutId } from './AppShell.tsx'
 import Mark from './Mark.tsx'
 import {
   AdminIcon,
   ConnectionsIcon,
   DashboardIcon,
+  DatabaseIcon,
   JobsIcon,
   MatchingIcon,
   ObservabilityIcon,
   QualityIcon,
+  TableIcon,
 } from './icons.tsx'
 
-const items: { id: string; label: string; icon: ReactNode }[] = [
-  { id: 'executive-dashboard', label: 'Executive Dashboard', icon: <DashboardIcon /> },
-  { id: 'connections', label: 'Connections', icon: <ConnectionsIcon /> },
+type NavItem = { id: string; label: string; icon: ReactNode }
+
+const dashboard: NavItem = { id: 'executive-dashboard', label: 'Executive Dashboard', icon: <DashboardIcon /> }
+const connections: NavItem = { id: 'connections', label: 'Connections', icon: <ConnectionsIcon /> }
+const dataSources: NavItem = { id: 'data-sources', label: 'Data Sources', icon: <DatabaseIcon /> }
+const tables: NavItem = { id: 'tables', label: 'Tables', icon: <TableIcon /> }
+
+const tail: NavItem[] = [
   { id: 'data-quality', label: 'Data Quality', icon: <QualityIcon /> },
   { id: 'matching', label: 'Matching', icon: <MatchingIcon /> },
   { id: 'observability', label: 'Observability', icon: <ObservabilityIcon /> },
@@ -20,7 +28,13 @@ const items: { id: string; label: string; icon: ReactNode }[] = [
   { id: 'administration', label: 'Administration', icon: <AdminIcon /> },
 ]
 
+function navigation(layout: LayoutId): NavItem[] {
+  if (layout === 'layout-2') return [dashboard, dataSources, tables, ...tail]
+  return [dashboard, connections, ...tail]
+}
+
 export default function Sidebar({
+  layout,
   expanded,
   narrow,
   activeId,
@@ -28,6 +42,7 @@ export default function Sidebar({
   onToggle,
   onHoverChange,
 }: {
+  layout: LayoutId
   expanded: boolean
   narrow: boolean
   activeId: string
@@ -35,6 +50,7 @@ export default function Sidebar({
   onToggle: () => void
   onHoverChange: (hovered: boolean) => void
 }) {
+  const items = navigation(layout)
   return (
     <div className="relative z-30 h-full w-[72px] shrink-0">
       <aside
