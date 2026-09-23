@@ -306,7 +306,7 @@ function SourceBranch({
         <RowMenu label={`Actions for ${source.name}`} items={sourceActions} />
       </div>
       {expanded && source.tables.length > 0 ? (
-        <ul className="relative before:absolute before:top-0 before:bottom-2 before:left-[1.25rem] before:w-px before:bg-line-strong before:content-['']">
+        <ul className="relative pl-8 before:absolute before:top-0 before:bottom-2 before:left-[1.25rem] before:w-px before:bg-line-strong before:content-['']">
           {source.tables.map((table) => (
             <TableRow
               key={table.id}
