@@ -1,0 +1,67 @@
+:root {
+  /* Ink, brand, danger */
+  --db-ink: #000000;
+  --db-ink-hover: #1a1a1a;
+  --db-indigo: #4b41e1;
+  --db-indigo-hover: #3f35cc;
+  --db-indigo-active: #352cad;
+  --db-danger: #ba1a1a;
+  --db-danger-hover: #9e1616;
+  --db-stable: #4cd7f6;
+
+  /* Semantic */
+  --db-success: #22c55e;
+  --db-success-tint: #eafbf0;
+  --db-success-ink: #16803d;
+  --db-warning: #f59e0b;
+  --db-warning-tint: #fef3c7;
+  --db-warning-ink: #b45309;
+  --db-danger-tint: #fbeaea;
+  --db-info: #3b82f6;
+  --db-info-tint: #eaf2fe;
+  --db-info-ink: #1d4ed8;
+
+  /* Neutrals and surfaces */
+  --db-on-surface-variant: #45464d;
+  --db-secondary-container: #645efb;
+  --db-secondary-fixed: #e2dfff;
+  --db-outline: #76777d;
+  --db-surface: #f8f9fa;
+  --db-container: #edeeef;
+  --db-container-high: #e7e8e9;
+  --db-container-highest: #e1e3e4;
+  --db-border: #e2e8f0;
+  --db-border-strong: #cbd5e1;
+  --db-slate-50: #f8fafc;
+  --db-slate-100: #f1f5f9;
+  --db-slate-200: #e2e8f0;
+  --db-slate-300: #cbd5e1;
+  --db-slate-400: #94a3b8;
+  --db-slate-500: #64748b;
+  --db-slate-600: #475569;
+  --db-slate-700: #334155;
+  --db-slate-800: #1e293b;
+  --db-slate-950: #0f172a;
+  --db-canvas: #ffffff;
+  --db-backdrop: rgba(15, 23, 42, 0.5);
+
+  /* Type */
+  --db-font-ui: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --db-font-label: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --db-font-mono: "JetBrains Mono", ui-monospace, monospace;
+
+  /* Radius: 2 / 4 / 8 / pill */
+  --db-radius-sm: 2px;
+  --db-radius-md: 4px;
+  --db-radius-lg: 8px;
+  --db-radius-pill: 9999px;
+
+  /* Elevation */
+  --db-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.05);
+  --db-shadow-hover: 0 8px 24px rgba(15, 23, 42, 0.08);
+  --db-shadow-overlay: 0 16px 48px rgba(15, 23, 42, 0.18);
+
+  /* Motion */
+  --db-ease: cubic-bezier(0.4, 0, 0.2, 1);
+  --db-duration: 150ms;
+}

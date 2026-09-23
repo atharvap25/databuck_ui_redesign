@@ -1,0 +1,82 @@
+@import "tailwindcss";
+@import "./styles/tokens.css";
+
+@theme inline {
+  --font-sans: var(--db-font-ui);
+  --font-label: var(--db-font-label);
+  --font-mono: var(--db-font-mono);
+
+  --color-ink: var(--db-ink);
+  --color-ink-hover: var(--db-ink-hover);
+  --color-indigo: var(--db-indigo);
+  --color-indigo-hover: var(--db-indigo-hover);
+  --color-indigo-active: var(--db-indigo-active);
+  --color-danger: var(--db-danger);
+  --color-danger-hover: var(--db-danger-hover);
+  --color-stable: var(--db-stable);
+  --color-success: var(--db-success);
+  --color-success-tint: var(--db-success-tint);
+  --color-success-ink: var(--db-success-ink);
+  --color-warning: var(--db-warning);
+  --color-warning-tint: var(--db-warning-tint);
+  --color-warning-ink: var(--db-warning-ink);
+  --color-danger-tint: var(--db-danger-tint);
+  --color-info: var(--db-info);
+  --color-info-tint: var(--db-info-tint);
+  --color-info-ink: var(--db-info-ink);
+  --color-muted: var(--db-on-surface-variant);
+  --color-secondary-container: var(--db-secondary-container);
+  --color-secondary-fixed: var(--db-secondary-fixed);
+  --color-outline: var(--db-outline);
+  --color-surface: var(--db-surface);
+  --color-container: var(--db-container);
+  --color-container-high: var(--db-container-high);
+  --color-container-highest: var(--db-container-highest);
+  --color-line: var(--db-border);
+  --color-line-strong: var(--db-border-strong);
+  --color-canvas: var(--db-canvas);
+  --color-tagline: var(--db-slate-400);
+
+  --radius-sm: var(--db-radius-sm);
+  --radius-md: var(--db-radius-md);
+  --radius-lg: var(--db-radius-lg);
+  --radius-pill: var(--db-radius-pill);
+
+  --shadow-card: var(--db-shadow-card);
+  --shadow-hover: var(--db-shadow-hover);
+  --shadow-overlay: var(--db-shadow-overlay);
+
+  --ease-databuck: var(--db-ease);
+}
+
+@layer base {
+  html {
+    color-scheme: light;
+  }
+
+  body {
+    margin: 0;
+    min-height: 100svh;
+    background: var(--db-canvas);
+    color: var(--db-ink);
+    font-family: var(--db-font-ui);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    min-height: 100svh;
+  }
+}
+
+@keyframes db-modal-in {
+  from {
+    opacity: 0;
+    transform: scale(0.96);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
