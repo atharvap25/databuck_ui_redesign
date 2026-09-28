@@ -8,6 +8,7 @@ import { BackIcon, ClockIcon, ExportIcon, InboxIcon, PlusIcon, SearchIcon } from
 import QualityDetail from './QualityDetail.tsx'
 import QualityPanel, { qualitySummaryId } from './QualityPanel.tsx'
 import ValidationWizard from './ValidationWizard.tsx'
+import WorkspaceSearch from './WorkspaceSearch.tsx'
 import { sourceFromDraft } from './wizard/model.ts'
 
 type ConnectionDialog = { kind: 'source' } | { kind: 'table'; sourceId: string }
@@ -26,9 +27,13 @@ const fieldClass =
 export default function Layout1Workspace({
   screen,
   onCollapseSidebar,
+  onRunValidation,
+  isValidationRunning,
 }: {
   screen: WorkspaceId
   onCollapseSidebar: () => void
+  onRunValidation: (validationId: string, name: string) => void
+  isValidationRunning: (validationId: string) => boolean
 }) {
   const { title, action } = screens[screen]
   const searchId = useId()
@@ -41,6 +46,7 @@ export default function Layout1Workspace({
   const [sources, setSources] = useState<DataSource[]>(dataSources)
   const [dialog, setDialog] = useState<ConnectionDialog | null>(null)
   const [revealId, setRevealId] = useState<string | null>(null)
+  const [highlightId, setHighlightId] = useState<string | null>(null)
   const [validationId, setValidationId] = useState(qualitySummaryId)
   const [validationsCollapsed, setValidationsCollapsed] = useState(false)
 
@@ -54,9 +60,22 @@ export default function Layout1Workspace({
     setSelection(null)
     setDialog(null)
     setRevealId(null)
+    setHighlightId(null)
     setValidationId(qualitySummaryId)
     setValidationsCollapsed(false)
   }, [screen])
+
+  useEffect(() => {
+    if (!revealId) return
+    const timer = window.setTimeout(() => setRevealId(null), 2000)
+    return () => window.clearTimeout(timer)
+  }, [revealId])
+
+  useEffect(() => {
+    if (!highlightId) return
+    const timer = window.setTimeout(() => setHighlightId(null), 2000)
+    return () => window.clearTimeout(timer)
+  }, [highlightId])
 
   useEffect(() => {
     function onKeyDown(event: KeyboardEvent) {
@@ -102,38 +121,47 @@ export default function Layout1Workspace({
           {title}
         </h1>
 
-        <div className="relative min-w-0 flex-1">
-          <label htmlFor={searchId} className="sr-only">
-            Search
-          </label>
-          <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-outline">
-            <SearchIcon />
-          </span>
-          <input
-            ref={searchRef}
-            id={searchId}
-            type="text"
-            value={query}
-            placeholder="Search"
-            onChange={(event) => setQuery(event.target.value)}
-            className={`${fieldClass} w-full pr-10 pl-10`}
+        {screen === 'connections' || screen === 'data-quality' ? (
+          <WorkspaceSearch
+            screen={screen}
+            sources={sources}
+            query={query}
+            onQuery={setQuery}
+            searchId={searchId}
+            inputRef={searchRef}
+            onPickSource={(id) => {
+              setSelection({ kind: 'source', id })
+              setRevealId(id)
+            }}
+            onPickTable={(id) => {
+              setSelection({ kind: 'table', id })
+              setRevealId(id)
+            }}
+            onPickValidation={(id) => {
+              setValidationId(id)
+              setHighlightId(id)
+              setValidationsCollapsed(false)
+            }}
           />
-          {query ? (
-            <button
-              type="button"
-              aria-label="Clear search"
-              onClick={() => {
-                setQuery('')
-                searchRef.current?.focus()
-              }}
-              className="absolute top-1/2 right-2 inline-flex size-7 -translate-y-1/2 items-center justify-center rounded-md text-muted transition-colors duration-150 ease-databuck hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
-            >
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M6 6l12 12M18 6 6 18" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" />
-              </svg>
-            </button>
-          ) : null}
-        </div>
+        ) : (
+          <div className="relative min-w-0 flex-1">
+            <label htmlFor={searchId} className="sr-only">
+              Search
+            </label>
+            <span className="pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-outline">
+              <SearchIcon />
+            </span>
+            <input
+              ref={searchRef}
+              id={searchId}
+              type="text"
+              value={query}
+              placeholder="Search"
+              onChange={(event) => setQuery(event.target.value)}
+              className={`${fieldClass} w-full pr-10 pl-10`}
+            />
+          </div>
+        )}
 
         <div className="flex flex-wrap items-center gap-2">
           <div
@@ -198,6 +226,7 @@ export default function Layout1Workspace({
             onSelect={setValidationId}
             collapsed={validationsCollapsed}
             onCollapsedChange={setValidationsCollapsed}
+            highlightId={highlightId}
           />
         ) : screen === 'connections' ? (
           <ConnectionsPanel
@@ -224,6 +253,8 @@ export default function Layout1Workspace({
                 setValidationsCollapsed(true)
                 onCollapseSidebar()
               }}
+              onRun={onRunValidation}
+              runBusy={isValidationRunning(validationId)}
             />
           ) : null}
           {screen === 'connections' && selection ? (

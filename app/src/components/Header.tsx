@@ -1,4 +1,13 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import {
+  cloneCatalog,
+  firstPair,
+  linkedPairs,
+  pairKey,
+  pairLabel,
+  type WorkspacePair,
+} from '../data/workspaces.ts'
+import DomainProjectDialog from './DomainProjectDialog.tsx'
 import UnderDevelopmentDialog from './UnderDevelopmentDialog.tsx'
 import {
   BellIcon,
@@ -8,8 +17,6 @@ import {
   SparkIcon,
   SunIcon,
 } from './icons.tsx'
-
-const workspace = 'Acme Corp — Production'
 
 const iconButtonClass =
   'relative inline-flex size-11 shrink-0 items-center justify-center rounded-md text-ink transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo active:scale-[0.97]'
@@ -25,10 +32,21 @@ export default function Header({
   agentOpen: boolean
   onToggleAgent: () => void
 }) {
+  const catalog = useMemo(() => cloneCatalog(), [])
+  const [domains, setDomains] = useState(catalog.domains)
+  const [projects, setProjects] = useState(catalog.projects)
+  const [selected, setSelected] = useState<WorkspacePair | null>(() => firstPair(catalog.domains, catalog.projects))
   const [menuOpen, setMenuOpen] = useState(false)
+  const [manageOpen, setManageOpen] = useState(false)
   const [noticeOpen, setNoticeOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
   const closeNotice = useCallback(() => setNoticeOpen(false), [])
+  const pairs = linkedPairs(domains, projects)
+  const selectedMeta = pairs.find((pair) => selected && pairKey(pair) === pairKey(selected)) ?? pairs[0] ?? null
+  const selectedDomain = selectedMeta ? domains.find((domain) => domain.id === selectedMeta.domainId) : null
+  const selectedProject = selectedMeta ? projects.find((project) => project.id === selectedMeta.projectId) : null
+  const triggerLabel =
+    selectedDomain && selectedProject ? pairLabel(selectedDomain.name, selectedProject.name) : 'Select domain-project'
 
   useEffect(() => {
     if (!menuOpen) return
@@ -49,6 +67,14 @@ export default function Header({
     }
   }, [menuOpen])
 
+  function applyCatalog(nextDomains: typeof domains, nextProjects: typeof projects) {
+    setDomains(nextDomains)
+    setProjects(nextProjects)
+    const nextPairs = linkedPairs(nextDomains, nextProjects)
+    const stillSelected = selected && nextPairs.some((pair) => pairKey(pair) === pairKey(selected))
+    if (!stillSelected) setSelected(nextPairs[0] ?? null)
+  }
+
   return (
     <header className="relative z-20 flex h-16 shrink-0 items-center gap-4 border-b border-line bg-canvas px-4">
       <div className="flex h-full min-w-0 flex-1 items-center gap-4">
@@ -60,7 +86,7 @@ export default function Header({
             aria-haspopup="menu"
             onClick={() => setMenuOpen((open) => !open)}
           >
-            <span className="truncate">{workspace}</span>
+            <span className="truncate">{triggerLabel}</span>
             <span className={`shrink-0 text-muted transition-transform duration-150 ease-databuck ${menuOpen ? 'rotate-180' : ''}`}>
               <ChevronIcon />
             </span>
@@ -68,18 +94,45 @@ export default function Header({
           {menuOpen ? (
             <div
               role="menu"
-              aria-label="Workspace"
+              aria-label="Domain and project"
               className="absolute top-full left-0 z-40 mt-1 min-w-64 rounded-md border border-line bg-canvas p-1 shadow-overlay"
             >
+              {pairs.map((pair) => {
+                const domain = domains.find((item) => item.id === pair.domainId)
+                const project = projects.find((item) => item.id === pair.projectId)
+                if (!domain || !project) return null
+                const current = selectedMeta ? pairKey(pair) === pairKey(selectedMeta) : false
+                const label = pairLabel(domain.name, project.name)
+                return (
+                  <button
+                    key={pairKey(pair)}
+                    type="button"
+                    role="menuitem"
+                    aria-current={current ? 'true' : undefined}
+                    className={`flex w-full items-center gap-2 rounded-md px-3 py-2 text-left font-sans text-sm transition-colors duration-150 ease-databuck ${
+                      current ? 'bg-secondary-fixed text-indigo' : 'text-ink hover:bg-surface'
+                    }`}
+                    onClick={() => {
+                      setSelected(pair)
+                      setMenuOpen(false)
+                    }}
+                  >
+                    {current ? <CheckIcon /> : <span className="inline-block w-4 shrink-0" />}
+                    {label}
+                  </button>
+                )
+              })}
+              <div className="my-1 border-t border-line" />
               <button
                 type="button"
                 role="menuitem"
-                aria-current="true"
-                className="flex w-full items-center gap-2 rounded-md bg-secondary-fixed px-3 py-2 text-left font-sans text-sm text-indigo"
-                onClick={() => setMenuOpen(false)}
+                className="flex h-10 w-full items-center rounded-md px-3 text-left font-sans text-sm font-medium text-ink transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
+                onClick={() => {
+                  setMenuOpen(false)
+                  setManageOpen(true)
+                }}
               >
-                <CheckIcon />
-                {workspace}
+                Manage domain-project
               </button>
             </div>
           ) : null}
@@ -140,6 +193,14 @@ export default function Header({
         </div>
       </div>
       {noticeOpen ? <UnderDevelopmentDialog onClose={closeNotice} /> : null}
+      {manageOpen ? (
+        <DomainProjectDialog
+          domains={domains}
+          projects={projects}
+          onChange={applyCatalog}
+          onClose={() => setManageOpen(false)}
+        />
+      ) : null}
     </header>
   )
 }

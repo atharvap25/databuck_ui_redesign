@@ -1,8 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { useJobQueue } from '../jobs/jobStore.ts'
 import AgentPanel from './AgentPanel.tsx'
 import EmptyState from './EmptyState.tsx'
 import Header from './Header.tsx'
 import { ClockIcon } from './icons.tsx'
+import JobDeck from './JobDeck.tsx'
 import Layout1Workspace, { type WorkspaceId } from './Layout1Workspace.tsx'
 import Layout2Workspace, { type Layout2Screen } from './Layout2Workspace.tsx'
 import Sidebar from './Sidebar.tsx'
@@ -64,6 +66,7 @@ export default function AppShell({
   const [open, setOpen] = useState(false)
   const [agentOpen, setAgentOpen] = useState(false)
   const [activeId, setActiveId] = useState('executive-dashboard')
+  const { jobs, wave, enqueue, isRunning } = useJobQueue()
 
   const expanded = narrow ? open : !held && (pinned || hovered)
 
@@ -149,7 +152,12 @@ export default function AppShell({
         <div className="relative flex min-h-0 flex-1">
           <div className="flex min-w-0 flex-1 flex-col">
             {layout === 'layout-1' && isWorkspace(activeId) ? (
-              <Layout1Workspace screen={activeId} onCollapseSidebar={collapseSidebar} />
+              <Layout1Workspace
+                screen={activeId}
+                onCollapseSidebar={collapseSidebar}
+                onRunValidation={enqueue}
+                isValidationRunning={isRunning}
+              />
             ) : layout === 'layout-2' && isLayout2Screen(activeId) ? (
               <Layout2Workspace screen={activeId} />
             ) : (
@@ -165,6 +173,7 @@ export default function AppShell({
           {agentOpen ? <AgentPanel onClose={() => setAgentOpen(false)} /> : null}
         </div>
       </div>
+      <JobDeck jobs={jobs} wave={wave} agentOpen={agentOpen} />
     </div>
   )
 }

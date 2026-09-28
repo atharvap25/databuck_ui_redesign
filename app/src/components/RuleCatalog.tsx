@@ -12,12 +12,53 @@ import {
   type CheckField,
 } from '../data/ruleCatalog.ts'
 import { SearchIcon } from './icons.tsx'
+import { Modal, primaryButton, secondaryButton } from './wizard/ui.tsx'
 
 const headClass =
   'sticky top-0 z-10 bg-canvas px-3 py-3 text-left font-label text-xs font-medium tracking-[0.08em] text-muted uppercase shadow-[inset_0_-1px_0_var(--db-border)]'
 
 const fieldClass =
   'h-8 w-full rounded-md border border-line bg-canvas px-2 font-mono text-sm text-ink transition-colors duration-150 ease-databuck focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo disabled:bg-surface disabled:text-outline'
+
+function cloneCatalog(state: CatalogState): CatalogState {
+  return JSON.parse(JSON.stringify(state)) as CatalogState
+}
+
+function catalogDiff(saved: CatalogState, draft: CatalogState, columns: CatalogColumn[]) {
+  const lines: string[] = []
+  for (const def of catalogChecks) {
+    const previous = saved.checks[def.id]
+    const next = draft.checks[def.id]
+    if (!previous || !next) continue
+    if (def.enableOnly) {
+      if (previous.enabled !== next.enabled) lines.push(`${def.name}: ${next.enabled ? 'turned on' : 'turned off'}`)
+      if (previous.critical !== next.critical) lines.push(`${def.name}: critical ${next.critical ? 'on' : 'off'}`)
+      continue
+    }
+    const previousCount = selectedColumns(previous, columns).length
+    const nextCount = selectedColumns(next, columns).length
+    if (previousCount !== nextCount) lines.push(`${def.name}: ${previousCount} → ${nextCount} columns`)
+    const previousCritical = criticalCount(previous, columns)
+    const nextCritical = criticalCount(next, columns)
+    if (previousCritical !== nextCritical) {
+      lines.push(`${def.name}: ${previousCritical} → ${nextCritical} critical columns`)
+    }
+    for (const column of columns) {
+      const previousColumn = previous.columns[column.id]
+      const nextColumn = next.columns[column.id]
+      if (!previousColumn || !nextColumn) continue
+      for (const field of def.fields) {
+        const from = previousColumn.values[field.id] ?? ''
+        const to = nextColumn.values[field.id] ?? ''
+        if (from !== to) lines.push(`${def.name} · ${column.name} ${field.label}: ${from || '—'} → ${to || '—'}`)
+      }
+    }
+  }
+  if (saved.segmentColumnIds.join() !== draft.segmentColumnIds.join()) {
+    lines.push('Microsegment columns updated')
+  }
+  return lines
+}
 
 export default function RuleCatalog({
   validationId,
@@ -26,6 +67,7 @@ export default function RuleCatalog({
   onChange,
   shown = true,
   onOpen,
+  onRun,
 }: {
   validationId?: string
   columns?: CatalogColumn[]
@@ -33,11 +75,14 @@ export default function RuleCatalog({
   onChange?: (state: CatalogState) => void
   shown?: boolean
   onOpen?: (name: string) => void
+  onRun?: () => void
 }) {
   const searchId = useId()
   const columnSearchId = useId()
   const columns = columnsProp ?? columnsFor(validationId ?? 'customers')
   const [internal, setInternal] = useState<CatalogState>(() => stateProp ?? seedCatalog(columns))
+  const [saved, setSaved] = useState<CatalogState>(() => cloneCatalog(stateProp ?? seedCatalog(columns)))
+  const [review, setReview] = useState<null | 'save' | 'run'>(null)
   const [activeId, setActiveId] = useState(catalogChecks[0].id)
   const [group, setGroup] = useState<'Essential' | 'Advanced'>('Essential')
   const [checkQuery, setCheckQuery] = useState('')
@@ -171,9 +216,17 @@ export default function RuleCatalog({
 
   const selected = selectedColumns(config, columns)
   const applied = active.enableOnly ? config.enabled : selected.length > 0
+  const dirty = JSON.stringify(state) !== JSON.stringify(saved)
+  const changes = dirty ? catalogDiff(saved, state, columns) : []
+
+  function commit() {
+    setSaved(cloneCatalog(state))
+    setReview(null)
+  }
 
   return (
-    <div className={shown ? 'flex h-full min-h-0 flex-1 flex-col lg:flex-row' : 'hidden'}>
+    <div className={shown ? 'flex h-full min-h-0 flex-1 flex-col' : 'hidden'}>
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
       <aside className="flex max-h-72 min-h-0 shrink-0 flex-col border-b border-line lg:max-h-none lg:w-[280px] lg:border-r lg:border-b-0">
         <div className="shrink-0 border-b border-line p-3">
           <label htmlFor={searchId} className="sr-only">
@@ -312,6 +365,59 @@ export default function RuleCatalog({
           )}
         </div>
       </div>
+      </div>
+      {dirty && !controlled ? (
+        <div className="flex shrink-0 flex-wrap items-center justify-end gap-2 border-t border-line bg-canvas px-4 py-3">
+          <button type="button" className={secondaryButton} onClick={() => setCatalog(cloneCatalog(saved))}>
+            Cancel
+          </button>
+          <button type="button" className={secondaryButton} onClick={() => setReview('save')}>
+            Save
+          </button>
+          <button type="button" className={primaryButton} onClick={() => setReview('run')}>
+            Save and run
+          </button>
+        </div>
+      ) : null}
+      {review ? (
+        <Modal
+          title="Review changes"
+          size="md"
+          onClose={() => setReview(null)}
+          footer={
+            <>
+              <button type="button" className={secondaryButton} onClick={() => setReview(null)}>
+                Close
+              </button>
+              <button
+                type="button"
+                className={primaryButton}
+                onClick={() => {
+                  commit()
+                  if (review === 'run') onRun?.()
+                }}
+              >
+                {review === 'run' ? 'Save and run' : 'Save'}
+              </button>
+            </>
+          }
+        >
+          {changes.length === 0 ? (
+            <p className="text-sm leading-6 text-muted">No visible field changes.</p>
+          ) : (
+            <ul className="flex flex-col gap-2">
+              {changes.slice(0, 12).map((line) => (
+                <li key={line} className="text-sm leading-6 text-ink">
+                  {line}
+                </li>
+              ))}
+              {changes.length > 12 ? (
+                <li className="text-sm text-muted">{changes.length - 12} more</li>
+              ) : null}
+            </ul>
+          )}
+        </Modal>
+      ) : null}
     </div>
   )
 }

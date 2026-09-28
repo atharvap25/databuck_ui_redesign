@@ -5,8 +5,10 @@ import { BackIcon, ClockIcon, SparkIcon } from './icons.tsx'
 import { qualitySummaryId } from './QualityPanel.tsx'
 import RuleCatalog from './RuleCatalog.tsx'
 import StatusBadge from './StatusBadge.tsx'
+import ConfigureStep from './wizard/ConfigureStep.tsx'
+import { defaultConfigure, inferDomain, type ConfigureState } from './wizard/model.ts'
 
-type QualityTab = 'checks' | 'catalog' | 'configure'
+type QualityTab = 'checks' | 'catalog' | 'custom' | 'configure'
 type Tone = 'success' | 'warning' | 'danger'
 
 type CheckMetrics = {
@@ -66,10 +68,18 @@ const secondaryButton =
   'inline-flex h-10 items-center gap-2 rounded-md border border-line-strong bg-canvas px-3 font-sans text-sm font-medium text-ink transition-colors duration-150 ease-databuck hover:border-ink hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo'
 
 const primaryButton =
-  'inline-flex h-10 items-center rounded-md bg-indigo px-4 font-sans text-sm font-medium text-white transition-colors duration-150 ease-databuck hover:bg-indigo-hover active:bg-indigo-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink'
+  'inline-flex h-10 items-center rounded-md bg-indigo px-4 font-sans text-sm font-medium text-white transition-colors duration-150 ease-databuck hover:bg-indigo-hover active:bg-indigo-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:bg-container-high disabled:text-outline disabled:hover:bg-container-high'
 
 const headClass =
   'sticky top-0 z-10 bg-canvas px-4 py-3 font-label text-xs font-medium tracking-[0.08em] text-muted uppercase shadow-[inset_0_-1px_0_var(--db-border)]'
+
+function nameCellClass(passed: boolean) {
+  return `border-l-[3px] px-4 py-3 ${
+    passed
+      ? 'border-l-success bg-[linear-gradient(to_right,var(--color-success-tint),transparent_8rem)]'
+      : 'border-l-danger bg-[linear-gradient(to_right,var(--color-danger-tint),transparent_8rem)]'
+  }`
+}
 
 const toneText: Record<Tone, string> = {
   success: 'text-success-ink',
@@ -154,17 +164,33 @@ function openFromKey(event: KeyboardEvent<HTMLTableRowElement>, open: () => void
 export default function QualityDetail({
   validationId,
   onOpenCatalog,
+  onRun,
+  runBusy = false,
 }: {
   validationId: string
   onOpenCatalog?: () => void
+  onRun?: (validationId: string, name: string) => void
+  runBusy?: boolean
 }) {
   const run = validationRuns.find((item) => item.id === validationId)
   const [tab, setTab] = useState<QualityTab>('checks')
   const [openCheck, setOpenCheck] = useState<string | null>(null)
+  const [configure, setConfigure] = useState<ConfigureState>(() => defaultConfigure())
+  const [domain, setDomain] = useState(() => (run ? inferDomain(run.schema, run.tableName) : ''))
+  const [description, setDescription] = useState(() => (run ? `Quality checks for ${run.tableName}` : ''))
 
   useEffect(() => {
     setTab('checks')
     setOpenCheck(null)
+    const next = validationRuns.find((item) => item.id === validationId)
+    setConfigure(defaultConfigure())
+    if (next) {
+      setDomain(inferDomain(next.schema, next.tableName))
+      setDescription(`Quality checks for ${next.tableName}`)
+    } else {
+      setDomain('')
+      setDescription('')
+    }
   }, [validationId])
 
   if (validationId === qualitySummaryId || !run) {
@@ -203,6 +229,7 @@ export default function QualityDetail({
           [
             ['checks', 'Check Summary'],
             ['catalog', 'Rule Catalog'],
+            ['custom', 'Custom Rules'],
             ['configure', 'Configure'],
           ] as const
         ).map(([id, label]) => (
@@ -253,13 +280,26 @@ export default function QualityDetail({
               <SparkIcon size={16} />
               Root Cause Analysis
             </button>
-            <button type="button" className={primaryButton}>
+            <button
+              type="button"
+              className={primaryButton}
+              disabled={runBusy}
+              onClick={() => onRun?.(run.id, run.tableName)}
+            >
               Run
             </button>
           </div>
         </header>
       ) : null}
-      <div className={tab === 'catalog' ? 'flex min-h-0 flex-1 flex-col overflow-hidden' : 'db-scroll min-h-0 flex-1 overflow-auto'}>
+      <div
+        className={
+          tab === 'catalog'
+            ? 'flex min-h-0 flex-1 flex-col overflow-hidden'
+            : tab === 'custom'
+              ? 'flex min-h-0 flex-1 flex-col'
+              : 'db-scroll min-h-0 flex-1 overflow-auto'
+        }
+      >
         <div className={tab === 'checks' ? undefined : 'hidden'}>
           <CheckSummary checks={checks} custom={custom} onOpen={setOpenCheck} />
         </div>
@@ -268,10 +308,27 @@ export default function QualityDetail({
           validationId={validationId}
           shown={tab === 'catalog'}
           onOpen={setOpenCheck}
+          onRun={() => onRun?.(run.id, run.tableName)}
         />
+        {tab === 'custom' ? (
+          <div className="flex min-h-0 flex-1 items-center justify-center">
+            <EmptyState
+              icon={<ClockIcon />}
+              title="Under Development"
+              description="Custom rules are not available yet."
+            />
+          </div>
+        ) : null}
         {tab === 'configure' ? (
           <div className="p-6">
-            <EmptyState icon={<ClockIcon />} title="Under Development" description="This area is not available yet." className="min-h-48" />
+            <ConfigureStep
+              configure={configure}
+              onConfigure={setConfigure}
+              domain={domain}
+              onDomain={setDomain}
+              description={description}
+              onDescription={setDescription}
+            />
           </div>
         ) : null}
       </div>
@@ -365,8 +422,8 @@ function CheckSummary({
           group.rows.length === 0 ? null : (
             <CheckGroup key={group.label} label={group.label}>
               {group.rows.map((check) => (
-                <CheckRow key={check.id} passed={check.passed} onOpen={() => onOpen(check.name)} label={check.name}>
-                  <td className={`border-l-[3px] px-4 py-3 ${check.passed ? 'border-l-success' : 'border-l-danger'}`}>
+                <CheckRow key={check.id} onOpen={() => onOpen(check.name)} label={check.name}>
+                  <td className={nameCellClass(check.passed)}>
                     <span className="block font-sans text-sm font-medium text-ink" title={check.summary}>
                       {check.name}
                     </span>
@@ -498,12 +555,10 @@ function CheckGroup({ label, children }: { label: string; children: ReactNode })
 
 function CheckRow({
   label,
-  passed,
   onOpen,
   children,
 }: {
   label: string
-  passed: boolean
   onOpen: () => void
   children: ReactNode
 }) {
@@ -514,9 +569,7 @@ function CheckRow({
       aria-label={label}
       onClick={onOpen}
       onKeyDown={(event) => openFromKey(event, onOpen)}
-      className={`cursor-pointer border-b border-line transition-colors duration-150 ease-databuck last:border-0 focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-indigo ${
-        passed ? 'bg-success-tint' : 'bg-danger-tint'
-      }`}
+      className="cursor-pointer border-b border-line transition-colors duration-150 ease-databuck last:border-0 hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-[-2px] focus-visible:outline-indigo"
     >
       {children}
     </tr>
@@ -603,8 +656,8 @@ function CustomGroup({ rules, onOpen }: { rules: CustomRule[]; onOpen: () => voi
           Custom
         </th>
       </tr>
-      <CheckRow label="Custom rules" passed={failed === 0} onOpen={onOpen}>
-        <td className={`max-w-0 border-l-[3px] px-4 py-3 ${failed === 0 ? 'border-l-success' : 'border-l-danger'}`}>
+      <CheckRow label="Custom rules" onOpen={onOpen}>
+        <td className={`max-w-0 ${nameCellClass(failed === 0)}`}>
           <span className="block font-sans text-sm font-medium text-ink" title={names}>
             Custom rules
           </span>

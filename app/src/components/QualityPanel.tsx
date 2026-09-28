@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { scoreTone, validationRuns, type ValidationRun } from '../data/validations.ts'
 import { ChevronIcon, TableIcon } from './icons.tsx'
 import IconBox from './IconBox.tsx'
@@ -19,13 +19,22 @@ export default function QualityPanel({
   onSelect,
   collapsed,
   onCollapsedChange,
+  highlightId = null,
 }: {
   selectedId: string
   onSelect: (id: string) => void
   collapsed: boolean
   onCollapsedChange: (collapsed: boolean) => void
+  highlightId?: string | null
 }) {
   const [page, setPage] = useState(1)
+
+  useEffect(() => {
+    if (!highlightId) return
+    const index = validationRuns.findIndex((run) => run.id === highlightId)
+    if (index < 0) return
+    setPage(Math.floor(index / pageSize) + 1)
+  }, [highlightId])
 
   const pageCount = Math.max(1, Math.ceil(validationRuns.length / pageSize))
   const safePage = Math.min(page, pageCount)
@@ -79,7 +88,12 @@ export default function QualityPanel({
             <ul className="flex flex-col gap-1">
               {visible.map((run) => (
                 <li key={run.id}>
-                  <ValidationRow run={run} selected={selectedId === run.id} onSelect={() => onSelect(run.id)} />
+                  <ValidationRow
+                    run={run}
+                    selected={selectedId === run.id}
+                    highlighted={highlightId === run.id}
+                    onSelect={() => onSelect(run.id)}
+                  />
                 </li>
               ))}
             </ul>
@@ -156,10 +170,12 @@ function SummaryRow({ selected, onSelect }: { selected: boolean; onSelect: () =>
 function ValidationRow({
   run,
   selected,
+  highlighted,
   onSelect,
 }: {
   run: ValidationRun
   selected: boolean
+  highlighted: boolean
   onSelect: () => void
 }) {
   const tone = scoreTone(run)
@@ -169,7 +185,7 @@ function ValidationRow({
       aria-current={selected ? 'true' : undefined}
       onClick={onSelect}
       className={`flex w-full cursor-pointer flex-col gap-2 rounded-md px-2 py-2 text-left transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
-        selected ? 'bg-secondary-fixed' : 'hover:bg-surface'
+        highlighted ? 'bg-info-tint' : selected ? 'bg-secondary-fixed' : 'hover:bg-surface'
       }`}
     >
       <span className="flex items-start gap-3">

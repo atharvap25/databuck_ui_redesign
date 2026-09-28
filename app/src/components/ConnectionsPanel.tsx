@@ -137,6 +137,7 @@ export default function ConnectionsPanel({
       (source) => source.id === revealId || source.tables.some((table) => table.id === revealId),
     )
     if (index < 0) return
+    setCollapsed(false)
     setPage(Math.floor(index / pageSize) + 1)
     const sourceId = sources[index].id
     setExpanded((current) => (current.includes(sourceId) ? current : [...current, sourceId]))
@@ -200,6 +201,7 @@ export default function ConnectionsPanel({
               source={source}
               expanded={expanded.includes(source.id)}
               selection={selection}
+              highlightId={revealId}
               onToggle={() => toggleExpanded(source.id)}
               onSelect={onSelect}
               onAddTable={onAddTable}
@@ -260,10 +262,17 @@ function selectionLabel(sources: DataSource[], selection: SourceSelection | null
   return 'Connections'
 }
 
+function rowTone(selected: boolean, highlighted: boolean) {
+  if (highlighted) return 'bg-info-tint'
+  if (selected) return 'bg-secondary-fixed'
+  return 'hover:bg-surface'
+}
+
 function SourceBranch({
   source,
   expanded,
   selection,
+  highlightId,
   onToggle,
   onSelect,
   onAddTable,
@@ -271,11 +280,13 @@ function SourceBranch({
   source: DataSource
   expanded: boolean
   selection: SourceSelection | null
+  highlightId?: string | null
   onToggle: () => void
   onSelect: (selection: SourceSelection) => void
   onAddTable: (sourceId: string) => void
 }) {
   const selected = isSelected(selection, { kind: 'source', id: source.id })
+  const highlighted = highlightId === source.id
 
   return (
     <li>
@@ -291,9 +302,7 @@ function SourceBranch({
             onSelect({ kind: 'source', id: source.id })
           }
         }}
-        className={`${rowGrid} transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
-          selected ? 'bg-secondary-fixed' : 'hover:bg-surface'
-        }`}
+        className={`${rowGrid} transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${rowTone(selected, highlighted)}`}
       >
         <button
           type="button"
@@ -345,6 +354,7 @@ function SourceBranch({
               key={table.id}
               table={table}
               selected={isSelected(selection, { kind: 'table', id: table.id })}
+              highlighted={highlightId === table.id}
               onSelect={() => onSelect({ kind: 'table', id: table.id })}
             />
           ))}
@@ -357,10 +367,12 @@ function SourceBranch({
 function TableRow({
   table,
   selected,
+  highlighted,
   onSelect,
 }: {
   table: SourceTable
   selected: boolean
+  highlighted: boolean
   onSelect: () => void
 }) {
   return (
@@ -377,9 +389,7 @@ function TableRow({
             onSelect()
           }
         }}
-        className={`${rowGrid} transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
-          selected ? 'bg-secondary-fixed' : 'hover:bg-surface'
-        }`}
+        className={`${rowGrid} transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${rowTone(selected, highlighted)}`}
       >
         <span aria-hidden="true" />
         <IconBox size="sm">

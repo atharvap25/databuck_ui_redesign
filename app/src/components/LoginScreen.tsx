@@ -77,10 +77,6 @@ export default function LoginScreen({
             Agentic AI for Enterprise Data Trust at Scale
           </p>
         </div>
-
-        <p className="relative mt-16 w-full max-w-md font-label text-xs font-medium tracking-[0.18em] text-tagline uppercase md:absolute md:bottom-12 md:left-12 md:mt-0 md:max-w-sm">
-          Connections · Data Quality · Matching
-        </p>
       </section>
 
       <section className="flex flex-1 items-start justify-center bg-surface px-6 py-10 md:w-1/2 md:items-center md:py-12">
@@ -147,8 +143,8 @@ export default function LoginScreen({
               </button>
               <button
                 type="button"
-                onClick={() => onOpenLayout('layout-2')}
-                className="inline-flex h-9 flex-1 items-center justify-center rounded-md border border-line bg-canvas px-3 font-sans text-xs font-medium text-muted transition-colors duration-150 ease-databuck hover:border-line-strong hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo active:scale-[0.98]"
+                disabled
+                className="inline-flex h-9 flex-1 cursor-not-allowed items-center justify-center rounded-md border border-line bg-surface px-3 font-sans text-xs font-medium text-outline"
               >
                 Layout 2
               </button>
