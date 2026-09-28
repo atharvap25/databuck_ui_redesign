@@ -16,7 +16,15 @@ const iconButtonClass =
 
 const dividerClass = 'hidden h-6 w-px shrink-0 bg-line sm:block'
 
-export default function Header({ onLogout }: { onLogout: () => void }) {
+export default function Header({
+  onLogout,
+  agentOpen,
+  onToggleAgent,
+}: {
+  onLogout: () => void
+  agentOpen: boolean
+  onToggleAgent: () => void
+}) {
   const [menuOpen, setMenuOpen] = useState(false)
   const [noticeOpen, setNoticeOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null)
@@ -101,7 +109,8 @@ export default function Header({ onLogout }: { onLogout: () => void }) {
           <span className={`mx-1 ${dividerClass}`} aria-hidden="true" />
           <button
             type="button"
-            onClick={() => setNoticeOpen(true)}
+            aria-pressed={agentOpen}
+            onClick={onToggleAgent}
             className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md bg-indigo px-3 font-label text-xs font-medium tracking-[0.08em] text-white uppercase transition-colors duration-150 ease-databuck hover:bg-indigo-hover active:scale-[0.97] active:bg-indigo-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink"
           >
             <SparkIcon />

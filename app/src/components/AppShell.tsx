@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import AgentPanel from './AgentPanel.tsx'
 import EmptyState from './EmptyState.tsx'
 import Header from './Header.tsx'
 import { ClockIcon } from './icons.tsx'
@@ -57,10 +58,39 @@ export default function AppShell({
   const narrow = useNarrow()
   const [hovered, setHovered] = useState(false)
   const [pinned, setPinned] = useState(false)
+  const [held, setHeld] = useState(false)
+  const heldRef = useRef(false)
+  const holdTimer = useRef<number | null>(null)
   const [open, setOpen] = useState(false)
+  const [agentOpen, setAgentOpen] = useState(false)
   const [activeId, setActiveId] = useState('executive-dashboard')
 
-  const expanded = narrow ? open : pinned || hovered
+  const expanded = narrow ? open : !held && (pinned || hovered)
+
+  const collapseSidebar = useCallback(() => {
+    setPinned(false)
+    setOpen(false)
+    setHovered(false)
+    heldRef.current = true
+    setHeld(true)
+    if (holdTimer.current) window.clearTimeout(holdTimer.current)
+    holdTimer.current = window.setTimeout(() => {
+      heldRef.current = false
+      setHeld(false)
+    }, 450)
+  }, [])
+
+  function onHoverChange(next: boolean) {
+    if (heldRef.current) return
+    setHovered(next)
+  }
+
+  function toggleAgent() {
+    setAgentOpen((current) => {
+      if (!current) collapseSidebar()
+      return !current
+    })
+  }
 
   useEffect(() => {
     if (!narrow) setOpen(false)
@@ -76,6 +106,17 @@ export default function AppShell({
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [narrow, open])
+
+  useEffect(() => {
+    if (!agentOpen) return
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Escape') setAgentOpen(false)
+    }
+
+    document.addEventListener('keydown', onKeyDown)
+    return () => document.removeEventListener('keydown', onKeyDown)
+  }, [agentOpen])
 
   return (
     <div className="flex h-svh overflow-hidden bg-surface">
@@ -95,24 +136,34 @@ export default function AppShell({
         activeId={activeId}
         onSelect={setActiveId}
         onToggle={() => setOpen((current) => !current)}
-        onPinToggle={() => setPinned((current) => !current)}
-        onHoverChange={setHovered}
+        onPinToggle={() => {
+          heldRef.current = false
+          setHeld(false)
+          if (holdTimer.current) window.clearTimeout(holdTimer.current)
+          setPinned((current) => !current)
+        }}
+        onHoverChange={onHoverChange}
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header onLogout={onLogout} />
-        {layout === 'layout-1' && isWorkspace(activeId) ? (
-          <Layout1Workspace screen={activeId} />
-        ) : layout === 'layout-2' && isLayout2Screen(activeId) ? (
-          <Layout2Workspace screen={activeId} />
-        ) : (
-          <div className="flex flex-1 items-center justify-center overflow-auto bg-surface p-8">
-            <EmptyState
-              icon={<ClockIcon />}
-              title={underDevelopment.has(activeId) ? 'Under Development' : layoutTitle[layout]}
-              description="This area is not available yet."
-            />
+        <Header onLogout={onLogout} agentOpen={agentOpen} onToggleAgent={toggleAgent} />
+        <div className="relative flex min-h-0 flex-1">
+          <div className="flex min-w-0 flex-1 flex-col">
+            {layout === 'layout-1' && isWorkspace(activeId) ? (
+              <Layout1Workspace screen={activeId} onCollapseSidebar={collapseSidebar} />
+            ) : layout === 'layout-2' && isLayout2Screen(activeId) ? (
+              <Layout2Workspace screen={activeId} />
+            ) : (
+              <div className="flex flex-1 items-center justify-center overflow-auto bg-surface p-8">
+                <EmptyState
+                  icon={<ClockIcon />}
+                  title={underDevelopment.has(activeId) ? 'Under Development' : layoutTitle[layout]}
+                  description="This area is not available yet."
+                />
+              </div>
+            )}
           </div>
-        )}
+          {agentOpen ? <AgentPanel onClose={() => setAgentOpen(false)} /> : null}
+        </div>
       </div>
     </div>
   )

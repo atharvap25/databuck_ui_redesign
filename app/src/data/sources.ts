@@ -61,6 +61,101 @@ function table(
   return { id, nickname, name, columns, approved, description: '', rowFilter: '' }
 }
 
+const discoveredCatalog: Record<string, { nickname: string; name: string; columns: number }[]> = {
+  'acme-erp': [
+    { nickname: 'Vendors', name: 'vendors', columns: 18 },
+    { nickname: 'Invoices', name: 'invoices', columns: 26 },
+  ],
+  'analytics-warehouse': [
+    { nickname: 'Sessions', name: 'sessions', columns: 20 },
+    { nickname: 'Conversions', name: 'conversions', columns: 14 },
+  ],
+  'finance-mart': [
+    { nickname: 'GL Accounts', name: 'gl_accounts', columns: 22 },
+    { nickname: 'Cost Centers', name: 'cost_centers', columns: 12 },
+  ],
+  'marketing-events': [
+    { nickname: 'Impressions', name: 'impressions', columns: 15 },
+    { nickname: 'Clicks', name: 'clicks', columns: 11 },
+  ],
+  'staging-sandbox': [
+    { nickname: 'Customers', name: 'customers', columns: 24 },
+    { nickname: 'Orders', name: 'orders', columns: 18 },
+  ],
+  'peoplesoft-hr': [
+    { nickname: 'Departments', name: 'departments', columns: 16 },
+    { nickname: 'Job Codes', name: 'job_codes', columns: 13 },
+  ],
+  'inventory-facts': [
+    { nickname: 'Warehouses', name: 'warehouses', columns: 14 },
+    { nickname: 'SKU Master', name: 'sku_master', columns: 31 },
+  ],
+  'crm-sync': [
+    { nickname: 'Contacts', name: 'contacts', columns: 28 },
+    { nickname: 'Opportunities', name: 'opportunities', columns: 21 },
+  ],
+  'teradata-core': [
+    { nickname: 'Cost Centers', name: 'cost_centers', columns: 12 },
+    { nickname: 'Fiscal Periods', name: 'fiscal_periods', columns: 9 },
+  ],
+  'lakehouse-gold': [
+    { nickname: 'Orders 360', name: 'orders_360', columns: 44 },
+    { nickname: 'Inventory 360', name: 'inventory_360', columns: 29 },
+  ],
+  'billing-ledger': [
+    { nickname: 'Subscriptions', name: 'subscriptions', columns: 19 },
+    { nickname: 'Dunning', name: 'dunning', columns: 13 },
+  ],
+  'claims-mart': [
+    { nickname: 'Claim Lines', name: 'claim_lines', columns: 33 },
+    { nickname: 'Providers', name: 'providers', columns: 17 },
+  ],
+  clickstream: [
+    { nickname: 'Sessions', name: 'sessions', columns: 18 },
+    { nickname: 'Page Views', name: 'page_views', columns: 12 },
+  ],
+  'supplier-hub': [
+    { nickname: 'Purchase Orders', name: 'purchase_orders', columns: 24 },
+    { nickname: 'Receipts', name: 'receipts', columns: 16 },
+  ],
+  payroll: [
+    { nickname: 'Pay Items', name: 'pay_items', columns: 21 },
+    { nickname: 'Deductions', name: 'deductions', columns: 14 },
+  ],
+  'risk-store': [
+    { nickname: 'Limits', name: 'limits', columns: 15 },
+    { nickname: 'Ratings', name: 'ratings', columns: 11 },
+  ],
+}
+
+const genericDiscovered = [
+  { nickname: 'Customers', name: 'customers', columns: 24 },
+  { nickname: 'Orders', name: 'orders', columns: 18 },
+  { nickname: 'Audit Log', name: 'audit_log', columns: 12 },
+]
+
+export function discoverableTables(source: DataSource): SourceTable[] {
+  const onboarded = new Set(source.tables.map((table) => table.name.toLowerCase()))
+  const catalog = [...(discoveredCatalog[source.id] ?? []), ...genericDiscovered]
+  const unique: { nickname: string; name: string; columns: number }[] = []
+  const seen = new Set<string>()
+  for (const entry of catalog) {
+    const key = entry.name.toLowerCase()
+    if (seen.has(key) || onboarded.has(key)) continue
+    seen.add(key)
+    unique.push(entry)
+  }
+  return unique.slice(0, 4).map((entry) => ({
+    id: `${source.id}-${entry.name}`,
+    nickname: entry.nickname,
+    name: entry.name,
+    columns: entry.columns,
+    approved: false,
+    description: '',
+    rowFilter: '',
+  }))
+}
+
 export const dataSources: DataSource[] = [
   {
     id: 'acme-erp',

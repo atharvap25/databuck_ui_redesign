@@ -108,9 +108,9 @@ export function SunIcon() {
   )
 }
 
-export function SparkIcon() {
+export function SparkIcon({ size = 20 }: { size?: number }) {
   return (
-    <Glyph>
+    <Glyph size={size}>
       <path d="M12 2.5 13.8 8 19.5 9.8 13.8 11.6 12 17.1 10.2 11.6 4.5 9.8 10.2 8 12 2.5z" />
       <path d="M18.5 14.5 19.2 16.8 21.5 17.5 19.2 18.2 18.5 20.5 17.8 18.2 15.5 17.5 17.8 16.8 18.5 14.5z" />
     </Glyph>

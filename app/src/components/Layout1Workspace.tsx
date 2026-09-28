@@ -1,11 +1,16 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import { dataSources, type DataSource } from '../data/sources.ts'
 import ConnectionDetail from './ConnectionDetail.tsx'
+import { SourceCreateDialog, TableCreateDialog } from './ConnectionFormDialogs.tsx'
 import ConnectionsPanel, { type SourceSelection } from './ConnectionsPanel.tsx'
 import EmptyState from './EmptyState.tsx'
 import { BackIcon, ClockIcon, ExportIcon, InboxIcon, PlusIcon, SearchIcon } from './icons.tsx'
 import QualityDetail from './QualityDetail.tsx'
 import QualityPanel, { qualitySummaryId } from './QualityPanel.tsx'
+import ValidationWizard from './ValidationWizard.tsx'
+import { sourceFromDraft } from './wizard/model.ts'
+
+type ConnectionDialog = { kind: 'source' } | { kind: 'table'; sourceId: string }
 
 const screens = {
   connections: { title: 'Connections', action: 'Add Data Source' },
@@ -18,7 +23,13 @@ export type WorkspaceId = keyof typeof screens
 const fieldClass =
   'h-11 rounded-md border border-line bg-canvas px-3 font-sans text-sm text-ink transition-colors duration-150 ease-databuck focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo'
 
-export default function Layout1Workspace({ screen }: { screen: WorkspaceId }) {
+export default function Layout1Workspace({
+  screen,
+  onCollapseSidebar,
+}: {
+  screen: WorkspaceId
+  onCollapseSidebar: () => void
+}) {
   const { title, action } = screens[screen]
   const searchId = useId()
   const searchRef = useRef<HTMLInputElement>(null)
@@ -28,7 +39,12 @@ export default function Layout1Workspace({ screen }: { screen: WorkspaceId }) {
   const [creating, setCreating] = useState(false)
   const [selection, setSelection] = useState<SourceSelection | null>(null)
   const [sources, setSources] = useState<DataSource[]>(dataSources)
+  const [dialog, setDialog] = useState<ConnectionDialog | null>(null)
+  const [revealId, setRevealId] = useState<string | null>(null)
   const [validationId, setValidationId] = useState(qualitySummaryId)
+  const [validationsCollapsed, setValidationsCollapsed] = useState(false)
+
+  const tableSource = dialog?.kind === 'table' ? sources.find((source) => source.id === dialog.sourceId) ?? null : null
 
   useEffect(() => {
     setQuery('')
@@ -36,7 +52,10 @@ export default function Layout1Workspace({ screen }: { screen: WorkspaceId }) {
     setEndDate('')
     setCreating(false)
     setSelection(null)
+    setDialog(null)
+    setRevealId(null)
     setValidationId(qualitySummaryId)
+    setValidationsCollapsed(false)
   }, [screen])
 
   useEffect(() => {
@@ -50,6 +69,10 @@ export default function Layout1Workspace({ screen }: { screen: WorkspaceId }) {
     document.addEventListener('keydown', onKeyDown)
     return () => document.removeEventListener('keydown', onKeyDown)
   }, [])
+
+  if (creating && screen === 'data-quality') {
+    return <ValidationWizard onExit={() => setCreating(false)} />
+  }
 
   if (creating) {
     return (
@@ -74,7 +97,7 @@ export default function Layout1Workspace({ screen }: { screen: WorkspaceId }) {
 
   return (
     <div className="db-scroll flex min-h-0 flex-1 flex-col gap-4 overflow-auto bg-surface p-8 lg:overflow-hidden">
-      <div className="flex flex-col gap-4 lg:flex-row lg:items-center">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
         <h1 className="shrink-0 font-sans text-2xl font-bold tracking-[-0.02em] text-ink">
           {title}
         </h1>
@@ -153,6 +176,10 @@ export default function Layout1Workspace({ screen }: { screen: WorkspaceId }) {
           <button
             type="button"
             onClick={() => {
+              if (screen === 'connections') {
+                setDialog({ kind: 'source' })
+                return
+              }
               setSelection(null)
               setCreating(true)
             }}
@@ -166,9 +193,20 @@ export default function Layout1Workspace({ screen }: { screen: WorkspaceId }) {
 
       <div className="flex min-h-[32rem] flex-1 flex-col gap-4 lg:min-h-0 lg:flex-row">
         {screen === 'data-quality' ? (
-          <QualityPanel selectedId={validationId} onSelect={setValidationId} />
+          <QualityPanel
+            selectedId={validationId}
+            onSelect={setValidationId}
+            collapsed={validationsCollapsed}
+            onCollapsedChange={setValidationsCollapsed}
+          />
         ) : screen === 'connections' ? (
-          <ConnectionsPanel sources={sources} selection={selection} onSelect={setSelection} />
+          <ConnectionsPanel
+            sources={sources}
+            selection={selection}
+            onSelect={setSelection}
+            onAddTable={(sourceId) => setDialog({ kind: 'table', sourceId })}
+            revealId={revealId}
+          />
         ) : (
           <div className="flex min-h-64 flex-col overflow-hidden rounded-lg border border-line bg-canvas shadow-card lg:w-[360px] lg:shrink-0">
             <EmptyState icon={<ClockIcon />} title="Under Development" description="This area is not available yet." className="flex-1" />
@@ -179,15 +217,20 @@ export default function Layout1Workspace({ screen }: { screen: WorkspaceId }) {
             (screen === 'connections' && selection) || screen === 'data-quality' ? '' : 'items-center justify-center p-8'
           }`}
         >
-          {screen === 'data-quality' ? <QualityDetail validationId={validationId} /> : null}
+          {screen === 'data-quality' ? (
+            <QualityDetail
+              validationId={validationId}
+              onOpenCatalog={() => {
+                setValidationsCollapsed(true)
+                onCollapseSidebar()
+              }}
+            />
+          ) : null}
           {screen === 'connections' && selection ? (
             <ConnectionDetail
               sources={sources}
               selection={selection}
-              onAddTable={() => {
-                setSelection(null)
-                setCreating(true)
-              }}
+              onAddTable={(sourceId) => setDialog({ kind: 'table', sourceId })}
               onSaveSource={(next) => {
                 setSources((current) => current.map((item) => (item.id === next.id ? next : item)))
               }}
@@ -210,6 +253,33 @@ export default function Layout1Workspace({ screen }: { screen: WorkspaceId }) {
           ) : null}
         </div>
       </div>
+      {screen === 'connections' && dialog?.kind === 'source' ? (
+        <SourceCreateDialog
+          onClose={() => setDialog(null)}
+          onSave={(draft) => {
+            const next = sourceFromDraft(draft, sources)
+            setSources((current) => [...current, next])
+            setDialog(null)
+            setRevealId(next.id)
+            setSelection({ kind: 'source', id: next.id })
+          }}
+        />
+      ) : null}
+      {screen === 'connections' && dialog?.kind === 'table' && tableSource ? (
+        <TableCreateDialog
+          source={tableSource}
+          onClose={() => setDialog(null)}
+          onSave={(table) => {
+            const sourceId = tableSource.id
+            setSources((current) =>
+              current.map((item) => (item.id === sourceId ? { ...item, tables: [...item.tables, table] } : item)),
+            )
+            setDialog(null)
+            setRevealId(table.id)
+            setSelection({ kind: 'table', id: table.id })
+          }}
+        />
+      ) : null}
     </div>
   )
 }

@@ -160,7 +160,7 @@ export default function ConnectionDetail({
   selection: SourceSelection
   onSaveSource: (source: DataSource) => void
   onSaveTable: (sourceId: string, table: SourceTable) => void
-  onAddTable: () => void
+  onAddTable: (sourceId: string) => void
   onCreateValidation?: () => void
 }) {
   const source =
@@ -181,7 +181,7 @@ export default function ConnectionDetail({
       {table ? (
         <TableHeader table={table} sourceName={source.name} />
       ) : (
-        <SourceHeader source={source} onAddTable={onAddTable} />
+        <SourceHeader source={source} onAddTable={() => onAddTable(source.id)} />
       )}
       <Tabs
         active={tab}

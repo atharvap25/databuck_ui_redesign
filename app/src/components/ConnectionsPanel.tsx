@@ -12,7 +12,15 @@ export type SourceSelection = { kind: 'source'; id: string } | { kind: 'table'; 
 const sourceActions = ['Add Table', 'Copy', 'Edit', 'Deactivate']
 const tableActions = ['Copy', 'Edit', 'Delete']
 
-function RowMenu({ label, items }: { label: string; items: string[] }) {
+function RowMenu({
+  label,
+  items,
+  onSelect,
+}: {
+  label: string
+  items: string[]
+  onSelect?: (item: string) => void
+}) {
   const [open, setOpen] = useState(false)
   const [position, setPosition] = useState({ top: 0, left: 0 })
   const buttonRef = useRef<HTMLButtonElement>(null)
@@ -82,6 +90,7 @@ function RowMenu({ label, items }: { label: string; items: string[] }) {
                   onClick={(event) => {
                     event.stopPropagation()
                     setOpen(false)
+                    onSelect?.(item)
                   }}
                   className={`flex h-9 w-full items-center rounded-md px-3 text-left font-sans text-sm transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
                     item === 'Delete' ? 'text-danger' : 'text-ink'
@@ -109,14 +118,29 @@ export default function ConnectionsPanel({
   sources,
   selection,
   onSelect,
+  onAddTable,
+  revealId,
 }: {
   sources: DataSource[]
   selection: SourceSelection | null
   onSelect: (selection: SourceSelection) => void
+  onAddTable: (sourceId: string) => void
+  revealId?: string | null
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [page, setPage] = useState(1)
   const [expanded, setExpanded] = useState<string[]>([])
+
+  useEffect(() => {
+    if (!revealId) return
+    const index = sources.findIndex(
+      (source) => source.id === revealId || source.tables.some((table) => table.id === revealId),
+    )
+    if (index < 0) return
+    setPage(Math.floor(index / pageSize) + 1)
+    const sourceId = sources[index].id
+    setExpanded((current) => (current.includes(sourceId) ? current : [...current, sourceId]))
+  }, [revealId, sources])
 
   const pageCount = Math.max(1, Math.ceil(sources.length / pageSize))
   const safePage = Math.min(page, pageCount)
@@ -178,6 +202,7 @@ export default function ConnectionsPanel({
               selection={selection}
               onToggle={() => toggleExpanded(source.id)}
               onSelect={onSelect}
+              onAddTable={onAddTable}
             />
           ))}
         </ul>
@@ -241,12 +266,14 @@ function SourceBranch({
   selection,
   onToggle,
   onSelect,
+  onAddTable,
 }: {
   source: DataSource
   expanded: boolean
   selection: SourceSelection | null
   onToggle: () => void
   onSelect: (selection: SourceSelection) => void
+  onAddTable: (sourceId: string) => void
 }) {
   const selected = isSelected(selection, { kind: 'source', id: source.id })
 
@@ -303,7 +330,13 @@ function SourceBranch({
             {source.tables.length}
           </span>
         </span>
-        <RowMenu label={`Actions for ${source.name}`} items={sourceActions} />
+        <RowMenu
+          label={`Actions for ${source.name}`}
+          items={sourceActions}
+          onSelect={(item) => {
+            if (item === 'Add Table') onAddTable(source.id)
+          }}
+        />
       </div>
       {expanded && source.tables.length > 0 ? (
         <ul className="relative pl-8 before:absolute before:top-0 before:bottom-2 before:left-[1.25rem] before:w-px before:bg-line-strong before:content-['']">

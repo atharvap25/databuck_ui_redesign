@@ -17,11 +17,14 @@ export const qualitySummaryId = summaryId
 export default function QualityPanel({
   selectedId,
   onSelect,
+  collapsed,
+  onCollapsedChange,
 }: {
   selectedId: string
   onSelect: (id: string) => void
+  collapsed: boolean
+  onCollapsedChange: (collapsed: boolean) => void
 }) {
-  const [collapsed, setCollapsed] = useState(false)
   const [page, setPage] = useState(1)
 
   const pageCount = Math.max(1, Math.ceil(validationRuns.length / pageSize))
@@ -41,7 +44,7 @@ export default function QualityPanel({
           <button
             type="button"
             aria-label="Expand validations"
-            onClick={() => setCollapsed(false)}
+            onClick={() => onCollapsedChange(false)}
             className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted transition-colors duration-150 ease-databuck hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
           >
             <span className="inline-flex -rotate-90">
@@ -61,7 +64,7 @@ export default function QualityPanel({
             <button
               type="button"
               aria-label="Collapse validations"
-              onClick={() => setCollapsed(true)}
+              onClick={() => onCollapsedChange(true)}
               className="inline-flex size-8 items-center justify-center rounded-md text-muted transition-colors duration-150 ease-databuck hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
             >
               <span className="inline-flex rotate-90">
