@@ -53,7 +53,202 @@ export const pages = [
   },
 ] as const
 
-export type StepId = (typeof steps)[number]['id']
+export const matchingSteps = [
+  { id: 'match-tables', label: 'Choose Tables', hint: 'Source and target' },
+  { id: 'match-configure', label: 'Configuration', hint: 'How to match' },
+  { id: 'match-additional', label: 'Additional', hint: 'Domain and thresholds' },
+  { id: 'match-mapping', label: 'Mapping', hint: 'Column criteria' },
+  { id: 'match-preview', label: 'Preview and Test', hint: 'Review then test' },
+  { id: 'alerts', label: 'Notifications', hint: 'Stay informed' },
+  { id: 'schedule', label: 'Schedule', hint: 'When to run?' },
+] as const
+
+export const matchingPages = [
+  {
+    title: 'Choose Tables',
+    subtitle: 'Set the matching type, then pick a source table and a target table',
+  },
+  {
+    title: 'Matching Configuration',
+    subtitle: 'Name this matching job and set how keys and values are compared',
+  },
+  {
+    title: 'Additional Settings',
+    subtitle: 'Set domain, job size, and thresholds for this matching run',
+  },
+  {
+    title: 'Column Mapping',
+    subtitle: 'Map source columns to target columns and mark keys',
+  },
+  {
+    title: 'Preview and Test',
+    subtitle: 'Review the matching setup, then run a test',
+  },
+  {
+    title: 'Stay Notified',
+    subtitle: 'Choose how you want to hear about results — email, Slack, Jira, or incident assignment',
+  },
+  {
+    title: 'Set Your Schedule',
+    subtitle: 'Choose how often this matching job should run automatically',
+  },
+] as const
+
+export const wizardMatchTypes = [
+  'Aggregate',
+  'Aggregate (multiple segments)',
+  'Migration',
+  'Migration (bulk)',
+  'Cell-to-cell',
+  'Schema',
+] as const
+
+export type WizardMatchType = (typeof wizardMatchTypes)[number]
+
+export const wizardMatchTypeHints: Record<WizardMatchType, string> = {
+  Aggregate: 'Compare totals and group keys.',
+  'Aggregate (multiple segments)': 'Segment-level aggregates.',
+  Migration: 'Row-level source to target.',
+  'Migration (bulk)': 'High-volume migration.',
+  'Cell-to-cell': 'Compare field values cell by cell.',
+  Schema: 'Compare table structure.',
+}
+
+export const stubMatchTypes: WizardMatchType[] = [
+  'Schema',
+  'Aggregate (multiple segments)',
+  'Migration (bulk)',
+]
+
+export function isStubMatchType(type: WizardMatchType | '') {
+  return type !== '' && stubMatchTypes.includes(type)
+}
+
+export const jobSizes = ['Small', 'Medium', 'Large'] as const
+export type JobSize = (typeof jobSizes)[number]
+
+export type MatchSideState = {
+  sourceId: string
+  tableId: string
+  incremental: boolean
+  filter: string
+  sql: string
+}
+
+export type MatchFlagState = {
+  autoMapPrimaryKeys: boolean
+  autoMapMatchValues: boolean
+  removeCaseSensitivity: boolean
+  applyTrim: boolean
+  addressNulls: boolean
+  castNumbers: boolean
+  autoMapAggregateKeys: boolean
+  autoMapAggregateField: boolean
+  matchRecordCount: boolean
+}
+
+export type MatchAdditionalState = {
+  domain: string
+  jobSize: JobSize
+  metricThreshold: string
+  recordCountThreshold: string
+}
+
+export type MatchMappingRow = {
+  id: string
+  sourceColumn: string
+  sourceType: string
+  pk: boolean
+  matchField: boolean
+  targetColumn: string
+  sourceExpression: string
+  targetExpression: string
+  showSourceExpression: boolean
+  showTargetExpression: boolean
+  expressionError: boolean
+}
+
+export function emptyMatchSide(): MatchSideState {
+  return { sourceId: '', tableId: '', incremental: false, filter: '', sql: '' }
+}
+
+export function defaultMatchFlags(): MatchFlagState {
+  return {
+    autoMapPrimaryKeys: true,
+    autoMapMatchValues: true,
+    applyTrim: false,
+    addressNulls: false,
+    castNumbers: false,
+    removeCaseSensitivity: false,
+    autoMapAggregateKeys: true,
+    autoMapAggregateField: true,
+    matchRecordCount: false,
+  }
+}
+
+export function defaultMatchAdditional(): MatchAdditionalState {
+  return {
+    domain: '',
+    jobSize: 'Medium',
+    metricThreshold: '95',
+    recordCountThreshold: '99',
+  }
+}
+
+export function matchingNameFor(sourceTable: string, targetTable: string) {
+  const left = sourceTable.trim() ? sourceTable.trim().replace(/\s+/g, '_') : 'Source'
+  const right = targetTable.trim() ? targetTable.trim().replace(/\s+/g, '_') : 'Target'
+  return `${left}_to_${right}`
+}
+
+export function seedMatchMappings(
+  sourceSchema: SchemaColumn[],
+  targetSchema: SchemaColumn[],
+  flags: MatchFlagState,
+  type: WizardMatchType | '',
+): MatchMappingRow[] {
+  const targetNames = new Set(targetSchema.map((column) => column.name.toLowerCase()))
+  const autoPk = type === 'Aggregate' ? flags.autoMapAggregateKeys : flags.autoMapPrimaryKeys
+  const autoMatch = type === 'Aggregate' ? flags.autoMapAggregateField : flags.autoMapMatchValues
+  const pkColumn = sourceSchema.find((column) => column.name.toLowerCase() === 'id') ?? sourceSchema[0]
+  return sourceSchema.map((column, index) => {
+    const mapped = targetNames.has(column.name.toLowerCase()) ? column.name : ''
+    const pk = Boolean(autoPk && pkColumn && column.name === pkColumn.name)
+    const matchField = Boolean(autoMatch && mapped && !pk)
+    return {
+      id: `${column.name}-${index}`,
+      sourceColumn: column.name,
+      sourceType: column.format,
+      pk,
+      matchField,
+      targetColumn: mapped,
+      sourceExpression: '',
+      targetExpression: '',
+      showSourceExpression: false,
+      showTargetExpression: false,
+      expressionError: false,
+    }
+  })
+}
+
+export function mappingSqlPreview(
+  sourceName: string,
+  sourceTable: string,
+  targetName: string,
+  targetTable: string,
+  rows: MatchMappingRow[],
+) {
+  const mapped = rows.filter((row) => row.targetColumn)
+  const keys = mapped.filter((row) => row.pk).map((row) => `src.${row.sourceColumn} = tgt.${row.targetColumn}`)
+  const matches = mapped.filter((row) => row.matchField).map((row) => `src.${row.sourceColumn} = tgt.${row.targetColumn}`)
+  const select = mapped
+    .map((row) => `  src.${row.sourceColumn} AS source_${row.sourceColumn},\n  tgt.${row.targetColumn} AS target_${row.targetColumn}`)
+    .join(',\n')
+  const on = [...keys, ...matches].join('\n  AND ') || '1 = 1'
+  return `-- Preview only. Not executed.\nSELECT\n${select || '  *'}\nFROM ${sourceName}.${sourceTable || 'source'} src\nJOIN ${targetName}.${targetTable || 'target'} tgt\n  ON ${on};`
+}
+
+export type StepId = (typeof steps)[number]['id'] | (typeof matchingSteps)[number]['id']
 export type ProfileMode = 'historic' | 'metadata' | 'profile' | 'discovery'
 export type TableKind = 'data' | 'derived' | 'reference'
 export type Cyclicality = 'None' | 'Daily' | 'Weekly' | 'Monthly' | 'Day of Week'

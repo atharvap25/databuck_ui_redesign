@@ -1,9 +1,6 @@
-import { useEffect, useState, type ReactNode } from 'react'
+﻿import { useEffect, useState, type ReactNode } from 'react'
 import {
   columnProfiles,
-  correlations,
-  microsegments,
-  previewRows,
   tableMetrics,
   type DataSource,
   type SourceConnection,
@@ -14,6 +11,7 @@ import EmptyState from './EmptyState.tsx'
 import { DatabaseIcon, InboxIcon, TableIcon } from './icons.tsx'
 import IconBox from './IconBox.tsx'
 import StatusBadge from './StatusBadge.tsx'
+import TableProfile from './TableProfile.tsx'
 
 type SourceTab = 'overview' | 'configure'
 type TableTab = 'overview' | 'configure' | 'profile' | 'validations'
@@ -153,14 +151,12 @@ export default function ConnectionDetail({
   selection,
   onSaveSource,
   onSaveTable,
-  onAddTable,
   onCreateValidation,
 }: {
   sources: DataSource[]
   selection: SourceSelection
   onSaveSource: (source: DataSource) => void
   onSaveTable: (sourceId: string, table: SourceTable) => void
-  onAddTable: (sourceId: string) => void
   onCreateValidation?: () => void
 }) {
   const source =
@@ -181,7 +177,7 @@ export default function ConnectionDetail({
       {table ? (
         <TableHeader table={table} sourceName={source.name} />
       ) : (
-        <SourceHeader source={source} onAddTable={() => onAddTable(source.id)} />
+        <SourceHeader source={source} />
       )}
       <Tabs
         active={tab}
@@ -241,49 +237,14 @@ function Metric({ label, value }: { label: string; value: string }) {
 }
 
 function SourceOverview({ source }: { source: DataSource }) {
-  const value = seed(source.id)
-  const onboarded = source.tables.length
-  const approved = source.tables.filter((item) => item.approved).length
-  const latency = source.active ? `${18 + (value % 40)} ms` : '—'
-  const syncs = [
-    { when: 'Today, 06:12', result: source.active ? 'Succeeded' : 'Failed', detail: `${onboarded} tables` },
-    { when: 'Yesterday, 06:11', result: 'Succeeded', detail: 'Schema unchanged' },
-    { when: '20 Sep, 06:08', result: 'Succeeded', detail: `${Math.max(onboarded - 1, 0)} tables` },
-  ]
-
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <Metric label="Onboarded tables" value={String(onboarded)} />
-        <Metric label="Approved" value={`${approved}/${onboarded || 0}`} />
-        <Metric label="Last sync" value={source.active ? '2h ago' : '14d ago'} />
-        <Metric label="Latency" value={latency} />
-      </div>
-      <div className="grid gap-6 xl:grid-cols-5">
-        <div className="xl:col-span-3">
-          <Panel title="Connection details">
-            <DetailGrid rows={sourceRows(source)} />
-          </Panel>
-        </div>
-        <div className="xl:col-span-2">
-          <Panel title="Recent syncs">
-            <ul className="flex flex-col gap-3">
-              {syncs.map((sync) => (
-                <li key={sync.when} className="flex items-start justify-between gap-4">
-                  <span>
-                    <span className="block font-sans text-sm text-ink">{sync.when}</span>
-                    <span className="mt-0.5 block text-xs text-muted">{sync.detail}</span>
-                  </span>
-                  <StatusBadge tone={sync.result === 'Failed' ? 'danger' : 'success'} label={sync.result} />
-                </li>
-              ))}
-            </ul>
-          </Panel>
-        </div>
-      </div>
-      <Panel title="Onboarded tables">
+      <Panel title="Connection details">
+        <DetailGrid rows={sourceRows(source)} />
+      </Panel>
+      <Panel title="Tables">
         {source.tables.length === 0 ? (
-          <p className="text-sm text-muted">No tables onboarded.</p>
+          <p className="text-sm text-muted">No tables in this data source.</p>
         ) : (
           <ul className="divide-y divide-line">
             {source.tables.map((item) => (
@@ -302,7 +263,7 @@ function SourceOverview({ source }: { source: DataSource }) {
   )
 }
 
-function SourceHeader({ source, onAddTable }: { source: DataSource; onAddTable: () => void }) {
+function SourceHeader({ source }: { source: DataSource }) {
   return (
     <div className="flex shrink-0 items-center gap-3 border-b border-line px-6 py-4">
       <IconBox size="lg">
@@ -315,9 +276,6 @@ function SourceHeader({ source, onAddTable }: { source: DataSource; onAddTable: 
           <StatusBadge tone={source.active ? 'success' : 'danger'} label={source.active ? 'Active' : 'Inactive'} />
         </div>
       </div>
-      <button type="button" onClick={onAddTable} className={`${primaryButton} ml-auto shrink-0`}>
-        Add Table
-      </button>
     </div>
   )
 }
@@ -447,7 +405,7 @@ function TableBody({
     )
   }
   if (tab === 'configure') return <TableForm table={table} onSave={onSave} />
-  if (tab === 'profile') return <Profile table={table} />
+  if (tab === 'profile') return <TableProfile table={table} />
   return <TableOverview table={table} />
 }
 
@@ -562,116 +520,5 @@ function TableForm({ table, onSave }: { table: SourceTable; onSave: (table: Sour
         Save
       </button>
     </form>
-  )
-}
-
-function Profile({ table }: { table: SourceTable }) {
-  const columns = columnProfiles(table)
-  const segments = microsegments(table)
-  const pairs = correlations(table)
-  const rows = previewRows(table)
-
-  return (
-    <div className="flex flex-col gap-8">
-      <section>
-        <h3 className="mb-4 font-sans text-sm font-semibold text-ink">Column profile</h3>
-        <div className="db-scroll overflow-x-auto rounded-lg border border-line">
-          <table className="w-full min-w-[720px] border-collapse text-left">
-            <thead className="sticky top-0 bg-canvas">
-              <tr className="border-b border-line">
-                {[
-                  ['Column', 'text-left'],
-                  ['Data type', 'text-left'],
-                  ['Missing count', 'text-right'],
-                  ['Missing %', 'text-right'],
-                  ['Unique %', 'text-right'],
-                  ['Mean', 'text-right'],
-                  ['Std dev', 'text-right'],
-                ].map(([heading, align]) => (
-                  <th
-                    key={heading}
-                    className={`px-4 py-2 font-label text-xs font-medium tracking-[0.08em] text-muted uppercase ${align}`}
-                  >
-                    {heading}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {columns.map((column) => (
-                <tr key={column.name} className="border-b border-line transition-colors duration-150 ease-databuck last:border-0 even:bg-surface hover:bg-container">
-                  <td className="px-4 py-2 font-mono text-sm text-ink">{column.name}</td>
-                  <td className="px-4 py-2 font-mono text-sm text-muted">{column.dataType}</td>
-                  <td className="px-4 py-2 text-right font-mono text-sm text-ink tabular-nums">{column.missingCount.toLocaleString('en-US')}</td>
-                  <td className="px-4 py-2 text-right font-mono text-sm text-ink tabular-nums">{column.missingPct}</td>
-                  <td className="px-4 py-2 text-right font-mono text-sm text-ink tabular-nums">{column.uniquePct}</td>
-                  <td className="px-4 py-2 text-right font-mono text-sm text-ink tabular-nums">{column.mean}</td>
-                  <td className="px-4 py-2 text-right font-mono text-sm text-ink tabular-nums">{column.stdDev}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-
-      <section>
-        <h3 className="mb-4 font-sans text-sm font-semibold text-ink">Microsegments</h3>
-        <ul className="divide-y divide-line rounded-lg border border-line">
-          {segments.map((segment) => (
-            <li key={segment.name} className="flex items-center justify-between gap-4 px-4 py-3">
-              <span className="font-sans text-sm text-ink">{segment.name}</span>
-              <span className="font-mono text-sm text-muted tabular-nums">
-                {segment.rows.toLocaleString('en-US')} · {segment.share}%
-              </span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section>
-        <h3 className="mb-4 font-sans text-sm font-semibold text-ink">Column correlation</h3>
-        <ul className="divide-y divide-line rounded-lg border border-line">
-          {pairs.map((pair) => (
-            <li key={`${pair.left}-${pair.right}`} className="flex items-center justify-between gap-4 px-4 py-3">
-              <span className="font-mono text-sm text-ink">
-                {pair.left} · {pair.right}
-              </span>
-              <span className="font-mono text-sm text-muted tabular-nums">{pair.coefficient}</span>
-            </li>
-          ))}
-        </ul>
-      </section>
-
-      <section>
-        <h3 className="mb-4 font-sans text-sm font-semibold text-ink">Data view</h3>
-        <div className="db-scroll overflow-x-auto rounded-lg border border-line">
-          <table className="w-full min-w-[640px] border-collapse text-left">
-            <thead className="sticky top-0 bg-canvas">
-              <tr className="border-b border-line">
-                {columns.map((column) => (
-                  <th
-                    key={column.name}
-                    className="px-4 py-2 font-label text-xs font-medium tracking-[0.08em] text-muted uppercase"
-                  >
-                    {column.name}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {rows.map((row, index) => (
-                <tr key={index} className="border-b border-line transition-colors duration-150 ease-databuck last:border-0 even:bg-surface hover:bg-container">
-                  {columns.map((column) => (
-                    <td key={column.name} className="px-4 py-2 font-mono text-sm text-ink tabular-nums">
-                      {row[column.name]}
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
   )
 }

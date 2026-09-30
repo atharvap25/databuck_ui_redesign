@@ -1,20 +1,18 @@
 import type { ReactNode } from 'react'
-import { catalogSummary, type CatalogColumn, type CatalogState } from '../../data/ruleCatalog.ts'
-import type { CustomRule } from '../../data/customRules.ts'
-import type { AlertState, ConfigureState, ScheduleState } from './model.ts'
-import { frequencyLabel } from './model.ts'
+import { frequencyLabel, type AlertState, type MatchAdditionalState, type MatchFlagState, type MatchMappingRow, type ScheduleState, type WizardMatchType } from './model.ts'
 import { cardClass, Glyph, primaryButton, secondaryButton } from './ui.tsx'
 
-export default function PreviewStep({
-  sourceName,
-  tableName,
-  configure,
-  domain,
+export default function MatchPreviewStep({
+  matchType,
+  name,
   description,
-  columns,
-  catalog,
-  customRules,
-  selectedCustomIds,
+  sourceName,
+  sourceTable,
+  targetName,
+  targetTable,
+  flags,
+  additional,
+  rows,
   alerts,
   schedule,
   visitedAlerts,
@@ -22,15 +20,16 @@ export default function PreviewStep({
   onJump,
   onRun,
 }: {
-  sourceName: string
-  tableName: string
-  configure: ConfigureState
-  domain: string
+  matchType: WizardMatchType | ''
+  name: string
   description: string
-  columns: CatalogColumn[]
-  catalog: CatalogState
-  customRules: CustomRule[]
-  selectedCustomIds: string[]
+  sourceName: string
+  sourceTable: string
+  targetName: string
+  targetTable: string
+  flags: MatchFlagState
+  additional: MatchAdditionalState
+  rows: MatchMappingRow[]
   alerts: AlertState
   schedule: ScheduleState
   visitedAlerts: boolean
@@ -38,76 +37,74 @@ export default function PreviewStep({
   onJump: (step: number) => void
   onRun: () => void
 }) {
-  const summary = catalogSummary(catalog, columns)
-  const selectedCustom = customRules.filter((rule) => selectedCustomIds.includes(rule.id))
+  const mapped = rows.filter((row) => row.targetColumn).length
+  const pk = rows.filter((row) => row.pk).length
+  const matchFields = rows.filter((row) => row.matchField).length
+  const options =
+    matchType === 'Migration'
+      ? [
+          flags.autoMapPrimaryKeys ? 'Auto map primary keys' : null,
+          flags.autoMapMatchValues ? 'Auto map match values' : null,
+          flags.removeCaseSensitivity ? 'Case insensitive' : null,
+          flags.applyTrim ? 'Trim match fields' : null,
+          flags.addressNulls ? 'Address nulls' : null,
+          flags.castNumbers ? 'Cast numbers' : null,
+        ]
+      : matchType === 'Aggregate'
+        ? [
+            flags.autoMapAggregateKeys ? 'Auto map keys' : null,
+            flags.autoMapAggregateField ? 'Auto map aggregate field' : null,
+            flags.removeCaseSensitivity ? 'Case insensitive' : null,
+            flags.matchRecordCount ? 'Match record count' : null,
+          ]
+        : []
 
   return (
     <div className="flex flex-col gap-4">
       <PreviewCard
-        title="Source and table"
+        title="Type and tables"
+        step={1}
+        onJump={onJump}
+        facts={[
+          ['Type', matchType || '—'],
+          ['Name', name || '—'],
+          ['Join', `${sourceTable || '—'} → ${targetTable || '—'}`],
+          ['Systems', `${sourceName} · ${targetName}`],
+        ]}
+      />
+      <PreviewCard
+        title="Configuration"
         step={2}
         onJump={onJump}
         facts={[
-          ['Source', sourceName],
-          ['Table', tableName || '—'],
           ['Description', description || '—'],
+          ['Options', options.filter(Boolean).join(', ') || 'None'],
         ]}
       />
       <PreviewCard
-        title="Foundation"
+        title="Additional settings"
         step={3}
         onJump={onJump}
         facts={[
-          ['Application', configure.applicationType],
-          ['Domain', domain || '—'],
-          ['Priority', configure.priority],
-          ['Cyclicality', configure.cyclicality],
+          ['Domain', additional.domain || '—'],
+          ['Job size', additional.jobSize],
+          ['Metric threshold', `${additional.metricThreshold}%`],
+          ['Record count', `${additional.recordCountThreshold}%`],
         ]}
       />
       <PreviewCard
-        title="Rule catalog"
+        title="Mapping"
         step={4}
         onJump={onJump}
         facts={[
-          ['Essential', String(summary.essential)],
-          ['Advanced', String(summary.advanced)],
-          ['Applied', String(summary.total)],
+          ['Primary keys', String(pk)],
+          ['Match fields', String(matchFields)],
+          ['Mapped', `${mapped} of ${rows.length}`],
         ]}
-      >
-        {summary.names.length > 0 ? (
-          <div className="mt-4 flex flex-wrap gap-1.5">
-            {summary.names.slice(0, 8).map((name) => (
-              <span key={name} className="rounded-md bg-surface px-2 py-1 font-sans text-xs text-ink">
-                {name}
-              </span>
-            ))}
-            {summary.names.length > 8 ? (
-              <span className="rounded-md bg-surface px-2 py-1 font-sans text-xs text-muted">+{summary.names.length - 8}</span>
-            ) : null}
-          </div>
-        ) : null}
-      </PreviewCard>
-      <PreviewCard
-        title="Custom rules"
-        step={5}
-        onJump={onJump}
-        facts={[['Selected', String(selectedCustom.length)]]}
-      >
-        {selectedCustom.length > 0 ? (
-          <ul className="mt-4 flex flex-col gap-1.5">
-            {selectedCustom.map((rule) => (
-              <li key={rule.id} className="font-mono text-xs text-ink">
-                {rule.name}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p className="mt-3 text-sm text-muted">No custom rules selected.</p>
-        )}
-      </PreviewCard>
+      />
       <PreviewCard
         title="Notifications"
-        step={7}
+        step={6}
         onJump={onJump}
         facts={
           visitedAlerts
@@ -121,14 +118,14 @@ export default function PreviewStep({
       />
       <PreviewCard
         title="Schedule"
-        step={8}
+        step={7}
         onJump={onJump}
         facts={
           visitedSchedule
             ? [
                 ['Frequency', frequencyLabel(schedule.frequency)],
                 ['Start', `${schedule.startDate} ${schedule.startTime}`],
-                ['Validation', schedule.validationName],
+                ['Job', schedule.validationName],
               ]
             : [['Status', 'Not set yet']]
         }
@@ -136,11 +133,11 @@ export default function PreviewStep({
 
       <section className={`${cardClass} flex flex-wrap items-center justify-between gap-4 px-5 py-4`}>
         <div>
-          <h2 className="font-sans text-sm font-semibold text-ink">Run this validation</h2>
-          <p className="mt-1 text-sm text-muted">Profile the table, apply selected rules, and score the first run.</p>
+          <h2 className="font-sans text-sm font-semibold text-ink">Test matching</h2>
+          <p className="mt-1 text-sm text-muted">Compare source and target on the current mappings, then continue to notifications.</p>
         </div>
         <button type="button" onClick={onRun} className={primaryButton}>
-          Run validation
+          Test matching
           <Glyph>
             <path d="M7 4v16l12-8z" />
           </Glyph>
@@ -150,7 +147,7 @@ export default function PreviewStep({
   )
 }
 
-export function PreviewCard({
+function PreviewCard({
   title,
   step,
   onJump,

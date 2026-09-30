@@ -82,9 +82,6 @@ export default function ConfigureStep({
             className={`${fieldClass} font-mono`}
           />
         </Field>
-        <div className="flex items-end pb-1">
-          <SwitchControl checked={configure.reprofiling} label="Enable Reprofiling" onChange={(reprofiling) => patch({ reprofiling })} />
-        </div>
         <Field label="Data Domain" required>
           <select value={domain} onChange={(event) => onDomain(event.target.value)} className={fieldClass}>
             <option value="">Select domain</option>
@@ -117,6 +114,7 @@ export default function ConfigureStep({
             className={`${fieldClass} font-mono`}
           />
         </Field>
+        <div className="hidden sm:block" aria-hidden="true" />
         <div className="sm:col-span-2">
           <Field label="Data Cyclicality">
             <Segmented>
@@ -127,6 +125,16 @@ export default function ConfigureStep({
               ))}
             </Segmented>
           </Field>
+        </div>
+        <div className="sm:col-span-2 border-t border-line pt-4">
+          <SwitchControl
+            checked={configure.reprofiling}
+            label="Enable Reprofiling"
+            onChange={(reprofiling) => patch({ reprofiling })}
+          />
+          <p className="mt-1.5 max-w-xl text-xs leading-5 text-muted">
+            When on, Databuck refreshes the table profile on each run before applying checks.
+          </p>
         </div>
       </div>
     </section>

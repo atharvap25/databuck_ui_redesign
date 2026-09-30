@@ -110,20 +110,27 @@ function qualityHits(query: string, pill: QualityPill | null): SearchHit[] {
   for (const run of validationRuns) {
     const dts = `${run.score.toFixed(1)}%`
     const match = pill
-      ? pill === 'validation' || pill === 'table'
-        ? has(run.tableName, needle)
-        : pill === 'source'
-          ? has(run.sourceType, needle)
-          : pill === 'schema'
-            ? has(run.schema, needle)
-            : has(dts, needle) || has(String(run.score), needle)
-      : has(run.tableName, needle) || has(run.sourceType, needle) || has(run.schema, needle) || has(dts, needle)
+      ? pill === 'validation'
+        ? has(run.validationName, needle) || has(run.validationId, needle)
+        : pill === 'table'
+          ? has(run.tableName, needle)
+          : pill === 'source'
+            ? has(run.sourceType, needle)
+            : pill === 'schema'
+              ? has(run.schema, needle)
+              : has(dts, needle) || has(String(run.score), needle)
+      : has(run.validationName, needle) ||
+        has(run.validationId, needle) ||
+        has(run.tableName, needle) ||
+        has(run.sourceType, needle) ||
+        has(run.schema, needle) ||
+        has(dts, needle)
     if (!match) continue
     hits.push({
       id: `validation:${run.id}`,
       group: 'validations',
       title: run.tableName,
-      detail: `${run.sourceType} · ${run.schema} · ${dts}`,
+      detail: `${run.validationId} · ${run.validationName} · ${dts}`,
     })
     if (hits.length >= resultLimit) break
   }

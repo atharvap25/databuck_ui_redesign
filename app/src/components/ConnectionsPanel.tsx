@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { type DataSource, type SourceTable } from '../data/sources.ts'
-import { ChevronIcon, DatabaseIcon, EllipsisIcon, TableIcon } from './icons.tsx'
+import { type DataSource } from '../data/sources.ts'
+import { ChevronIcon, DatabaseIcon, EllipsisIcon } from './icons.tsx'
 import IconBox from './IconBox.tsx'
 import StatusBadge from './StatusBadge.tsx'
 
@@ -9,8 +9,7 @@ const pageSize = 14
 
 export type SourceSelection = { kind: 'source'; id: string } | { kind: 'table'; id: string }
 
-const sourceActions = ['Add Table', 'Copy', 'Edit', 'Deactivate']
-const tableActions = ['Copy', 'Edit', 'Delete']
+const sourceActions = ['Copy', 'Edit', 'Deactivate']
 
 function RowMenu({
   label,
@@ -112,24 +111,21 @@ function isSelected(selection: SourceSelection | null, next: SourceSelection) {
 }
 
 const rowGrid =
-  'grid cursor-pointer grid-cols-[1.5rem_1.75rem_minmax(0,1fr)_3.25rem_2rem] items-center gap-x-2 rounded-md px-2 py-2 select-none [&_*]:cursor-pointer'
+  'grid cursor-pointer grid-cols-[1.75rem_minmax(0,1fr)_auto_2rem] items-center gap-x-2 rounded-md px-2 py-2 select-none [&_*]:cursor-pointer'
 
 export default function ConnectionsPanel({
   sources,
   selection,
   onSelect,
-  onAddTable,
   revealId,
 }: {
   sources: DataSource[]
   selection: SourceSelection | null
   onSelect: (selection: SourceSelection) => void
-  onAddTable: (sourceId: string) => void
   revealId?: string | null
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [page, setPage] = useState(1)
-  const [expanded, setExpanded] = useState<string[]>([])
 
   useEffect(() => {
     if (!revealId) return
@@ -139,8 +135,6 @@ export default function ConnectionsPanel({
     if (index < 0) return
     setCollapsed(false)
     setPage(Math.floor(index / pageSize) + 1)
-    const sourceId = sources[index].id
-    setExpanded((current) => (current.includes(sourceId) ? current : [...current, sourceId]))
   }, [revealId, sources])
 
   const pageCount = Math.max(1, Math.ceil(sources.length / pageSize))
@@ -148,12 +142,6 @@ export default function ConnectionsPanel({
   const visible = sources.slice((safePage - 1) * pageSize, safePage * pageSize)
   const countLabel = `${sources.length} ${sources.length === 1 ? 'source' : 'sources'}`
   const collapsedLabel = selectionLabel(sources, selection)
-
-  function toggleExpanded(id: string) {
-    setExpanded((current) =>
-      current.includes(id) ? current.filter((item) => item !== id) : [...current, id],
-    )
-  }
 
   return (
     <aside
@@ -179,71 +167,68 @@ export default function ConnectionsPanel({
         </div>
       ) : (
         <div className="flex h-full min-h-0 flex-col">
-      <div className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-3">
-        <h2 className="min-w-0 flex-1 truncate font-sans text-sm font-semibold text-ink">Data Sources</h2>
-        <button
-          type="button"
-          aria-label="Collapse data sources"
-          onClick={() => setCollapsed(true)}
-          className="inline-flex size-8 items-center justify-center rounded-md text-muted transition-colors duration-150 ease-databuck hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
-        >
-          <span className="inline-flex rotate-90">
-            <ChevronIcon size={16} />
-          </span>
-        </button>
-      </div>
-
-      <div className="db-scroll min-h-0 flex-1 overflow-y-auto px-2 py-2">
-        <ul className="flex flex-col">
-          {visible.map((source) => (
-            <SourceBranch
-              key={source.id}
-              source={source}
-              expanded={expanded.includes(source.id)}
-              selection={selection}
-              highlightId={revealId}
-              onToggle={() => toggleExpanded(source.id)}
-              onSelect={onSelect}
-              onAddTable={onAddTable}
-            />
-          ))}
-        </ul>
-      </div>
-
-      <div className="flex h-12 shrink-0 items-center justify-between gap-2 border-t border-line px-3">
-        <p className="font-mono text-xs text-muted">{countLabel}</p>
-        <div className="flex items-center gap-1">
-          <button
-            type="button"
-            onClick={() => setPage((current) => Math.max(1, current - 1))}
-            disabled={safePage === 1}
-            className="inline-flex h-8 items-center rounded-md px-2 font-sans text-sm text-ink transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo disabled:text-outline"
-          >
-            Prev
-          </button>
-          {Array.from({ length: pageCount }, (_, index) => index + 1).map((number) => (
+          <div className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-3">
+            <h2 className="min-w-0 flex-1 truncate font-sans text-sm font-semibold text-ink">Data Sources</h2>
             <button
-              key={number}
               type="button"
-              aria-current={number === safePage ? 'page' : undefined}
-              onClick={() => setPage(number)}
-              className={`inline-flex size-8 items-center justify-center rounded-md font-sans text-sm tabular-nums transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
-                number === safePage ? 'bg-indigo text-white' : 'text-ink hover:bg-surface'
-              }`}
+              aria-label="Collapse data sources"
+              onClick={() => setCollapsed(true)}
+              className="inline-flex size-8 items-center justify-center rounded-md text-muted transition-colors duration-150 ease-databuck hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
             >
-              {number}
+              <span className="inline-flex rotate-90">
+                <ChevronIcon size={16} />
+              </span>
             </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
-            disabled={safePage === pageCount}
-            className="inline-flex h-8 items-center rounded-md px-2 font-sans text-sm text-ink transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo disabled:text-outline"
-          >
-            Next
-          </button>
-        </div>
-      </div>
+          </div>
+
+          <div className="db-scroll min-h-0 flex-1 overflow-y-auto px-2 py-2">
+            <ul className="flex flex-col">
+              {visible.map((source) => (
+                <SourceRow
+                  key={source.id}
+                  source={source}
+                  selection={selection}
+                  highlightId={revealId}
+                  onSelect={onSelect}
+                />
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex h-12 shrink-0 items-center justify-between gap-2 border-t border-line px-3">
+            <p className="font-mono text-xs text-muted">{countLabel}</p>
+            <div className="flex items-center gap-1">
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.max(1, current - 1))}
+                disabled={safePage === 1}
+                className="inline-flex h-8 items-center rounded-md px-2 font-sans text-sm text-ink transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo disabled:text-outline"
+              >
+                Prev
+              </button>
+              {Array.from({ length: pageCount }, (_, index) => index + 1).map((number) => (
+                <button
+                  key={number}
+                  type="button"
+                  aria-current={number === safePage ? 'page' : undefined}
+                  onClick={() => setPage(number)}
+                  className={`inline-flex size-8 items-center justify-center rounded-md font-sans text-sm tabular-nums transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
+                    number === safePage ? 'bg-indigo text-white' : 'text-ink hover:bg-surface'
+                  }`}
+                >
+                  {number}
+                </button>
+              ))}
+              <button
+                type="button"
+                onClick={() => setPage((current) => Math.min(pageCount, current + 1))}
+                disabled={safePage === pageCount}
+                className="inline-flex h-8 items-center rounded-md px-2 font-sans text-sm text-ink transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo disabled:text-outline"
+              >
+                Next
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </aside>
@@ -268,25 +253,19 @@ function rowTone(selected: boolean, highlighted: boolean) {
   return 'hover:bg-surface'
 }
 
-function SourceBranch({
+function SourceRow({
   source,
-  expanded,
   selection,
   highlightId,
-  onToggle,
   onSelect,
-  onAddTable,
 }: {
   source: DataSource
-  expanded: boolean
   selection: SourceSelection | null
   highlightId?: string | null
-  onToggle: () => void
   onSelect: (selection: SourceSelection) => void
-  onAddTable: (sourceId: string) => void
 }) {
   const selected = isSelected(selection, { kind: 'source', id: source.id })
-  const highlighted = highlightId === source.id
+  const highlighted = highlightId === source.id || source.tables.some((table) => table.id === highlightId)
 
   return (
     <li>
@@ -304,21 +283,6 @@ function SourceBranch({
         }}
         className={`${rowGrid} transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${rowTone(selected, highlighted)}`}
       >
-        <button
-          type="button"
-          aria-expanded={expanded}
-          aria-label={`${expanded ? 'Collapse' : 'Expand'} ${source.name}`}
-          onClick={(event) => {
-            event.stopPropagation()
-            onToggle()
-          }}
-          onKeyDown={(event) => event.stopPropagation()}
-          className="inline-flex size-6 items-center justify-center rounded-md text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
-        >
-          <span className={`inline-flex transition-transform duration-150 ease-databuck ${expanded ? '' : '-rotate-90'}`}>
-            <ChevronIcon size={14} />
-          </span>
-        </button>
         <IconBox size="sm">
           <DatabaseIcon size={15} />
         </IconBox>
@@ -329,81 +293,12 @@ function SourceBranch({
             <span className="font-mono"> · {source.schema}</span>
           </span>
         </span>
-        <span className="flex items-center justify-end gap-2">
-          <StatusBadge
-            tone={source.active ? 'success' : 'danger'}
-            label={source.active ? 'Active' : 'Inactive'}
-            hideLabel
-          />
-          <span className="w-4 text-right font-mono text-xs text-muted tabular-nums" aria-label={`${source.tables.length} tables`}>
-            {source.tables.length}
-          </span>
-        </span>
-        <RowMenu
-          label={`Actions for ${source.name}`}
-          items={sourceActions}
-          onSelect={(item) => {
-            if (item === 'Add Table') onAddTable(source.id)
-          }}
+        <StatusBadge
+          tone={source.active ? 'success' : 'danger'}
+          label={source.active ? 'Active' : 'Inactive'}
+          hideLabel
         />
-      </div>
-      {expanded && source.tables.length > 0 ? (
-        <ul className="relative pl-8 before:absolute before:top-0 before:bottom-2 before:left-[1.25rem] before:w-px before:bg-line-strong before:content-['']">
-          {source.tables.map((table) => (
-            <TableRow
-              key={table.id}
-              table={table}
-              selected={isSelected(selection, { kind: 'table', id: table.id })}
-              highlighted={highlightId === table.id}
-              onSelect={() => onSelect({ kind: 'table', id: table.id })}
-            />
-          ))}
-        </ul>
-      ) : null}
-    </li>
-  )
-}
-
-function TableRow({
-  table,
-  selected,
-  highlighted,
-  onSelect,
-}: {
-  table: SourceTable
-  selected: boolean
-  highlighted: boolean
-  onSelect: () => void
-}) {
-  return (
-    <li>
-      <div
-        role="button"
-        tabIndex={0}
-        aria-current={selected ? 'true' : undefined}
-        onClick={onSelect}
-        onKeyDown={(event) => {
-          if (event.target !== event.currentTarget) return
-          if (event.key === 'Enter' || event.key === ' ') {
-            event.preventDefault()
-            onSelect()
-          }
-        }}
-        className={`${rowGrid} transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${rowTone(selected, highlighted)}`}
-      >
-        <span aria-hidden="true" />
-        <IconBox size="sm">
-          <TableIcon size={15} />
-        </IconBox>
-        <span className="min-w-0">
-          <span className="block truncate font-sans text-sm font-medium text-ink">{table.nickname}</span>
-          <span className="mt-0.5 block truncate text-xs text-muted">
-            <span className="font-mono">{table.name}</span>
-            <span> · {table.columns} columns</span>
-          </span>
-        </span>
-        <span aria-hidden="true" />
-        <RowMenu label={`Actions for ${table.nickname}`} items={tableActions} />
+        <RowMenu label={`Actions for ${source.name}`} items={sourceActions} />
       </div>
     </li>
   )

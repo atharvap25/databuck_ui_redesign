@@ -192,6 +192,8 @@ export const dataSources: DataSource[] = [
     tables: [
       table('analytics-shipments', 'Shipments', 'shipments', 21, true),
       table('analytics-returns', 'Returns', 'returns', 16, true),
+      table('analytics-customer-dim', 'Customer Dim', 'customer_dim', 28, true),
+      table('analytics-order-facts', 'Order Facts', 'order_facts', 34, true),
     ],
   },
   {
@@ -210,6 +212,7 @@ export const dataSources: DataSource[] = [
     tables: [
       table('finance-invoices', 'AR Invoices', 'ar_invoices', 29, true),
       table('finance-payments', 'AR Payments', 'ar_payments', 16, false),
+      table('finance-gl-entries', 'GL Entries', 'gl_entries', 22, true),
     ],
   },
   {
@@ -505,6 +508,15 @@ export function correlations(table: SourceTable) {
       coefficient: (0.35 + (seed % 55) / 100).toFixed(2),
     }
   })
+}
+
+export function tableForNickname(nickname: string): SourceTable {
+  for (const source of dataSources) {
+    const match = source.tables.find((item) => item.nickname === nickname)
+    if (match) return match
+  }
+  const slug = nickname.trim().toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '') || 'table'
+  return table(`profile-${slug}`, nickname, slug.replace(/-/g, '_'), 12, true)
 }
 
 export function previewRows(table: SourceTable) {

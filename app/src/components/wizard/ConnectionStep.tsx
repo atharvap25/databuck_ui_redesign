@@ -26,6 +26,7 @@ export default function ConnectionStep({
   onTogglePassword,
   tagDraft,
   onTagDraft,
+  sources = dataSources,
 }: {
   mode: 'existing' | 'new'
   onMode: (mode: 'existing' | 'new') => void
@@ -37,12 +38,13 @@ export default function ConnectionStep({
   onTogglePassword: () => void
   tagDraft: string
   onTagDraft: (value: string) => void
+  sources?: DataSource[]
 }) {
-  const selected = dataSources.find((source) => source.id === sourceId) ?? null
+  const selected = sources.find((source) => source.id === sourceId) ?? null
   return (
     <div className="flex flex-col gap-4">
       <Segmented>
-        <Segment pressed={mode === 'existing'} onClick={() => onMode('existing')} count={dataSources.length} icon={<DatabaseGlyph />}>
+        <Segment pressed={mode === 'existing'} onClick={() => onMode('existing')} count={sources.length} icon={<DatabaseGlyph />}>
           Select Existing
         </Segment>
         <Segment pressed={mode === 'new'} onClick={() => onMode('new')} icon={<PlusGlyph />}>
@@ -60,7 +62,7 @@ export default function ConnectionStep({
               Available Data Sources
             </h2>
             <ul className="db-scroll mt-3 flex max-h-[28rem] flex-col gap-2 overflow-auto rounded-lg bg-surface p-2">
-              {dataSources.map((source) => {
+              {sources.map((source) => {
                 const on = source.id === sourceId
                 return (
                   <li key={source.id}>

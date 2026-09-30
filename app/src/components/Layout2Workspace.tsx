@@ -1225,7 +1225,6 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
           <ConnectionDetail
             sources={sources}
             selection={selection}
-            onAddTable={() => setCreating(true)}
             onCreateValidation={selection.kind === 'table' ? () => setCreating(true) : undefined}
             onSaveSource={(next) => {
               setSources((current) => current.map((item) => (item.id === next.id ? next : item)))

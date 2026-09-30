@@ -8,8 +8,10 @@ import {
   type WorkspacePair,
 } from '../data/workspaces.ts'
 import DomainProjectDialog from './DomainProjectDialog.tsx'
+import Mark from './Mark.tsx'
 import UnderDevelopmentDialog from './UnderDevelopmentDialog.tsx'
 import {
+  BackIcon,
   BellIcon,
   CheckIcon,
   ChevronIcon,
@@ -27,10 +29,14 @@ export default function Header({
   onLogout,
   agentOpen,
   onToggleAgent,
+  agentWorkspace = false,
+  onLeaveAgent,
 }: {
   onLogout: () => void
   agentOpen: boolean
   onToggleAgent: () => void
+  agentWorkspace?: boolean
+  onLeaveAgent?: () => void
 }) {
   const catalog = useMemo(() => cloneCatalog(), [])
   const [domains, setDomains] = useState(catalog.domains)
@@ -78,6 +84,17 @@ export default function Header({
   return (
     <header className="relative z-20 flex h-16 shrink-0 items-center gap-4 border-b border-line bg-canvas px-4">
       <div className="flex h-full min-w-0 flex-1 items-center gap-4">
+        {agentWorkspace ? (
+          <>
+            <div className="flex min-w-0 items-center gap-3">
+              <Mark />
+              <span className="hidden font-sans text-lg font-bold tracking-[-0.04em] whitespace-nowrap text-ink sm:block">
+                Databuck
+              </span>
+            </div>
+            <span className={dividerClass} aria-hidden="true" />
+          </>
+        ) : null}
         <div className="relative shrink-0" ref={menuRef}>
           <button
             type="button"
@@ -160,6 +177,16 @@ export default function Header({
             <SunIcon />
           </button>
           <span className={`mx-1 ${dividerClass}`} aria-hidden="true" />
+          {agentWorkspace ? (
+            <button
+              type="button"
+              onClick={onLeaveAgent}
+              className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md border border-line-strong bg-canvas px-3 font-sans text-sm font-medium text-ink transition-colors duration-150 ease-databuck hover:border-ink hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
+            >
+              <BackIcon />
+              Back to workspace
+            </button>
+          ) : (
           <button
             type="button"
             aria-pressed={agentOpen}
@@ -169,6 +196,7 @@ export default function Header({
             <SparkIcon />
             Data Trust Agent
           </button>
+          )}
           <button
             type="button"
             className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md px-2 transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"

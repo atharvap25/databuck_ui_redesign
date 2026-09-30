@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useJobQueue } from '../jobs/jobStore.ts'
 import AgentPanel from './AgentPanel.tsx'
+import AgentWorkspace from './AgentWorkspace.tsx'
 import EmptyState from './EmptyState.tsx'
 import Header from './Header.tsx'
 import { ClockIcon } from './icons.tsx'
@@ -65,6 +66,7 @@ export default function AppShell({
   const holdTimer = useRef<number | null>(null)
   const [open, setOpen] = useState(false)
   const [agentOpen, setAgentOpen] = useState(false)
+  const [agentWorkspace, setAgentWorkspace] = useState(false)
   const [activeId, setActiveId] = useState('executive-dashboard')
   const { jobs, wave, enqueue, isRunning } = useJobQueue()
 
@@ -89,10 +91,20 @@ export default function AppShell({
   }
 
   function toggleAgent() {
+    if (agentWorkspace) return
     setAgentOpen((current) => {
       if (!current) collapseSidebar()
       return !current
     })
+  }
+
+  function openAgentWorkspace() {
+    setAgentOpen(false)
+    setAgentWorkspace(true)
+  }
+
+  function closeAgentWorkspace() {
+    setAgentWorkspace(false)
   }
 
   useEffect(() => {
@@ -123,6 +135,19 @@ export default function AppShell({
 
   return (
     <div className="flex h-svh overflow-hidden bg-surface">
+      {agentWorkspace ? (
+        <div className="flex min-w-0 flex-1 flex-col">
+          <Header
+            onLogout={onLogout}
+            agentOpen={false}
+            agentWorkspace
+            onToggleAgent={toggleAgent}
+            onLeaveAgent={closeAgentWorkspace}
+          />
+          <AgentWorkspace />
+        </div>
+      ) : (
+        <>
       {narrow && open ? (
         <button
           type="button"
@@ -170,10 +195,14 @@ export default function AppShell({
               </div>
             )}
           </div>
-          {agentOpen ? <AgentPanel onClose={() => setAgentOpen(false)} /> : null}
+          {agentOpen ? (
+            <AgentPanel onClose={() => setAgentOpen(false)} onOpenWorkspace={openAgentWorkspace} />
+          ) : null}
         </div>
       </div>
       <JobDeck jobs={jobs} wave={wave} agentOpen={agentOpen} />
+        </>
+      )}
     </div>
   )
 }

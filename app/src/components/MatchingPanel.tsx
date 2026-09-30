@@ -1,59 +1,55 @@
 import { useEffect, useMemo, useState } from 'react'
-import { scoreTone, validationRuns, type TableKind, type ValidationRun } from '../data/validations.ts'
-import { ChevronIcon, TableIcon } from './icons.tsx'
+import {
+  jobMatchesQuery,
+  matchingJobs,
+  matchingSummaryId,
+  matchingTitle,
+  matchTypes,
+  type MatchEndpoint,
+  type MatchingJob,
+  type MatchType,
+} from '../data/matchings.ts'
+import { matchViz } from './matching/viz.ts'
+import { ChevronIcon, SwapIcon } from './icons.tsx'
 import IconBox from './IconBox.tsx'
 
 const pageSize = 12
-const summaryId = 'summary'
+const summaryId = matchingSummaryId
 
-const toneText = {
-  success: 'text-success-ink',
-  warning: 'text-warning-ink',
-  danger: 'text-danger',
-}
+export { matchingSummaryId }
 
-const tableKinds: { id: TableKind; label: string }[] = [
-  { id: 'direct', label: 'Direct table' },
-  { id: 'derived', label: 'Derived table' },
-  { id: 'reference', label: 'Reference data' },
-]
-
-export const qualitySummaryId = summaryId
-
-export default function QualityPanel({
+export default function MatchingPanel({
   selectedId,
   onSelect,
   collapsed,
   onCollapsedChange,
-  highlightId = null,
+  query = '',
 }: {
   selectedId: string
   onSelect: (id: string) => void
   collapsed: boolean
   onCollapsedChange: (collapsed: boolean) => void
-  highlightId?: string | null
+  query?: string
 }) {
   const [page, setPage] = useState(1)
-  const [kind, setKind] = useState<TableKind>('direct')
-  const filtered = useMemo(() => validationRuns.filter((run) => run.tableKind === kind), [kind])
+  const [typeFilter, setTypeFilter] = useState<'All' | MatchType>('All')
+
+  const filtered = useMemo(() => {
+    return matchingJobs.filter((job) => {
+      if (typeFilter !== 'All' && job.type !== typeFilter) return false
+      return jobMatchesQuery(job, query)
+    })
+  }, [query, typeFilter])
 
   useEffect(() => {
     setPage(1)
-  }, [kind])
-
-  useEffect(() => {
-    if (!highlightId) return
-    const index = filtered.findIndex((run) => run.id === highlightId)
-    if (index < 0) return
-    setPage(Math.floor(index / pageSize) + 1)
-  }, [highlightId, filtered])
+  }, [query, typeFilter])
 
   const pageCount = Math.max(1, Math.ceil(filtered.length / pageSize))
   const safePage = Math.min(page, pageCount)
   const visible = filtered.slice((safePage - 1) * pageSize, safePage * pageSize)
-  const selected = validationRuns.find((run) => run.id === selectedId)
-  const collapsedLabel = selected ? selected.tableName : 'Summary'
-  const countLabel = `${filtered.length} ${filtered.length === 1 ? 'validation' : 'validations'}`
+  const selected = matchingJobs.find((job) => job.id === selectedId)
+  const collapsedLabel = selected ? matchingTitle(selected) : 'Summary'
 
   return (
     <aside
@@ -65,7 +61,7 @@ export default function QualityPanel({
         <div className="flex h-14 items-center gap-3 px-3 lg:h-full lg:flex-col lg:items-center lg:px-0 lg:py-3">
           <button
             type="button"
-            aria-label="Expand validations"
+            aria-label="Expand matchings"
             onClick={() => onCollapsedChange(false)}
             className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted transition-colors duration-150 ease-databuck hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
           >
@@ -80,14 +76,30 @@ export default function QualityPanel({
       ) : (
         <div className="flex h-full min-h-0 flex-col">
           <div className="flex h-12 shrink-0 items-center gap-2 border-b border-line px-3">
-            <div className="min-w-0 flex-1">
-              <h2 className="truncate font-sans text-sm font-semibold text-ink">Validations</h2>
+            <div className="min-w-0 shrink-0">
+              <h2 className="truncate font-sans text-sm font-semibold text-ink">Matchings</h2>
             </div>
+            <label className="sr-only" htmlFor="matching-type-filter">
+              Match type
+            </label>
+            <select
+              id="matching-type-filter"
+              value={typeFilter}
+              onChange={(event) => setTypeFilter(event.target.value as 'All' | MatchType)}
+              className="h-8 min-w-0 flex-1 rounded-md border border-line bg-canvas px-2 font-sans text-xs text-ink transition-colors duration-150 ease-databuck hover:border-line-strong focus:outline-none focus-visible:border-indigo focus-visible:ring-2 focus-visible:ring-indigo"
+            >
+              <option value="All">All</option>
+              {matchTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
+              ))}
+            </select>
             <button
               type="button"
-              aria-label="Collapse validations"
+              aria-label="Collapse matchings"
               onClick={() => onCollapsedChange(true)}
-              className="inline-flex size-8 items-center justify-center rounded-md text-muted transition-colors duration-150 ease-databuck hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
+              className="inline-flex size-8 shrink-0 items-center justify-center rounded-md text-muted transition-colors duration-150 ease-databuck hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
             >
               <span className="inline-flex rotate-90">
                 <ChevronIcon size={16} />
@@ -95,48 +107,23 @@ export default function QualityPanel({
             </button>
           </div>
 
-          <div className="flex shrink-0 flex-wrap gap-1.5 border-b border-line px-3 py-2" role="group" aria-label="Table kind">
-            {tableKinds.map((item) => {
-              const pressed = kind === item.id
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  aria-pressed={pressed}
-                  onClick={() => setKind(item.id)}
-                  className={`h-8 shrink-0 whitespace-nowrap rounded-full border px-2.5 font-label text-[0.6875rem] font-medium tracking-[0.04em] transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
-                    pressed ? 'border-indigo bg-secondary-fixed text-indigo' : 'border-line text-muted hover:border-line-strong hover:text-ink'
-                  }`}
-                >
-                  {item.label}
-                </button>
-              )
-            })}
-          </div>
-
           <div className="db-scroll min-h-0 flex-1 overflow-y-auto px-2 py-2">
             <SummaryRow selected={selectedId === summaryId} onSelect={() => onSelect(summaryId)} />
             <div className="my-2 border-t border-line" role="presentation" />
-            {visible.length === 0 ? (
-              <p className="px-2 py-6 text-center text-sm text-muted">No validations for this table kind.</p>
-            ) : (
-              <ul className="flex flex-col gap-1">
-                {visible.map((run) => (
-                  <li key={run.id}>
-                    <ValidationRow
-                      run={run}
-                      selected={selectedId === run.id}
-                      highlighted={highlightId === run.id}
-                      onSelect={() => onSelect(run.id)}
-                    />
-                  </li>
-                ))}
-              </ul>
-            )}
+            <ul className="flex flex-col gap-2">
+              {visible.map((job) => (
+                <li key={job.id}>
+                  <MatchingRow job={job} selected={selectedId === job.id} onSelect={() => onSelect(job.id)} />
+                </li>
+              ))}
+            </ul>
+            {filtered.length === 0 ? (
+              <p className="px-2 py-6 text-center text-sm text-muted">No matchings match this filter.</p>
+            ) : null}
           </div>
 
           <div className="flex h-12 shrink-0 items-center justify-between gap-2 border-t border-line px-3">
-            <p className="font-mono text-xs text-muted tabular-nums">{countLabel}</p>
+            <p className="font-mono text-xs text-muted tabular-nums">{filtered.length} matchings</p>
             <div className="flex items-center gap-1">
               <button
                 type="button"
@@ -181,8 +168,8 @@ function SummaryRow({ selected, onSelect }: { selected: boolean; onSelect: () =>
       type="button"
       aria-current={selected ? 'true' : undefined}
       onClick={onSelect}
-      className={`flex w-full cursor-pointer items-center gap-3 rounded-md px-2 py-2 text-left transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
-        selected ? 'bg-secondary-fixed' : 'hover:bg-surface'
+      className={`flex w-full cursor-pointer items-center gap-3 rounded-lg border px-2.5 py-2.5 text-left transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
+        selected ? 'border-indigo bg-secondary-fixed' : 'border-transparent hover:bg-surface'
       }`}
     >
       <IconBox size="sm">
@@ -201,49 +188,68 @@ function SummaryRow({ selected, onSelect }: { selected: boolean; onSelect: () =>
   )
 }
 
-function ValidationRow({
-  run,
+function MatchingRow({
+  job,
   selected,
-  highlighted,
   onSelect,
 }: {
-  run: ValidationRun
+  job: MatchingJob
   selected: boolean
-  highlighted: boolean
   onSelect: () => void
 }) {
-  const tone = scoreTone(run)
+  const later = job.type === 'Aggregate (multiple segments)'
+
   return (
     <button
       type="button"
       aria-current={selected ? 'true' : undefined}
       onClick={onSelect}
-      className={`flex w-full cursor-pointer flex-col gap-2 rounded-md px-2 py-2 text-left transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
-        highlighted ? 'bg-info-tint' : selected ? 'bg-secondary-fixed' : 'hover:bg-surface'
+      className={`flex w-full cursor-pointer flex-col gap-2 rounded-lg border px-2.5 py-2.5 text-left transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
+        selected ? 'border-indigo bg-secondary-fixed' : 'border-transparent hover:bg-surface'
       }`}
     >
-      <span className="flex items-start gap-3">
-        <IconBox size="sm" className="mt-0.5">
-          <TableIcon size={15} />
-        </IconBox>
-        <span className="min-w-0 flex-1">
-          <span className="flex items-start justify-between gap-3">
-            <span className="truncate font-sans text-sm font-medium text-ink">{run.tableName}</span>
-            <span className={`font-mono text-sm tabular-nums ${toneText[tone]}`}>{run.score.toFixed(1)}%</span>
-          </span>
-          <span className="mt-0.5 block truncate font-mono text-xs text-muted">{run.validationId}</span>
-          <span className="mt-0.5 block truncate text-xs text-muted">{run.validationName}</span>
-          <span className="mt-0.5 block truncate text-xs text-muted">
-            {run.sourceType}
-            <span className="font-mono"> · {run.schema}</span>
+      <span className="flex items-start justify-between gap-2">
+        <span className="min-w-0 truncate font-sans text-sm font-semibold tracking-[-0.02em] text-ink">{matchingTitle(job)}</span>
+        <span className="flex shrink-0 items-center gap-1">
+          {later ? (
+            <span className="rounded-md bg-surface px-1.5 py-0.5 font-label text-[10px] tracking-[0.08em] text-muted uppercase">
+              Later
+            </span>
+          ) : null}
+          <span className="rounded-md bg-surface px-1.5 py-0.5 font-label text-[10px] font-medium tracking-[0.08em] text-muted uppercase">
+            {later ? 'Multi-segment' : job.type}
           </span>
         </span>
       </span>
-      {run.failedChecks > 0 ? (
-        <span className="ml-10 w-fit rounded-md bg-danger-tint px-2 py-1 font-label text-xs font-medium tracking-[0.06em] text-danger uppercase">
-          {run.failedChecks} {run.failedChecks === 1 ? 'check' : 'checks'} failed
+      <span className="grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-stretch gap-1.5">
+        <EndpointTile role="Source" endpoint={job.source} side="source" />
+        <span className="flex flex-col items-center justify-center px-0.5 text-muted" aria-hidden="true">
+          <span className="w-px flex-1 bg-line" />
+          <SwapIcon size={12} />
+          <span className="w-px flex-1 bg-line" />
         </span>
-      ) : null}
+        <EndpointTile role="Target" endpoint={job.target} side="target" />
+      </span>
     </button>
+  )
+}
+
+function EndpointTile({
+  role,
+  endpoint,
+  side,
+}: {
+  role: 'Source' | 'Target'
+  endpoint: MatchEndpoint
+  side: 'source' | 'target'
+}) {
+  const accent = side === 'source' ? matchViz.sourceDot : matchViz.targetDot
+
+  return (
+    <span className="min-w-0 rounded-md border border-line bg-canvas py-2 pr-2 pl-2.5" style={{ borderLeftWidth: 3, borderLeftColor: accent }}>
+      <span className="block font-label text-[10px] font-medium tracking-[0.08em] text-muted uppercase">{role}</span>
+      <span className="mt-1 block truncate font-sans text-sm font-medium text-ink">{endpoint.tableName}</span>
+      <span className="mt-0.5 block truncate text-xs text-muted">{endpoint.sourceName}</span>
+    </span>
   )
 }

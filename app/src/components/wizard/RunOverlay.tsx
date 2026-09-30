@@ -3,21 +3,30 @@ import { Glyph } from './ui.tsx'
 
 type Phase = 'profiling' | 'rules' | 'scoring' | 'done'
 
-const stages: { id: Phase; label: string }[] = [
+const qualityStages: { id: Phase; label: string }[] = [
   { id: 'profiling', label: 'Profiling columns' },
   { id: 'rules', label: 'Applying selected rules' },
   { id: 'scoring', label: 'Scoring the first run' },
+]
+
+const matchingStages: { id: Phase; label: string }[] = [
+  { id: 'profiling', label: 'Comparing keys' },
+  { id: 'rules', label: 'Applying mappings' },
+  { id: 'scoring', label: 'Scoring the match' },
 ]
 
 export default function RunOverlay({
   tableName,
   ruleCount,
   onFinished,
+  kind = 'validation',
 }: {
   tableName: string
   ruleCount: number
   onFinished: () => void
+  kind?: 'validation' | 'matching'
 }) {
+  const stages = kind === 'matching' ? matchingStages : qualityStages
   const [phase, setPhase] = useState<Phase>('profiling')
 
   useEffect(() => {
@@ -44,15 +53,21 @@ export default function RunOverlay({
                 <path d="m7 12.5 3 3L17 9" />
               </Glyph>
             </span>
-            <h2 className="mt-4 font-sans text-lg font-semibold tracking-[-0.02em]">Validation created</h2>
+            <h2 className="mt-4 font-sans text-lg font-semibold tracking-[-0.02em]">
+              {kind === 'matching' ? 'Matching created' : 'Validation created'}
+            </h2>
             <p className="mt-1 text-sm leading-6 text-white/70">{tableName} is ready. Opening notifications next.</p>
           </div>
         ) : (
           <div>
             <p className="font-label text-[11px] tracking-[0.16em] text-white/50 uppercase">Running</p>
-            <h2 className="mt-2 font-sans text-lg font-semibold tracking-[-0.02em]">{tableName || 'Validation'}</h2>
+            <h2 className="mt-2 font-sans text-lg font-semibold tracking-[-0.02em]">{tableName || (kind === 'matching' ? 'Matching' : 'Validation')}</h2>
             <p className="mt-1 text-sm text-white/70">
-              {phase === 'rules' ? `Applying ${ruleCount} checks` : stages[currentIndex]?.label}
+              {phase === 'rules'
+                ? kind === 'matching'
+                  ? `Applying ${ruleCount} mappings`
+                  : `Applying ${ruleCount} checks`
+                : stages[currentIndex]?.label}
             </p>
             <ol className="mt-6 flex flex-col gap-3">
               {stages.map((stage, index) => {

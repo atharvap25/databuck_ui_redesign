@@ -103,6 +103,33 @@ export function Segment({
   )
 }
 
+export function CheckControl({
+  checked,
+  label,
+  hint,
+  onChange,
+}: {
+  checked: boolean
+  label: string
+  hint?: string
+  onChange: (checked: boolean) => void
+}) {
+  return (
+    <label className="flex cursor-pointer items-start gap-3 rounded-md px-2 py-2 transition-colors duration-150 ease-databuck hover:bg-surface">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+        className="mt-0.5 size-4 shrink-0 rounded-[2px] border-line text-indigo accent-indigo focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
+      />
+      <span className="min-w-0">
+        <span className="block font-sans text-sm font-medium leading-5 text-ink">{label}</span>
+        {hint ? <span className="mt-0.5 block text-xs leading-5 text-muted">{hint}</span> : null}
+      </span>
+    </label>
+  )
+}
+
 export function SwitchControl({
   checked,
   label,
@@ -334,8 +361,28 @@ export function SendGlyph({ size = 16 }: { size?: number }) {
 
 export function StepGlyph({ id, size = 16 }: { id: StepId; size?: number }) {
   if (id === 'connect') return <DatabaseGlyph size={size} />
-  if (id === 'table') return <TableGlyph size={size} />
-  if (id === 'configure') {
+  if (id === 'table' || id === 'match-tables') return <TableGlyph size={size} />
+  if (id === 'match-additional') {
+    return (
+      <Glyph size={size}>
+        <path d="M4 8h10" />
+        <path d="M18 8h2" />
+        <circle cx="16" cy="8" r="2" />
+        <path d="M4 16h2" />
+        <path d="M10 16h10" />
+        <circle cx="8" cy="16" r="2" />
+      </Glyph>
+    )
+  }
+  if (id === 'match-mapping') {
+    return (
+      <Glyph size={size}>
+        <rect x="4" y="5" width="16" height="14" rx="1.5" />
+        <path d="M4 10h16M10 5v14" />
+      </Glyph>
+    )
+  }
+  if (id === 'configure' || id === 'match-configure') {
     return (
       <Glyph size={size}>
         <circle cx="12" cy="12" r="3" />
@@ -360,7 +407,7 @@ export function StepGlyph({ id, size = 16 }: { id: StepId; size?: number }) {
       </Glyph>
     )
   }
-  if (id === 'preview') {
+  if (id === 'preview' || id === 'match-preview') {
     return (
       <Glyph size={size}>
         <path d="M9 3h6" />

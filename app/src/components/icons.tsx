@@ -209,6 +209,15 @@ export function PlusIcon({ size = 16 }: { size?: number }) {
   )
 }
 
+export function SendIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <path d="M5 12h12" />
+      <path d="m13 6 6 6-6 6" />
+    </Glyph>
+  )
+}
+
 export function ClockIcon({ size = 20 }: { size?: number }) {
   return (
     <Glyph size={size}>
@@ -265,6 +274,28 @@ export function InboxIcon({ size = 20 }: { size?: number }) {
       <path d="M4 12.5 6.6 5h10.8l2.6 7.5" />
       <path d="M4 12.5V18a1.5 1.5 0 0 0 1.5 1.5h13A1.5 1.5 0 0 0 20 18v-5.5" />
       <path d="M4 12.5h5.2c.3 1.4 1.4 2.3 2.8 2.3s2.5-.9 2.8-2.3H20" />
+    </Glyph>
+  )
+}
+
+export function ExpandIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <path d="M9 5H5v4" />
+      <path d="M5 5l6 6" />
+      <path d="M15 19h4v-4" />
+      <path d="M19 19l-6-6" />
+    </Glyph>
+  )
+}
+
+export function SwapIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <path d="M7 7h10" />
+      <path d="m14 4 3 3-3 3" />
+      <path d="M17 17H7" />
+      <path d="m10 20-3-3 3-3" />
     </Glyph>
   )
 }
