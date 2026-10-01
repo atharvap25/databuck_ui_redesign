@@ -253,7 +253,6 @@ export default function ValidationWizard({
     setSchedule((current) => ({
       ...current,
       validationName: nextName,
-      triggerType: 'Matching',
     }))
     setMappingSeedKey('')
   }
@@ -266,7 +265,6 @@ export default function ValidationWizard({
       setMatchMode('existing')
       setMatchLeft((current) => ({ ...emptyMatchSide(), sourceId: sourceId ?? current.sourceId }))
       setMatchRight(emptyMatchSide())
-      setSchedule((current) => ({ ...current, triggerType: 'Matching' }))
       return
     }
     if (pathChoice === 'quality') {

@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { useJobQueue } from '../jobs/jobStore.ts'
+import { useJobs } from '../jobs/jobStore.ts'
 import AgentPanel from './AgentPanel.tsx'
 import AgentWorkspace from './AgentWorkspace.tsx'
 import EmptyState from './EmptyState.tsx'
 import Header from './Header.tsx'
 import { ClockIcon } from './icons.tsx'
 import JobDeck from './JobDeck.tsx'
+import JobsWorkspace from './jobs/JobsWorkspace.tsx'
 import Layout1Workspace, { type WorkspaceId } from './Layout1Workspace.tsx'
 import Layout2Workspace, { type Layout2Screen } from './Layout2Workspace.tsx'
 import Sidebar from './Sidebar.tsx'
@@ -20,7 +21,6 @@ const layoutTitle: Record<LayoutId, string> = {
 const underDevelopment = new Set([
   'executive-dashboard',
   'observability',
-  'jobs',
   'administration',
 ])
 
@@ -68,7 +68,7 @@ export default function AppShell({
   const [agentOpen, setAgentOpen] = useState(false)
   const [agentWorkspace, setAgentWorkspace] = useState(false)
   const [activeId, setActiveId] = useState('executive-dashboard')
-  const { jobs, wave, enqueue, isRunning } = useJobQueue()
+  const { liveJobs, wave, enqueue, isRunning } = useJobs()
 
   const expanded = narrow ? open : !held && (pinned || hovered)
 
@@ -176,7 +176,9 @@ export default function AppShell({
         <Header onLogout={onLogout} agentOpen={agentOpen} onToggleAgent={toggleAgent} />
         <div className="relative flex min-h-0 flex-1">
           <div className="flex min-w-0 flex-1 flex-col">
-            {layout === 'layout-1' && isWorkspace(activeId) ? (
+            {activeId === 'jobs' ? (
+              <JobsWorkspace />
+            ) : layout === 'layout-1' && isWorkspace(activeId) ? (
               <Layout1Workspace
                 screen={activeId}
                 onCollapseSidebar={collapseSidebar}
@@ -200,7 +202,7 @@ export default function AppShell({
           ) : null}
         </div>
       </div>
-      <JobDeck jobs={jobs} wave={wave} agentOpen={agentOpen} />
+      <JobDeck jobs={liveJobs} wave={wave} agentOpen={agentOpen} onOpenJobs={() => setActiveId('jobs')} />
         </>
       )}
     </div>

@@ -4,6 +4,7 @@ import {
   matchingTitle,
   matchRateTone,
 } from '../data/matchings.ts'
+import type { JobKind } from '../data/jobs.ts'
 import MatchDashboard from './matching/MatchDashboard.tsx'
 import EmptyState from './EmptyState.tsx'
 import { ClockIcon } from './icons.tsx'
@@ -26,7 +27,15 @@ const toneStroke: Record<Tone, string> = {
 const secondaryButton =
   'inline-flex h-10 items-center gap-2 rounded-md border border-line-strong bg-canvas px-3 font-sans text-sm font-medium text-ink transition-colors duration-150 ease-databuck hover:border-ink hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo'
 
-export default function MatchingDetail({ matchingId }: { matchingId: string }) {
+export default function MatchingDetail({
+  matchingId,
+  onRun,
+  runBusy = false,
+}: {
+  matchingId: string
+  onRun?: (matchingId: string, name: string, kind: JobKind) => void
+  runBusy?: boolean
+}) {
   const job = matchingJobs.find((item) => item.id === matchingId) ?? null
 
   if (matchingId === matchingSummaryId || !job) {
@@ -63,7 +72,12 @@ export default function MatchingDetail({ matchingId }: { matchingId: string }) {
             {job.unmatched > 0 ? <StatusBadge tone="danger" label="Needs review" /> : <StatusBadge tone="success" label="Healthy" />}
           </div>
         </div>
-        <button type="button" className={secondaryButton}>
+        <button
+          type="button"
+          className={secondaryButton}
+          disabled={runBusy}
+          onClick={() => onRun?.(job.id, matchingTitle(job), 'matching')}
+        >
           Run
         </button>
       </header>

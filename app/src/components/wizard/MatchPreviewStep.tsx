@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
-import { frequencyLabel, type AlertState, type MatchAdditionalState, type MatchFlagState, type MatchMappingRow, type ScheduleState, type WizardMatchType } from './model.ts'
+import { schedulePlanFacts, type AlertState, type MatchAdditionalState, type MatchFlagState, type MatchMappingRow, type ScheduleState, type WizardMatchType } from './model.ts'
 import { cardClass, Glyph, primaryButton, secondaryButton } from './ui.tsx'
+import { useJobs } from '../../jobs/jobStore.ts'
 
 export default function MatchPreviewStep({
   matchType,
@@ -37,6 +38,7 @@ export default function MatchPreviewStep({
   onJump: (step: number) => void
   onRun: () => void
 }) {
+  const { schedules, triggers, groups } = useJobs()
   const mapped = rows.filter((row) => row.targetColumn).length
   const pk = rows.filter((row) => row.pk).length
   const matchFields = rows.filter((row) => row.matchField).length
@@ -122,11 +124,7 @@ export default function MatchPreviewStep({
         onJump={onJump}
         facts={
           visitedSchedule
-            ? [
-                ['Frequency', frequencyLabel(schedule.frequency)],
-                ['Start', `${schedule.startDate} ${schedule.startTime}`],
-                ['Job', schedule.validationName],
-              ]
+            ? schedulePlanFacts(schedule, schedules, triggers, groups)
             : [['Status', 'Not set yet']]
         }
       />

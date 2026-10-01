@@ -2,8 +2,9 @@ import type { ReactNode } from 'react'
 import { catalogSummary, type CatalogColumn, type CatalogState } from '../../data/ruleCatalog.ts'
 import type { CustomRule } from '../../data/customRules.ts'
 import type { AlertState, ConfigureState, ScheduleState } from './model.ts'
-import { frequencyLabel } from './model.ts'
+import { schedulePlanFacts } from './model.ts'
 import { cardClass, Glyph, primaryButton, secondaryButton } from './ui.tsx'
+import { useJobs } from '../../jobs/jobStore.ts'
 
 export default function PreviewStep({
   sourceName,
@@ -38,6 +39,7 @@ export default function PreviewStep({
   onJump: (step: number) => void
   onRun: () => void
 }) {
+  const { schedules, triggers, groups } = useJobs()
   const summary = catalogSummary(catalog, columns)
   const selectedCustom = customRules.filter((rule) => selectedCustomIds.includes(rule.id))
 
@@ -125,11 +127,7 @@ export default function PreviewStep({
         onJump={onJump}
         facts={
           visitedSchedule
-            ? [
-                ['Frequency', frequencyLabel(schedule.frequency)],
-                ['Start', `${schedule.startDate} ${schedule.startTime}`],
-                ['Validation', schedule.validationName],
-              ]
+            ? schedulePlanFacts(schedule, schedules, triggers, groups)
             : [['Status', 'Not set yet']]
         }
       />

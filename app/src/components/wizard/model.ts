@@ -4,8 +4,22 @@ import {
   type CatalogState,
   type ColumnFormat,
 } from '../../data/ruleCatalog.ts'
+import {
+  cadenceSummary,
+  frequencyLabel as cadenceFrequencyLabel,
+  triggerKindLabel,
+  type AfterJobWhen,
+  type Frequency,
+  type JobGroup,
+  type JobSchedule,
+  type JobTrigger,
+  type TriggerKind,
+  type Weekday,
+} from '../../data/jobs.ts'
 import { columnProfiles, dataSources, type DataSource, type SourceTable, type SourceType } from '../../data/sources.ts'
 import { validationRuns } from '../../data/validations.ts'
+
+export type { Frequency }
 
 export const steps = [
   { id: 'connect', label: 'Connect', hint: 'Where is your data?' },
@@ -49,7 +63,7 @@ export const pages = [
   },
   {
     title: 'Set Your Schedule',
-    subtitle: 'Choose how often your data quality checks should run automatically',
+    subtitle: 'Choose when this should run. You can leave it on demand and run it anytime.',
   },
 ] as const
 
@@ -90,7 +104,7 @@ export const matchingPages = [
   },
   {
     title: 'Set Your Schedule',
-    subtitle: 'Choose how often this matching job should run automatically',
+    subtitle: 'Choose when this should run. You can leave it on demand and run it anytime.',
   },
 ] as const
 
@@ -252,7 +266,7 @@ export type StepId = (typeof steps)[number]['id'] | (typeof matchingSteps)[numbe
 export type ProfileMode = 'historic' | 'metadata' | 'profile' | 'discovery'
 export type TableKind = 'data' | 'derived' | 'reference'
 export type Cyclicality = 'None' | 'Daily' | 'Weekly' | 'Monthly' | 'Day of Week'
-export type Frequency = 'hourly' | 'daily' | 'weekly' | 'custom'
+export type RunMode = 'on-demand' | 'schedule' | 'trigger'
 
 export type DraftSource = {
   type: SourceType
@@ -292,13 +306,22 @@ export type AlertState = {
 }
 
 export type ScheduleState = {
-  scheduler: string
-  triggerType: string
+  mode: RunMode
   validationName: string
+  scheduleId: string
   frequency: Frequency
   startDate: string
   startTime: string
   cron: string
+  weekdays: Weekday[]
+  monthDay: number
+  triggerId: string
+  triggerKind: TriggerKind
+  filePath: string
+  afterGroupId: string
+  afterWhen: AfterJobWhen
+  jobGroupId: string
+  jobGroupName: string
 }
 
 export const sourceTypes: SourceType[] = ['MSSQL', 'BigQuery', 'Databricks', 'Teradata']
@@ -339,9 +362,6 @@ export const priorities = ['Low', 'Medium', 'High', 'Critical']
 export const cyclicalityOptions: Cyclicality[] = ['None', 'Daily', 'Weekly', 'Monthly', 'Day of Week']
 export const severityLevels = ['Low', 'Medium', 'High', 'Critical']
 export const alertTriggers = ['On Failure', 'On Warning', 'Always', 'On Success']
-export const schedulers = ['Production Scheduler', 'Staging Scheduler', 'Adhoc Scheduler']
-export const triggerTypes = ['Validation', 'Profiling', 'Matching']
-
 export const tips = [
   'Ensure your database allows external connections from this platform',
   'Use a read-only user for security best practices',
@@ -350,10 +370,10 @@ export const tips = [
 ]
 
 export const scheduleTips = [
-  'Run checks after your data loads finish for best results',
-  'Daily checks work best for important tables',
-  'Use Custom if you need a specific schedule pattern',
-  'All times shown are in UTC timezone',
+  'On demand keeps this available to run from the Jobs screen or a detail page.',
+  'Named schedules can be reused across job groups and other validations.',
+  'Triggers start a run when an API is called, a file lands, or another job finishes.',
+  'All times shown are in UTC.',
 ]
 
 export function emptyDraft(type: SourceType = 'MSSQL'): DraftSource {
@@ -450,14 +470,70 @@ export function defaultAlerts(): AlertState {
 
 export function defaultSchedule(validationName: string): ScheduleState {
   return {
-    scheduler: 'Production Scheduler',
-    triggerType: 'Validation',
+    mode: 'on-demand',
     validationName,
+    scheduleId: '',
     frequency: 'daily',
     startDate: todayInputDate(),
     startTime: '09:00',
     cron: '0 9 * * *',
+    weekdays: ['mon', 'tue', 'wed', 'thu', 'fri'],
+    monthDay: 1,
+    triggerId: '',
+    triggerKind: 'api',
+    filePath: '',
+    afterGroupId: '',
+    afterWhen: 'success',
+    jobGroupId: '',
+    jobGroupName: '',
   }
+}
+
+export function scheduleCadence(schedule: ScheduleState) {
+  return {
+    frequency: schedule.frequency,
+    startDate: schedule.startDate,
+    startTime: schedule.startTime,
+    cron: schedule.cron,
+    weekdays: schedule.weekdays,
+    monthDay: schedule.monthDay,
+  }
+}
+
+export function schedulePlanFacts(
+  schedule: ScheduleState,
+  schedules: JobSchedule[],
+  triggers: JobTrigger[],
+  groups: JobGroup[],
+): [string, string][] {
+  const group =
+    schedule.jobGroupId === 'new'
+      ? schedule.jobGroupName.trim() || 'New job group'
+      : groups.find((item) => item.id === schedule.jobGroupId)?.name
+
+  const facts: [string, string][] = []
+  if (schedule.mode === 'on-demand') {
+    facts.push(['Run plan', 'On demand'])
+  } else if (schedule.mode === 'schedule') {
+    const named = schedules.find((item) => item.id === schedule.scheduleId)
+    facts.push(['Run plan', named ? named.name : 'New schedule'])
+    facts.push(['Cadence', named ? cadenceSummary(named.cadence) : cadenceSummary(scheduleCadence(schedule))])
+  } else {
+    const named = triggers.find((item) => item.id === schedule.triggerId)
+    facts.push(['Run plan', named ? named.name : 'New trigger'])
+    facts.push([
+      'Event',
+      named
+        ? triggerKindLabel(named.kind)
+        : schedule.triggerKind === 'file'
+          ? schedule.filePath || 'File arrival'
+          : schedule.triggerKind === 'after-job'
+            ? 'After another job'
+            : 'API call',
+    ])
+  }
+  if (group) facts.push(['Job group', group])
+  return facts
 }
 
 export function validationNameFor(nickname: string) {
@@ -517,8 +593,5 @@ export function emptyCatalog(): CatalogState {
 }
 
 export function frequencyLabel(frequency: Frequency) {
-  if (frequency === 'hourly') return 'Hourly'
-  if (frequency === 'weekly') return 'Weekly'
-  if (frequency === 'custom') return 'Custom'
-  return 'Daily'
+  return cadenceFrequencyLabel(frequency)
 }

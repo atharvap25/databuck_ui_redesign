@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { JOB_AUTO_COLLAPSE_MS, type Job } from '../jobs/jobStore.ts'
+import { kindLabel } from '../data/jobs.ts'
+import { JOB_AUTO_COLLAPSE_MS, type LiveJob } from '../jobs/jobStore.ts'
 import { ChevronIcon } from './icons.tsx'
 import StatusBadge from './StatusBadge.tsx'
 
@@ -8,10 +9,12 @@ export default function JobDeck({
   jobs,
   wave,
   agentOpen,
+  onOpenJobs,
 }: {
-  jobs: Job[]
+  jobs: LiveJob[]
   wave: number
   agentOpen: boolean
+  onOpenJobs: () => void
 }) {
   const [expanded, setExpanded] = useState(true)
   const [hovering, setHovering] = useState(false)
@@ -33,7 +36,8 @@ export default function JobDeck({
   if (jobs.length === 0) return null
 
   const running = jobs.filter((job) => job.status === 'running')
-  const lead = running[running.length - 1] ?? jobs[jobs.length - 1]
+  const queued = jobs.filter((job) => job.status === 'queued')
+  const lead = running[running.length - 1] ?? queued[queued.length - 1] ?? jobs[jobs.length - 1]
   const live = running.length > 0
 
   return createPortal(
@@ -54,9 +58,20 @@ export default function JobDeck({
             <div className="min-w-0 flex-1">
               <p className="font-label text-[0.6875rem] font-medium tracking-[0.14em] text-muted uppercase">Jobs</p>
               <p className="truncate font-sans text-sm font-medium text-ink">
-                {live ? `${running.length} running` : 'Complete'}
+                {live
+                  ? `${running.length} running${queued.length ? ` · ${queued.length} queued` : ''}`
+                  : queued.length
+                    ? `${queued.length} queued`
+                    : 'Complete'}
               </p>
             </div>
+            <button
+              type="button"
+              onClick={onOpenJobs}
+              className="h-8 rounded-md px-2 font-sans text-xs font-medium text-indigo transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
+            >
+              View all
+            </button>
             <button
               type="button"
               aria-label="Collapse jobs"
@@ -70,14 +85,21 @@ export default function JobDeck({
             {jobs.map((job) => (
               <li key={job.id} className="px-4 py-2.5">
                 <div className="flex items-center gap-3">
-                  <p className="min-w-0 flex-1 truncate font-sans text-sm text-ink">{job.name}</p>
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-sans text-sm text-ink">{job.name}</p>
+                    <p className="mt-0.5 font-label text-[10px] tracking-[0.14em] text-muted uppercase">{kindLabel(job.kind)}</p>
+                  </div>
                   {job.status === 'complete' ? (
                     <StatusBadge tone="success" label="Complete" />
+                  ) : job.status === 'failed' ? (
+                    <StatusBadge tone="danger" label="Failed" />
+                  ) : job.status === 'queued' ? (
+                    <span className="font-sans text-xs text-muted">Waiting</span>
                   ) : (
                     <span className="font-mono text-xs tabular-nums text-muted">{job.progress}%</span>
                   )}
                 </div>
-                <Track value={job.progress} className="mt-2" />
+                {job.status === 'queued' ? null : <Track value={job.progress} className="mt-2" />}
               </li>
             ))}
           </ul>
@@ -91,12 +113,12 @@ export default function JobDeck({
         onClick={() => setExpanded((current) => !current)}
         className="relative grid size-12 place-items-center rounded-full border border-line bg-canvas shadow-overlay transition-[box-shadow] duration-150 ease-databuck hover:shadow-hover focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
       >
-        <ProgressRing value={lead.progress} />
+        <ProgressRing value={lead.status === 'queued' ? 0 : lead.progress} />
         <span
-          className={`relative grid size-7 place-items-center rounded-full ${live ? 'bg-stable' : 'bg-success'}`}
+          className={`relative grid size-7 place-items-center rounded-full ${live ? 'bg-stable' : queued.length ? 'bg-warning' : 'bg-success'}`}
           style={live ? { animation: 'db-live-dot 1.2s var(--db-ease) infinite' } : undefined}
         >
-          {live ? null : (
+          {live || queued.length ? null : (
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M5 12.5 9.5 17 19 7.5" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

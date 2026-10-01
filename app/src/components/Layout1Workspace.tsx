@@ -1,4 +1,5 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import type { JobKind } from '../data/jobs.ts'
 import { dataSources, type DataSource } from '../data/sources.ts'
 import ConnectionDetail from './ConnectionDetail.tsx'
 import ConnectionsPanel, { type SourceSelection } from './ConnectionsPanel.tsx'
@@ -30,7 +31,7 @@ export default function Layout1Workspace({
 }: {
   screen: WorkspaceId
   onCollapseSidebar: () => void
-  onRunValidation: (validationId: string, name: string) => void
+  onRunValidation: (validationId: string, name: string, kind?: JobKind) => void
   isValidationRunning: (validationId: string) => boolean
 }) {
   const { title, action } = screens[screen]
@@ -265,7 +266,13 @@ export default function Layout1Workspace({
           {screen === 'connections' && selection === null ? (
             <EmptyState icon={<InboxIcon />} title="Select a data source." />
           ) : null}
-          {screen === 'matching' ? <MatchingDetail matchingId={matchingId} /> : null}
+          {screen === 'matching' ? (
+            <MatchingDetail
+              matchingId={matchingId}
+              onRun={onRunValidation}
+              runBusy={isValidationRunning(matchingId)}
+            />
+          ) : null}
         </div>
       </div>
     </div>

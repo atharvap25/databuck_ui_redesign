@@ -1,11 +1,24 @@
-import { frequencyLabel, scheduleTips, schedulers, triggerTypes, type Frequency, type ScheduleState } from './model.ts'
-import { cardClass, Field, fieldClass, Glyph } from './ui.tsx'
+import { useJobs } from '../../jobs/jobStore.ts'
+import {
+  apiEndpointFor,
+  cadenceSummary,
+  triggerKindLabel,
+  type TriggerKind,
+} from '../../data/jobs.ts'
+import FrequencyBuilder from '../jobs/FrequencyBuilder.tsx'
+import { scheduleCadence, scheduleTips, type RunMode, type ScheduleState } from './model.ts'
+import { cardClass, CheckControl, Field, fieldClass, Glyph } from './ui.tsx'
 
-const frequencies: { id: Frequency; label: string; hint: string; icon: 'hour' | 'day' | 'week' | 'cron' }[] = [
-  { id: 'hourly', label: 'Hourly', hint: 'Every hour', icon: 'hour' },
-  { id: 'daily', label: 'Daily', hint: 'Once a day', icon: 'day' },
-  { id: 'weekly', label: 'Weekly', hint: 'Once a week', icon: 'week' },
-  { id: 'custom', label: 'Custom', hint: 'Cron expression', icon: 'cron' },
+const modes: { id: RunMode; label: string; hint: string }[] = [
+  { id: 'on-demand', label: 'On demand', hint: 'Run from the UI when you need it' },
+  { id: 'schedule', label: 'On a schedule', hint: 'Repeat on a named calendar' },
+  { id: 'trigger', label: 'On an event', hint: 'API, file arrival, or after a job' },
+]
+
+const triggerKinds: { id: TriggerKind; label: string; hint: string }[] = [
+  { id: 'api', label: 'API call', hint: 'Airflow, ADF, Glue, dbt' },
+  { id: 'file', label: 'File arrival', hint: 'Watched path or bucket' },
+  { id: 'after-job', label: 'After job', hint: 'Chain from another group' },
 ]
 
 export default function ScheduleStep({
@@ -15,101 +28,200 @@ export default function ScheduleStep({
   schedule: ScheduleState
   onChange: (schedule: ScheduleState) => void
 }) {
+  const { schedules, groups, triggers } = useJobs()
+
   function patch(partial: Partial<ScheduleState>) {
     onChange({ ...schedule, ...partial })
   }
+
+  const selectedSchedule = schedules.find((item) => item.id === schedule.scheduleId)
+  const selectedTrigger = triggers.find((item) => item.id === schedule.triggerId)
+  const creatingSchedule = schedule.mode === 'schedule' && (schedule.scheduleId === 'new' || !schedule.scheduleId)
+  const creatingTrigger = schedule.mode === 'trigger' && (schedule.triggerId === 'new' || !schedule.triggerId)
 
   return (
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(16rem,0.7fr)]">
       <div className="flex flex-col gap-4">
         <section className={`${cardClass} p-5`}>
-          <h2 className="flex items-center gap-2 font-sans text-sm font-semibold text-ink">
-            <span className="text-indigo">
-              <Glyph>
-                <path d="M13 3 6 14h6l-1 7 8-12h-6z" />
-              </Glyph>
-            </span>
-            Trigger Configuration
-          </h2>
-          <div className="mt-5 grid gap-x-4 gap-y-4 sm:grid-cols-2">
-            <Field label="Scheduler" required>
-              <select value={schedule.scheduler} onChange={(event) => patch({ scheduler: event.target.value })} className={fieldClass}>
-                {schedulers.map((item) => (
-                  <option key={item}>{item}</option>
-                ))}
-              </select>
-            </Field>
-            <Field label="Trigger Type" required>
-              <select value={schedule.triggerType} onChange={(event) => patch({ triggerType: event.target.value })} className={fieldClass}>
-                {triggerTypes.map((item) => (
-                  <option key={item}>{item}</option>
-                ))}
-              </select>
-            </Field>
-            <div className="sm:col-span-2">
-              <Field label="Validation" required>
-                <input
-                  value={schedule.validationName}
-                  onChange={(event) => patch({ validationName: event.target.value })}
-                  className={fieldClass}
-                />
-              </Field>
-            </div>
-          </div>
-        </section>
-
-        <section className={`${cardClass} p-5`}>
-          <h2 className="flex items-center gap-2 font-sans text-sm font-semibold text-ink">
-            <span className="text-indigo">
-              <Glyph>
-                <path d="M4 12a8 8 0 1 0 8-8" />
-                <path d="M12 8v4l2.5 1.5" />
-              </Glyph>
-            </span>
-            Frequency
-          </h2>
-          <div className="mt-4 grid grid-cols-2 gap-2 sm:grid-cols-4">
-            {frequencies.map((item) => {
-              const on = schedule.frequency === item.id
+          <h2 className="font-sans text-sm font-semibold text-ink">When should this run?</h2>
+          <div className="mt-4 grid gap-2 sm:grid-cols-3">
+            {modes.map((item) => {
+              const on = schedule.mode === item.id
               return (
                 <button
                   key={item.id}
                   type="button"
                   aria-pressed={on}
-                  onClick={() => patch({ frequency: item.id })}
-                  className={`flex flex-col items-center gap-1 rounded-lg border px-3 py-4 text-center transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
+                  onClick={() => patch({ mode: item.id })}
+                  className={`rounded-lg border px-3 py-4 text-left transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
                     on ? 'border-indigo bg-secondary-fixed text-ink' : 'border-line bg-canvas text-ink hover:border-line-strong hover:bg-surface'
                   }`}
                 >
-                  <span className={on ? 'text-indigo' : 'text-muted'}>
-                    <FreqGlyph kind={item.icon} />
-                  </span>
-                  <span className="font-sans text-sm font-semibold">{item.label}</span>
-                  <span className="font-sans text-[11px] text-muted">{item.hint}</span>
+                  <span className="block font-sans text-sm font-semibold">{item.label}</span>
+                  <span className="mt-1 block font-sans text-[11px] leading-4 text-muted">{item.hint}</span>
                 </button>
               )
             })}
           </div>
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <Field label="Start Date">
-              <input type="date" value={schedule.startDate} onChange={(event) => patch({ startDate: event.target.value })} className={fieldClass} />
-            </Field>
-            <Field label="Start Time">
-              <input type="time" value={schedule.startTime} onChange={(event) => patch({ startTime: event.target.value })} className={fieldClass} />
-            </Field>
-            {schedule.frequency === 'custom' ? (
-              <div className="sm:col-span-2">
-                <Field label="Cron expression">
+        </section>
+
+        {schedule.mode === 'schedule' ? (
+          <section className={`${cardClass} p-5`}>
+            <h2 className="font-sans text-sm font-semibold text-ink">Schedule</h2>
+            <div className="mt-4">
+              <Field label="Named schedule">
+                <select
+                  value={schedule.scheduleId || 'new'}
+                  onChange={(event) => patch({ scheduleId: event.target.value })}
+                  className={fieldClass}
+                >
+                  <option value="new">Create a new schedule</option>
+                  {schedules.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+            {creatingSchedule ? (
+              <div className="mt-4">
+                <FrequencyBuilder
+                  cadence={scheduleCadence(schedule)}
+                  onChange={(cadence) =>
+                    patch({
+                      frequency: cadence.frequency,
+                      startDate: cadence.startDate,
+                      startTime: cadence.startTime,
+                      cron: cadence.cron,
+                      weekdays: cadence.weekdays,
+                      monthDay: cadence.monthDay,
+                    })
+                  }
+                />
+              </div>
+            ) : selectedSchedule ? (
+              <p className="mt-4 rounded-md bg-surface px-3 py-2 text-sm text-ink">{cadenceSummary(selectedSchedule.cadence)} UTC</p>
+            ) : null}
+          </section>
+        ) : null}
+
+        {schedule.mode === 'trigger' ? (
+          <section className={`${cardClass} p-5`}>
+            <h2 className="font-sans text-sm font-semibold text-ink">Trigger</h2>
+            <div className="mt-4">
+              <Field label="Named trigger">
+                <select
+                  value={schedule.triggerId || 'new'}
+                  onChange={(event) => patch({ triggerId: event.target.value })}
+                  className={fieldClass}
+                >
+                  <option value="new">Create a new trigger</option>
+                  {triggers.map((item) => (
+                    <option key={item.id} value={item.id}>
+                      {item.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+            </div>
+            {creatingTrigger ? (
+              <div className="mt-4 flex flex-col gap-4">
+                <div className="grid gap-2 sm:grid-cols-3">
+                  {triggerKinds.map((item) => {
+                    const on = schedule.triggerKind === item.id
+                    return (
+                      <button
+                        key={item.id}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => patch({ triggerKind: item.id })}
+                        className={`rounded-lg border px-3 py-3 text-left transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
+                          on ? 'border-indigo bg-secondary-fixed' : 'border-line hover:border-line-strong hover:bg-surface'
+                        }`}
+                      >
+                        <span className="block font-sans text-sm font-semibold text-ink">{item.label}</span>
+                        <span className="mt-1 block text-[11px] text-muted">{item.hint}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+                {schedule.triggerKind === 'api' ? (
+                  <Field label="Endpoint">
+                    <input readOnly value={apiEndpointFor('quality', 'new')} className={`${fieldClass} font-mono`} />
+                  </Field>
+                ) : null}
+                {schedule.triggerKind === 'file' ? (
+                  <Field label="Watched path">
+                    <input
+                      value={schedule.filePath}
+                      placeholder="s3://bucket/path/"
+                      onChange={(event) => patch({ filePath: event.target.value })}
+                      className={`${fieldClass} font-mono`}
+                    />
+                  </Field>
+                ) : null}
+                {schedule.triggerKind === 'after-job' ? (
+                  <Field label="After job group">
+                    <select
+                      value={schedule.afterGroupId}
+                      onChange={(event) => patch({ afterGroupId: event.target.value })}
+                      className={fieldClass}
+                    >
+                      <option value="">Select a job group</option>
+                      {groups.map((group) => (
+                        <option key={group.id} value={group.id}>
+                          {group.name}
+                        </option>
+                      ))}
+                    </select>
+                  </Field>
+                ) : null}
+              </div>
+            ) : selectedTrigger ? (
+              <p className="mt-4 rounded-md bg-surface px-3 py-2 text-sm text-ink">
+                {triggerKindLabel(selectedTrigger.kind)}
+                {selectedTrigger.path ? ` · ${selectedTrigger.path}` : ''}
+              </p>
+            ) : null}
+          </section>
+        ) : null}
+
+        <section className={`${cardClass} p-5`}>
+          <CheckControl
+            checked={schedule.jobGroupId !== ''}
+            label="Also add to a job group"
+            hint="Run this with a bundle of other validations or matching jobs."
+            onChange={(checked) => patch({ jobGroupId: checked ? (groups[0]?.id ?? 'new') : '', jobGroupName: '' })}
+          />
+          {schedule.jobGroupId ? (
+            <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <Field label="Job group">
+                <select
+                  value={schedule.jobGroupId}
+                  onChange={(event) => patch({ jobGroupId: event.target.value })}
+                  className={fieldClass}
+                >
+                  <option value="new">Create a new group</option>
+                  {groups.map((group) => (
+                    <option key={group.id} value={group.id}>
+                      {group.name}
+                    </option>
+                  ))}
+                </select>
+              </Field>
+              {schedule.jobGroupId === 'new' ? (
+                <Field label="Group name">
                   <input
-                    value={schedule.cron}
-                    placeholder="0 9 * * *"
-                    onChange={(event) => patch({ cron: event.target.value })}
-                    className={`${fieldClass} font-mono`}
+                    value={schedule.jobGroupName}
+                    onChange={(event) => patch({ jobGroupName: event.target.value })}
+                    className={fieldClass}
+                    placeholder="Finance nightly"
                   />
                 </Field>
-              </div>
-            ) : null}
-          </div>
+              ) : null}
+            </div>
+          ) : null}
         </section>
       </div>
 
@@ -137,9 +249,26 @@ export default function ScheduleStep({
         <section className={`${cardClass} p-5`}>
           <h2 className="font-sans text-sm font-semibold text-ink">Summary</h2>
           <dl className="mt-4 flex flex-col gap-3">
-            <SummaryRow label="Trigger Type" value={schedule.triggerType} pill />
-            <SummaryRow label="Frequency" value={frequencyLabel(schedule.frequency)} pill />
-            <SummaryRow label="Start Time" value={schedule.startTime} />
+            <SummaryRow
+              label="Run plan"
+              value={schedule.mode === 'on-demand' ? 'On demand' : schedule.mode === 'schedule' ? 'Schedule' : 'Event'}
+              pill
+            />
+            {schedule.mode === 'schedule' ? (
+              <SummaryRow
+                label="Cadence"
+                value={selectedSchedule ? cadenceSummary(selectedSchedule.cadence) : cadenceSummary(scheduleCadence(schedule))}
+              />
+            ) : null}
+            {schedule.mode === 'trigger' ? (
+              <SummaryRow label="Event" value={selectedTrigger ? triggerKindLabel(selectedTrigger.kind) : triggerKindLabel(schedule.triggerKind)} pill />
+            ) : null}
+            {schedule.jobGroupId ? (
+              <SummaryRow
+                label="Job group"
+                value={schedule.jobGroupId === 'new' ? schedule.jobGroupName || 'New group' : groups.find((group) => group.id === schedule.jobGroupId)?.name ?? 'Group'}
+              />
+            ) : null}
           </dl>
         </section>
       </div>
@@ -155,41 +284,9 @@ function SummaryRow({ label, value, pill }: { label: string; value: string; pill
         {pill ? (
           <span className="rounded-full bg-surface px-2.5 py-1 font-sans text-xs font-medium text-ink">{value}</span>
         ) : (
-          <span className="font-mono text-sm text-ink">{value}</span>
+          <span className="text-right font-sans text-sm text-ink">{value}</span>
         )}
       </dd>
     </div>
-  )
-}
-
-function FreqGlyph({ kind }: { kind: 'hour' | 'day' | 'week' | 'cron' }) {
-  if (kind === 'hour') {
-    return (
-      <Glyph size={20}>
-        <circle cx="12" cy="12" r="8" />
-        <path d="M12 8v4l2.5 1.5" />
-      </Glyph>
-    )
-  }
-  if (kind === 'day') {
-    return (
-      <Glyph size={20}>
-        <rect x="4" y="5" width="16" height="15" rx="2" />
-        <path d="M8 3v4M16 3v4M4 10h16" />
-      </Glyph>
-    )
-  }
-  if (kind === 'week') {
-    return (
-      <Glyph size={20}>
-        <path d="M4 12a8 8 0 1 0 3-6.3" />
-        <path d="M4 4v5h5" />
-      </Glyph>
-    )
-  }
-  return (
-    <Glyph size={20}>
-      <path d="M13 3 6 14h6l-1 7 8-12h-6z" />
-    </Glyph>
   )
 }
