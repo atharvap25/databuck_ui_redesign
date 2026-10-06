@@ -1,4 +1,6 @@
-export type SourceType = 'BigQuery' | 'Teradata' | 'MSSQL' | 'Databricks'
+import { schemaFamily, type SourceType } from './connectionFields.ts'
+
+export type { SourceType }
 
 export type SourceTable = {
   id: string
@@ -10,43 +12,21 @@ export type SourceTable = {
   rowFilter: string
 }
 
-export type SourceConnection = {
-  host: string
-  port: string
-  username: string
-  createdOn: string
-  encrypt: string
-  logon: string
-  project: string
-  location: string
-  serviceAccount: string
-  workspaceUrl: string
-  catalog: string
-  warehouse: string
-}
-
 export type DataSource = {
   id: string
   name: string
   type: SourceType
   schema: string
   active: boolean
-  connection: SourceConnection
+  properties: Record<string, string>
   tables: SourceTable[]
 }
 
-function connection(partial: Partial<SourceConnection> & Pick<SourceConnection, 'username' | 'createdOn'>): SourceConnection {
+function props(partial: Record<string, string>): Record<string, string> {
   return {
-    host: '',
-    port: '',
-    encrypt: '',
-    logon: '',
-    project: '',
-    location: '',
-    serviceAccount: '',
-    workspaceUrl: '',
-    catalog: '',
-    warehouse: '',
+    createdByUser: 'Admin User',
+    projectName: 'Production',
+    sslEnb: 'N',
     ...partial,
   }
 }
@@ -163,12 +143,15 @@ export const dataSources: DataSource[] = [
     type: 'MSSQL',
     schema: 'erp.dbo',
     active: true,
-    connection: connection({
-      host: 'sql-erp.internal',
+    properties: props({
+      ipAddress: 'sql-erp.internal',
       port: '1433',
+      databaseSchema: 'erp.dbo',
       username: 'erp_reader',
-      createdOn: '12 Mar 2024',
-      encrypt: 'Yes',
+      password: 'erp_reader',
+      sslEnb: 'Y',
+      createdAtStr: '12 Mar 2024',
+      domainName: 'Operations',
     }),
     tables: [
       table('acme-erp-customers', 'Customer Master', 'customers', 42, true),
@@ -182,12 +165,18 @@ export const dataSources: DataSource[] = [
     type: 'BigQuery',
     schema: 'acme.analytics',
     active: true,
-    connection: connection({
+    properties: props({
       username: 'analytics-job',
-      createdOn: '3 Jan 2025',
-      project: 'acme-analytics',
-      location: 'US',
-      serviceAccount: 'analytics@acme-analytics.iam.gserviceaccount.com',
+      createdAtStr: '3 Jan 2025',
+      bigQueryProjectName: 'acme-analytics',
+      datasetName: 'acme.analytics',
+      clientEmail: 'analytics@acme-analytics.iam.gserviceaccount.com',
+      clientId: '1029384756',
+      privatekeyId: 'a1b2c3',
+      privatekey: '-----BEGIN PRIVATE KEY-----',
+      dataplex_integration_enabled: 'N',
+      pushDownQueryEnabled: 'Y',
+      domainName: 'Customer',
     }),
     tables: [
       table('analytics-shipments', 'Shipments', 'shipments', 21, true),
@@ -202,12 +191,15 @@ export const dataSources: DataSource[] = [
     type: 'MSSQL',
     schema: 'finance.dbo',
     active: true,
-    connection: connection({
-      host: 'sql-finance.internal',
+    properties: props({
+      ipAddress: 'sql-finance.internal',
       port: '1433',
+      databaseSchema: 'finance.dbo',
       username: 'finance_reader',
-      createdOn: '18 Jun 2024',
-      encrypt: 'Yes',
+      password: 'finance_reader',
+      sslEnb: 'Y',
+      createdAtStr: '18 Jun 2024',
+      domainName: 'Finance',
     }),
     tables: [
       table('finance-invoices', 'AR Invoices', 'ar_invoices', 29, true),
@@ -221,12 +213,13 @@ export const dataSources: DataSource[] = [
     type: 'BigQuery',
     schema: 'acme.events',
     active: false,
-    connection: connection({
+    properties: props({
       username: 'events-job',
-      createdOn: '9 Sep 2023',
-      project: 'acme-marketing',
-      location: 'EU',
-      serviceAccount: 'events@acme-marketing.iam.gserviceaccount.com',
+      createdAtStr: '9 Sep 2023',
+      bigQueryProjectName: 'acme-marketing',
+      datasetName: 'acme.events',
+      clientEmail: 'events@acme-marketing.iam.gserviceaccount.com',
+      domainName: 'Customer',
     }),
     tables: [table('marketing-campaigns', 'Campaigns', 'campaigns', 18, false)],
   },
@@ -236,12 +229,13 @@ export const dataSources: DataSource[] = [
     type: 'MSSQL',
     schema: 'stage.sandbox',
     active: true,
-    connection: connection({
-      host: 'sql-stage.internal',
+    properties: props({
+      ipAddress: 'sql-stage.internal',
       port: '1433',
+      databaseSchema: 'stage.sandbox',
       username: 'stage_reader',
-      createdOn: '2 Feb 2025',
-      encrypt: 'No',
+      password: 'stage_reader',
+      createdAtStr: '2 Feb 2025',
     }),
     tables: [],
   },
@@ -251,12 +245,15 @@ export const dataSources: DataSource[] = [
     type: 'MSSQL',
     schema: 'hr.dbo',
     active: true,
-    connection: connection({
-      host: 'sql-hr.internal',
+    properties: props({
+      ipAddress: 'sql-hr.internal',
       port: '1433',
+      databaseSchema: 'hr.dbo',
       username: 'hr_reader',
-      createdOn: '21 Nov 2023',
-      encrypt: 'Yes',
+      password: 'hr_reader',
+      sslEnb: 'Y',
+      createdAtStr: '21 Nov 2023',
+      domainName: 'People',
     }),
     tables: [
       table('hr-workers', 'Workers', 'workers', 54, true),
@@ -266,15 +263,19 @@ export const dataSources: DataSource[] = [
   {
     id: 'inventory-facts',
     name: 'Inventory Facts',
-    type: 'Databricks',
+    type: 'DatabricksDeltaLake',
     schema: 'inventory.gold',
     active: true,
-    connection: connection({
+    properties: props({
       username: 'inventory-job',
-      createdOn: '14 Apr 2025',
-      workspaceUrl: 'https://acme.cloud.databricks.com',
-      catalog: 'inventory',
-      warehouse: 'ops-warehouse',
+      password: 'dapi****************',
+      createdAtStr: '14 Apr 2025',
+      httpPath: 'https://acme.cloud.databricks.com',
+      databaseSchema: 'inventory.gold',
+      clusterPropertyCategory: 'cluster',
+      azureAuthenticationType: 'PAT',
+      sslEnb: 'Y',
+      domainName: 'Inventory',
     }),
     tables: [
       table('inventory-balances', 'Balances', 'item_balances', 19, true),
@@ -287,12 +288,15 @@ export const dataSources: DataSource[] = [
     type: 'MSSQL',
     schema: 'crm.dbo',
     active: true,
-    connection: connection({
-      host: 'sql-crm.internal',
+    properties: props({
+      ipAddress: 'sql-crm.internal',
       port: '1433',
+      databaseSchema: 'crm.dbo',
       username: 'crm_reader',
-      createdOn: '7 Aug 2024',
-      encrypt: 'Yes',
+      password: 'crm_reader',
+      sslEnb: 'Y',
+      createdAtStr: '7 Aug 2024',
+      domainName: 'Customer',
     }),
     tables: [table('crm-accounts', 'Accounts', 'accounts', 33, true)],
   },
@@ -302,12 +306,14 @@ export const dataSources: DataSource[] = [
     type: 'Teradata',
     schema: 'edw_prod',
     active: false,
-    connection: connection({
-      host: 'td-edw.internal',
+    properties: props({
+      ipAddress: 'td-edw.internal',
       port: '1025',
+      databaseSchema: 'edw_prod',
       username: 'edw_reader',
-      createdOn: '30 May 2022',
-      logon: 'TD2',
+      password: 'edw_reader',
+      createdAtStr: '30 May 2022',
+      domainName: 'Finance',
     }),
     tables: [
       table('teradata-ledger', 'General Ledger', 'gl_balances', 41, false),
@@ -317,15 +323,18 @@ export const dataSources: DataSource[] = [
   {
     id: 'lakehouse-gold',
     name: 'Lakehouse Gold',
-    type: 'Databricks',
+    type: 'DatabricksDeltaLake',
     schema: 'lakehouse.gold',
     active: true,
-    connection: connection({
+    properties: props({
       username: 'lakehouse-job',
-      createdOn: '11 Dec 2024',
-      workspaceUrl: 'https://acme-gold.cloud.databricks.com',
-      catalog: 'lakehouse',
-      warehouse: 'gold-warehouse',
+      password: 'dapi****************',
+      createdAtStr: '11 Dec 2024',
+      httpPath: 'https://acme-gold.cloud.databricks.com',
+      databaseSchema: 'lakehouse.gold',
+      clusterPropertyCategory: 'cluster',
+      azureAuthenticationType: 'PAT',
+      sslEnb: 'Y',
     }),
     tables: [
       table('lake-customers', 'Customer 360', 'customer_360', 63, true),
@@ -338,12 +347,15 @@ export const dataSources: DataSource[] = [
     type: 'MSSQL',
     schema: 'billing.dbo',
     active: true,
-    connection: connection({
-      host: 'sql-billing.internal',
+    properties: props({
+      ipAddress: 'sql-billing.internal',
       port: '1433',
+      databaseSchema: 'billing.dbo',
       username: 'billing_reader',
-      createdOn: '4 May 2025',
-      encrypt: 'Yes',
+      password: 'billing_reader',
+      sslEnb: 'Y',
+      createdAtStr: '4 May 2025',
+      domainName: 'Finance',
     }),
     tables: [
       table('billing-invoices', 'Billing Invoices', 'billing_invoices', 31, true),
@@ -356,12 +368,14 @@ export const dataSources: DataSource[] = [
     type: 'Teradata',
     schema: 'claims_prod',
     active: true,
-    connection: connection({
-      host: 'td-claims.internal',
+    properties: props({
+      ipAddress: 'td-claims.internal',
       port: '1025',
+      databaseSchema: 'claims_prod',
       username: 'claims_reader',
-      createdOn: '16 Jan 2024',
-      logon: 'LDAP',
+      password: 'claims_reader',
+      createdAtStr: '16 Jan 2024',
+      domainName: 'Finance',
     }),
     tables: [table('claims-headers', 'Claim Headers', 'claim_headers', 47, true)],
   },
@@ -371,27 +385,30 @@ export const dataSources: DataSource[] = [
     type: 'BigQuery',
     schema: 'acme.clickstream',
     active: true,
-    connection: connection({
+    properties: props({
       username: 'clickstream-job',
-      createdOn: '28 Jul 2025',
-      project: 'acme-product',
-      location: 'US',
-      serviceAccount: 'clickstream@acme-product.iam.gserviceaccount.com',
+      createdAtStr: '28 Jul 2025',
+      bigQueryProjectName: 'acme-product',
+      datasetName: 'acme.clickstream',
+      clientEmail: 'clickstream@acme-product.iam.gserviceaccount.com',
+      domainName: 'Customer',
     }),
     tables: [table('click-events', 'Events', 'events', 22, true)],
   },
   {
     id: 'supplier-hub',
     name: 'Supplier Hub',
-    type: 'Databricks',
+    type: 'DatabricksDeltaLake',
     schema: 'supplier.silver',
     active: false,
-    connection: connection({
+    properties: props({
       username: 'supplier-job',
-      createdOn: '9 Oct 2023',
-      workspaceUrl: 'https://acme-supply.cloud.databricks.com',
-      catalog: 'supplier',
-      warehouse: 'silver-warehouse',
+      password: 'dapi****************',
+      createdAtStr: '9 Oct 2023',
+      httpPath: 'https://acme-supply.cloud.databricks.com',
+      databaseSchema: 'supplier.silver',
+      clusterPropertyCategory: 'cluster',
+      azureAuthenticationType: 'PAT',
     }),
     tables: [table('supplier-master', 'Supplier Master', 'suppliers', 36, false)],
   },
@@ -401,12 +418,15 @@ export const dataSources: DataSource[] = [
     type: 'MSSQL',
     schema: 'payroll.dbo',
     active: true,
-    connection: connection({
-      host: 'sql-payroll.internal',
+    properties: props({
+      ipAddress: 'sql-payroll.internal',
       port: '1433',
+      databaseSchema: 'payroll.dbo',
       username: 'payroll_reader',
-      createdOn: '22 Feb 2024',
-      encrypt: 'Yes',
+      password: 'payroll_reader',
+      sslEnb: 'Y',
+      createdAtStr: '22 Feb 2024',
+      domainName: 'People',
     }),
     tables: [table('payroll-runs', 'Pay Runs', 'pay_runs', 28, true)],
   },
@@ -416,16 +436,136 @@ export const dataSources: DataSource[] = [
     type: 'Teradata',
     schema: 'risk_mart',
     active: true,
-    connection: connection({
-      host: 'td-risk.internal',
+    properties: props({
+      ipAddress: 'td-risk.internal',
       port: '1025',
+      databaseSchema: 'risk_mart',
       username: 'risk_reader',
-      createdOn: '1 Aug 2025',
-      logon: 'TD2',
+      password: 'risk_reader',
+      createdAtStr: '1 Aug 2025',
+      domainName: 'Finance',
     }),
     tables: [table('risk-exposure', 'Exposure', 'exposure', 39, true)],
   },
+  {
+    id: 'snowflake-finance',
+    name: 'Snowflake Finance',
+    type: 'SnowFlake',
+    schema: 'ANALYTICS.PUBLIC',
+    active: true,
+    properties: props({
+      ipAddress: 'acme.snowflakecomputing.com',
+      port: '443',
+      databaseSchema: 'ANALYTICS.PUBLIC',
+      username: 'finance_reader',
+      password: 'snowflake_reader',
+      sslEnb: 'Y',
+      createdAtStr: '8 Mar 2026',
+      domainName: 'Finance',
+      projectName: 'Production',
+    }),
+    tables: [table('snow-gl', 'GL Balances', 'gl_balances', 36, true)],
+  },
+  {
+    id: 's3-landing',
+    name: 'S3 Landing',
+    type: 'S3 Batch',
+    schema: 'landing',
+    active: true,
+    properties: props({
+      bucketName: 'acme-landing',
+      folderPath: 's3://acme-landing/raw',
+      fileNamePattern: '*.parquet',
+      fileDataFormat: 'Parquet',
+      headerPresent: 'Y',
+      accessKey: 'AKIA****************',
+      secretKey: '****************',
+      partitionedFolders: 'Y',
+      enableFileMonitoring: 'Y',
+      kmsAuthDisabled: 'Y',
+      createdAtStr: '2 Apr 2026',
+      domainName: 'Operations',
+    }),
+    tables: [table('s3-orders', 'Orders Drop', 'orders_drop', 22, true)],
+  },
+  {
+    id: 'files-claims',
+    name: 'Claims Files',
+    type: 'FileSystem Batch',
+    schema: 'claims',
+    active: true,
+    properties: props({
+      folderPath: '/data/claims/landing',
+      bucketName: 'claims',
+      fileNamePattern: 'claims_*.psv',
+      fileDataFormat: 'PSV(Pipe Delimited)',
+      headerPresent: 'Y',
+      enableFileMonitoring: 'Y',
+      createdAtStr: '19 May 2026',
+      domainName: 'Finance',
+    }),
+    tables: [table('files-claims-daily', 'Daily Claims', 'daily_claims', 31, true)],
+  },
+  {
+    id: 'hive-lake',
+    name: 'Hive Lake',
+    type: 'Hive Kerberos',
+    schema: 'lake.default',
+    active: true,
+    properties: props({
+      ipAddress: 'hive.internal',
+      port: '10000',
+      databaseSchema: 'lake.default',
+      username: 'hive_reader',
+      password: 'hive_reader',
+      domain: 'CORP.ACME.LOCAL',
+      keytab: '/opt/security/hive.keytab',
+      krb5conf: '/etc/krb5.conf',
+      hivejdbchost: 'hive-jdbc.internal',
+      hivejdbcport: '10000',
+      zookeeperUrl: 'zk1:2181,zk2:2181',
+      createdAtStr: '11 Jan 2026',
+      domainName: 'Operations',
+    }),
+    tables: [table('hive-sessions', 'Sessions', 'sessions', 18, true)],
+  },
+  {
+    id: 'kafka-events',
+    name: 'Kafka Events',
+    type: 'ApacheKafka',
+    schema: 'events.*',
+    active: true,
+    properties: props({
+      ipAddress: 'kafka-1.internal:9092,kafka-2.internal:9092',
+      port: '9092',
+      databaseSchema: 'events.*',
+      sslEnb: 'Y',
+      username: 'events_reader',
+      password: 'events_reader',
+      createdAtStr: '6 Jun 2026',
+      domainName: 'Customer',
+    }),
+    tables: [table('kafka-pageviews', 'Page Views', 'page_views', 12, true)],
+  },
 ]
+
+export function duplicateSource(source: DataSource, existing: DataSource[]): DataSource {
+  const base = `${source.id}-copy`
+  const taken = new Set(existing.map((item) => item.id))
+  let id = base
+  let suffix = 2
+  while (taken.has(id)) {
+    id = `${base}-${suffix}`
+    suffix += 1
+  }
+  return {
+    ...source,
+    id,
+    name: `${source.name} copy`,
+    tables: source.tables.map((item) => ({ ...item, id: `${id}-${item.name}` })),
+    properties: { ...source.properties },
+  }
+}
 
 function hash(value: string) {
   return [...value].reduce((total, character) => total + character.charCodeAt(0), 0)
@@ -477,6 +617,56 @@ export function columnProfiles(table: SourceTable): ColumnProfile[] {
       stdDev: column.numeric ? ((seed % 800) / 10).toFixed(1) : '—',
     }
   })
+}
+
+export function tableMetadata(table: SourceTable, type: SourceType) {
+  const family = schemaFamily(type)
+  const columns = columnProfiles(table)
+  if (family === 'bigquery') {
+    return {
+      headers: ['Column', 'Type', 'Mode'],
+      rows: columns.map((column, index) => [
+        column.name,
+        column.dataType === 'int' ? 'INT64' : column.dataType === 'decimal' ? 'NUMERIC' : column.dataType === 'timestamp' ? 'TIMESTAMP' : 'STRING',
+        index === 0 ? 'REQUIRED' : index === 3 ? 'REPEATED' : 'NULLABLE',
+      ]),
+    }
+  }
+  if (family === 'file') {
+    return {
+      headers: ['Column', 'Inferred type', 'Position'],
+      rows: columns.map((column, index) => [column.name, column.dataType, String(index + 1)]),
+    }
+  }
+  if (family === 'kafka') {
+    return {
+      headers: ['Field', 'Type'],
+      rows: columns.map((column) => [column.name, column.dataType === 'int' ? 'int32' : column.dataType === 'decimal' ? 'double' : 'string']),
+    }
+  }
+  if (family === 'document') {
+    return {
+      headers: ['Field', 'Native type'],
+      rows: columns.map((column) => [
+        column.name,
+        column.dataType === 'int' ? 'int' : column.dataType === 'decimal' ? 'double' : column.dataType === 'timestamp' ? 'date' : 'string',
+      ]),
+    }
+  }
+  if (family === 'microstrategy') {
+    return {
+      headers: ['Name', 'Type'],
+      rows: columns.map((column) => [column.name, column.dataType === 'decimal' || column.dataType === 'int' ? 'Metric' : 'Attribute']),
+    }
+  }
+  return {
+    headers: ['Column', 'Data type', 'Nullable', 'Length'],
+    rows: columns.map((column, index) => {
+      const length =
+        column.dataType === 'varchar' ? String(20 + (hash(`${table.id}:${column.name}`) % 80)) : column.dataType === 'decimal' ? '18,2' : '—'
+      return [column.name, column.dataType, index === 0 ? 'No' : 'Yes', length]
+    }),
+  }
 }
 
 export function microsegments(table: SourceTable) {

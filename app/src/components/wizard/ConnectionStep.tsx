@@ -1,5 +1,6 @@
 import { dataSources, type DataSource, type SourceType } from '../../data/sources.ts'
 import { databaseOf, endpointOf, emptyDraft, sourceTypes, tips, typeLabels, type DraftSource } from './model.ts'
+import { endpointMeta } from '../../data/connectionFields.ts'
 import {
   cardClass,
   DatabaseGlyph,
@@ -120,10 +121,10 @@ function ConnectionInfo({ source }: { source: DataSource | null }) {
             <StatusPill active={source.active} />
           </div>
           <dl className="mt-6 grid grid-cols-2 gap-x-4 gap-y-5">
-            <Fact label="Host" value={endpointOf(source)} mono />
+            <Fact label={endpointMeta(source).label} value={endpointOf(source)} mono />
             <Fact label="Database" value={databaseOf(source)} mono />
             <Fact label="Tables" value={String(source.tables.length)} />
-            <Fact label="User" value={source.connection.username || '—'} mono />
+            <Fact label="User" value={source.properties.username || '—'} mono />
           </dl>
           <p className={`mt-auto pt-6 text-sm leading-6 ${source.active ? 'text-success-ink' : 'text-muted'}`}>
             {source.active
@@ -326,7 +327,7 @@ export function CreateSource({
                     on ? 'bg-indigo text-white' : 'bg-surface text-ink hover:bg-container-high'
                   }`}
                 >
-                  {type}
+                  {typeLabels[type]}
                 </button>
               )
             })}

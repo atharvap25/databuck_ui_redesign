@@ -1,0 +1,99 @@
+- generic [ref=e34]:
+  - complementary [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]: Databuck
+      - button "Collapse sidebar" [pressed] [ref=e148]
+    - navigation "Primary" [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - button "Executive Dashboard" [ref=e46]
+        - listitem [ref=e54]:
+          - button "Connections" [ref=e55]
+        - listitem [ref=e59]:
+          - button "Data Quality" [ref=e60]
+        - listitem [ref=e65]:
+          - button "Matching" [ref=e66]
+        - listitem [ref=e73]:
+          - button "Observability" [ref=e74]
+        - listitem [ref=e78]:
+          - button "Jobs & Tasks" [ref=e79]
+        - listitem [ref=e85]:
+          - button "Administration" [ref=e86]
+    - paragraph [ref=e147]: 2026 © FirstEigen
+  - generic [ref=e91]:
+    - banner [ref=e92]:
+      - generic [ref=e93]:
+        - button "Acme Corp — Production" [ref=e95]
+        - generic [ref=e102]:
+          - button "Notifications, unread" [ref=e103]
+          - button "Settings" [ref=e108]
+          - button "Data Trust Agent" [ref=e113]
+          - button "Alex Rivera, Data Steward" [ref=e117]:
+            - generic [ref=e118]: AR
+            - generic [ref=e119]:
+              - generic [ref=e120]: Alex Rivera
+              - generic [ref=e121]: Data Steward
+          - button "Log out" [ref=e122]
+    - generic [ref=e150]:
+      - generic [ref=e151]:
+        - heading "Administration" [level=1] [ref=e152]
+        - generic [ref=e153]:
+          - generic [ref=e154]: Search
+          - textbox "Search" [ref=e155]:
+            - /placeholder: Search reports
+        - button "New report" [ref=e635]
+      - tablist [ref=e158]:
+        - tab "Access" [ref=e159] [cursor=pointer]
+        - tab "Tokens" [ref=e160] [cursor=pointer]
+        - tab "Reports" [active] [selected] [ref=e161] [cursor=pointer]
+        - tab "Settings" [ref=e162] [cursor=pointer]
+        - tab "Audit" [ref=e163] [cursor=pointer]
+        - tab "Logs" [ref=e164] [cursor=pointer]
+      - generic [ref=e636]:
+        - complementary [ref=e637]:
+          - generic [ref=e638]:
+            - heading "Reports" [level=2] [ref=e639]
+            - paragraph [ref=e640]: 4 embedded dashboards
+          - list [ref=e641]:
+            - listitem [ref=e642]:
+              - button "Weekly Quality Board DQ Overview · Production" [ref=e643]:
+                - generic [ref=e644]: Weekly Quality Board
+                - generic [ref=e645]: DQ Overview · Production
+            - listitem [ref=e646]:
+              - button "Claims Exception Watch Exception Heatmap · Claims Desk" [ref=e647]:
+                - generic [ref=e648]: Claims Exception Watch
+                - generic [ref=e649]: Exception Heatmap · Claims Desk
+            - listitem [ref=e650]:
+              - button "Catalog Drift Digest Schema Drift · Catalog Hub" [ref=e651]:
+                - generic [ref=e652]: Catalog Drift Digest
+                - generic [ref=e653]: Schema Drift · Catalog Hub
+            - listitem [ref=e654]:
+              - button "Matching Stewardship Matching Outcomes · Production, Claims Desk" [ref=e655]:
+                - generic [ref=e656]: Matching Stewardship
+                - generic [ref=e657]: Matching Outcomes · Production, Claims Desk
+        - generic [ref=e658]:
+          - generic [ref=e659]:
+            - generic [ref=e660]:
+              - heading "Weekly Quality Board" [level=2] [ref=e661]
+              - paragraph [ref=e662]: DQ Overview · Published 6 Oct 2026
+              - generic [ref=e663]: Production
+            - generic [ref=e665]:
+              - button "Edit" [ref=e666]
+              - button "Delete" [ref=e667]
+          - generic [ref=e668]:
+            - paragraph [ref=e669]: Superset embed
+            - generic [ref=e670]:
+              - generic [ref=e671]:
+                - generic [ref=e672]: DQ Overview
+                - generic [ref=e673]: superset · live
+              - paragraph [ref=e674]: Score trends, failed checks, and run volume.
+              - generic [ref=e688]:
+                - generic [ref=e689]:
+                  - paragraph [ref=e690]: Score
+                  - paragraph [ref=e691]: "94.2"
+                - generic [ref=e692]:
+                  - paragraph [ref=e693]: Failed checks
+                  - paragraph [ref=e694]: "6"
+                - generic [ref=e695]:
+                  - paragraph [ref=e696]: Runs (7d)
+                  - paragraph [ref=e697]: "128"

@@ -17,6 +17,15 @@ import {
   type Weekday,
 } from '../../data/jobs.ts'
 import { columnProfiles, dataSources, type DataSource, type SourceTable, type SourceType } from '../../data/sources.ts'
+import {
+  applyDraftProperties,
+  databaseOf as databaseFromProperties,
+  defaultPorts,
+  endpointValue,
+  sourceDefaults,
+  sourceTypes,
+  typeLabels,
+} from '../../data/connectionFields.ts'
 import { validationRuns } from '../../data/validations.ts'
 
 export type { Frequency }
@@ -324,28 +333,7 @@ export type ScheduleState = {
   jobGroupName: string
 }
 
-export const sourceTypes: SourceType[] = ['MSSQL', 'BigQuery', 'Databricks', 'Teradata']
-
-export const typeLabels: Record<SourceType, string> = {
-  MSSQL: 'Microsoft SQL Server',
-  BigQuery: 'Google BigQuery',
-  Databricks: 'Databricks',
-  Teradata: 'Teradata',
-}
-
-export const defaultPorts: Record<SourceType, string> = {
-  MSSQL: '1433',
-  BigQuery: '443',
-  Databricks: '443',
-  Teradata: '1025',
-}
-
-export const sourceDefaults: Record<SourceType, { nickname: string; host: string; database: string; username: string }> = {
-  MSSQL: { nickname: 'MSSQL source', host: 'sql.internal', database: 'app.dbo', username: 'readonly' },
-  BigQuery: { nickname: 'BigQuery source', host: 'bigquery.googleapis.com', database: 'acme.analytics', username: 'analytics-job' },
-  Databricks: { nickname: 'Databricks source', host: 'adb.azuredatabricks.net', database: 'main.default', username: 'token' },
-  Teradata: { nickname: 'Teradata source', host: 'td.internal', database: 'prod_db', username: 'readonly' },
-}
+export { defaultPorts, sourceDefaults, sourceTypes, typeLabels }
 
 export const domains = ['Finance', 'Customer', 'Inventory', 'People', 'Operations'] as const
 
@@ -411,20 +399,14 @@ export function sourceFromDraft(draft: DraftSource, existing: DataSource[]): Dat
     type: draft.type,
     schema: database,
     active: true,
-    connection: {
+    properties: applyDraftProperties(draft.type, {
       host,
+      database,
       port: draft.port.trim(),
       username: draft.username.trim(),
+      password: draft.password,
       createdOn,
-      encrypt: draft.type === 'MSSQL' ? 'Yes' : '',
-      logon: draft.type === 'Teradata' ? 'TD2' : '',
-      project: draft.type === 'BigQuery' ? host : '',
-      location: draft.type === 'BigQuery' ? 'US' : '',
-      serviceAccount: '',
-      workspaceUrl: draft.type === 'Databricks' ? host : '',
-      catalog: draft.type === 'Databricks' ? database.split('.')[0] ?? '' : '',
-      warehouse: '',
-    },
+    }),
     tables: [],
   }
 }
@@ -556,11 +538,11 @@ export function dateFormatFor(schema: SchemaColumn[]) {
 }
 
 export function endpointOf(source: DataSource) {
-  return source.connection.host || source.connection.project || source.connection.workspaceUrl || source.schema
+  return endpointValue(source)
 }
 
 export function databaseOf(source: DataSource) {
-  return source.schema || source.connection.catalog || source.connection.project || '—'
+  return databaseFromProperties(source)
 }
 
 export function schemaFor(table: SourceTable): SchemaColumn[] {

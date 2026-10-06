@@ -1,0 +1,90 @@
+- generic [ref=e34]:
+  - complementary [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]: Databuck
+      - button "Collapse sidebar" [pressed] [ref=e148]
+    - navigation "Primary" [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - button "Executive Dashboard" [ref=e46]
+        - listitem [ref=e54]:
+          - button "Connections" [ref=e55]
+        - listitem [ref=e59]:
+          - button "Data Quality" [ref=e60]
+        - listitem [ref=e65]:
+          - button "Matching" [ref=e66]
+        - listitem [ref=e73]:
+          - button "Observability" [ref=e74]
+        - listitem [ref=e78]:
+          - button "Jobs & Tasks" [ref=e79]
+        - listitem [ref=e85]:
+          - button "Administration" [ref=e86]
+    - paragraph [ref=e147]: 2026 © FirstEigen
+  - generic [ref=e91]:
+    - banner [ref=e92]:
+      - generic [ref=e93]:
+        - button "Acme Corp — Production" [ref=e95]
+        - generic [ref=e102]:
+          - button "Notifications, unread" [ref=e103]
+          - button "Settings" [ref=e108]
+          - button "Data Trust Agent" [ref=e113]
+          - button "Alex Rivera, Data Steward" [ref=e117]:
+            - generic [ref=e118]: AR
+            - generic [ref=e119]:
+              - generic [ref=e120]: Alex Rivera
+              - generic [ref=e121]: Data Steward
+          - button "Log out" [ref=e122]
+    - generic [ref=e150]:
+      - generic [ref=e151]:
+        - heading "Administration" [level=1] [ref=e152]
+        - generic [ref=e153]:
+          - generic [ref=e154]: Search
+          - textbox "Search" [ref=e155]:
+            - /placeholder: Filter log lines
+        - button "Fetch logs" [ref=e982]
+      - tablist [ref=e158]:
+        - tab "Access" [ref=e159] [cursor=pointer]
+        - tab "Tokens" [ref=e160] [cursor=pointer]
+        - tab "Reports" [ref=e161] [cursor=pointer]
+        - tab "Settings" [ref=e162] [cursor=pointer]
+        - tab "Audit" [ref=e163] [cursor=pointer]
+        - tab "Logs" [selected] [ref=e164] [cursor=pointer]
+      - generic [ref=e983]:
+        - generic [ref=e984]:
+          - generic [ref=e986]:
+            - generic [ref=e987]: Source
+            - combobox [ref=e988]:
+              - option "Validation" [selected]
+              - option "catalina.out"
+              - option "Databuck error"
+          - generic [ref=e990]:
+            - generic [ref=e991]: Validation
+            - combobox [ref=e992]:
+              - option "Customer_Master_Validation" [selected]
+              - option "Orders_Validation"
+              - option "Order_Lines_Validation"
+              - option "Shipments_Validation"
+              - option "AR_Invoices_Validation"
+              - option "AR_Payments_Validation"
+              - option "Workers_Validation"
+              - option "Balances_Validation"
+              - option "General_Ledger_Validation"
+              - option "Accounts_Validation"
+              - option "Positions_Validation"
+              - option "Returns_Validation"
+              - option "Movements_Validation"
+              - option "Journals_Validation"
+              - option "Products_Validation"
+              - option "Customer_360_Validation"
+              - option "Campaigns_Validation"
+              - option "Vendors_Validation"
+          - generic [ref=e994]:
+            - generic [ref=e995]: Lines
+            - combobox [ref=e996]:
+              - option "50"
+              - option "100" [selected]
+              - option "250"
+              - option "500"
+              - option "Custom"
+          - button "Fetch logs" [active] [ref=e997]
+        - generic [ref=e1006]: INFO 2026-10-06 13:40:00 Validation Customer_Master_Validation started INFO 2026-10-06 13:40:01 Connecting to MSSQL · erp.dbo INFO 2026-10-06 13:40:02 Loaded 1,204,331 rows from erp.dbo.Customer_Master INFO 2026-10-06 13:40:04 Applied template Standard (v14) INFO 2026-10-06 13:40:05 Running 28 rules across 41 columns INFO 2026-10-06 13:40:07 Null check passed on customer_id (0 nulls) INFO 2026-10-06 13:40:08 Uniqueness passed on customer_id WARN 2026-10-06 13:40:09 Length check flagged 14 values on email INFO 2026-10-06 13:40:11 Pattern check passed on phone INFO 2026-10-06 13:40:12 Score 98.4 · failed checks 0 INFO 2026-10-06 13:40:14 Exception file written (0 rows) INFO 2026-10-06 13:40:15 Validation Customer_Master_Validation complete in 4m 12s INFO 2026-10-06 13:40:16 Column email · rule null · pass INFO 2026-10-06 13:40:18 Column status · rule type · pass INFO 2026-10-06 13:40:19 Column updated_at · rule range · pass INFO 2026-10-06 13:40:21 Column amount · rule regex · pass INFO 2026-10-06 13:40:22 Column email · rule null · pass INFO 2026-10-06 13:40:23 Column status · rule type · pass INFO 2026-10-06 13:40:25 Column updated_at · rule range · warn INFO 2026-10-06 13:40:26 Column amount · rule regex · pass INFO 2026-10-06 13:40:28 Column email · rule null · pass INFO 2026-10-06 13:40:29 Column status · rule type · pass INFO 2026-10-06 13:40:30 Column updated_at · rule range · pass INFO 2026-10-06 13:40:32 Column amount · rule regex · pass INFO 2026-10-06 13:40:33 Column email · rule null · pass INFO 2026-10-06 13:40:35 Column status · rule type · pass INFO 2026-10-06 13:40:36 Column updated_at · rule range · pass INFO 2026-10-06 13:40:37 Column amount · rule regex · warn INFO 2026-10-06 13:40:39 Column email · rule null · pass INFO 2026-10-06 13:40:40 Column status · rule type · pass INFO 2026-10-06 13:40:42 Column updated_at · rule range · pass INFO 2026-10-06 13:40:43 Column amount · rule regex · pass INFO 2026-10-06 13:40:44 Column email · rule null · pass INFO 2026-10-06 13:40:46 Column status · rule type · pass INFO 2026-10-06 13:40:47 Column updated_at · rule range · pass INFO 2026-10-06 13:40:49 Column amount · rule regex · pass INFO 2026-10-06 13:40:50 Column email · rule null · warn INFO 2026-10-06 13:40:51 Column status · rule type · pass INFO 2026-10-06 13:40:53 Column updated_at · rule range · pass INFO 2026-10-06 13:40:54 Column amount · rule regex · pass INFO 2026-10-06 13:40:56 Column email · rule null · pass INFO 2026-10-06 13:40:57 Column status · rule type · pass INFO 2026-10-06 13:40:58 Column updated_at · rule range · pass INFO 2026-10-06 13:41:00 Column amount · rule regex · pass INFO 2026-10-06 13:41:01 Column email · rule null · pass INFO 2026-10-06 13:41:03 Column status · rule type · warn INFO 2026-10-06 13:41:04 Column updated_at · rule range · pass INFO 2026-10-06 13:41:05 Column amount · rule regex · pass INFO 2026-10-06 13:41:07 Column email · rule null · pass INFO 2026-10-06 13:41:08 Column status · rule type · pass INFO 2026-10-06 13:41:10 Column updated_at · rule range · pass INFO 2026-10-06 13:41:11 Column amount · rule regex · pass INFO 2026-10-06 13:41:12 Column email · rule null · pass INFO 2026-10-06 13:41:14 Column status · rule type · pass INFO 2026-10-06 13:41:15 Column updated_at · rule range · warn INFO 2026-10-06 13:41:17 Column amount · rule regex · pass INFO 2026-10-06 13:41:18 Column email · rule null · pass INFO 2026-10-06 13:41:19 Column status · rule type · pass INFO 2026-10-06 13:41:21 Column updated_at · rule range · pass INFO 2026-10-06 13:41:22 Column amount · rule regex · pass INFO 2026-10-06 13:41:24 Column email · rule null · pass INFO 2026-10-06 13:41:25 Column status · rule type · pass INFO 2026-10-06 13:41:26 Column updated_at · rule range · pass INFO 2026-10-06 13:41:28 Column amount · rule regex · warn INFO 2026-10-06 13:41:29 Column email · rule null · pass INFO 2026-10-06 13:41:31 Column status · rule type · pass INFO 2026-10-06 13:41:32 Column updated_at · rule range · pass INFO 2026-10-06 13:41:33 Column amount · rule regex · pass INFO 2026-10-06 13:41:35 Column email · rule null · pass INFO 2026-10-06 13:41:36 Column status · rule type · pass INFO 2026-10-06 13:41:38 Column updated_at · rule range · pass INFO 2026-10-06 13:41:39 Column amount · rule regex · pass INFO 2026-10-06 13:41:40 Column email · rule null · warn INFO 2026-10-06 13:41:42 Column status · rule type · pass INFO 2026-10-06 13:41:43 Column updated_at · rule range · pass INFO 2026-10-06 13:41:45 Column amount · rule regex · pass INFO 2026-10-06 13:41:46 Column email · rule null · pass INFO 2026-10-06 13:41:47 Column status · rule type · pass INFO 2026-10-06 13:41:49 Column updated_at · rule range · pass INFO 2026-10-06 13:41:50 Column amount · rule regex · pass INFO 2026-10-06 13:41:52 Column email · rule null · pass INFO 2026-10-06 13:41:53 Column status · rule type · warn INFO 2026-10-06 13:41:54 Column updated_at · rule range · pass INFO 2026-10-06 13:41:56 Column amount · rule regex · pass INFO 2026-10-06 13:41:57 Column email · rule null · pass INFO 2026-10-06 13:41:59 Column status · rule type · pass INFO 2026-10-06 13:42:00 Column updated_at · rule range · pass INFO 2026-10-06 13:42:01 Column amount · rule regex · pass INFO 2026-10-06 13:42:03 Column email · rule null · pass INFO 2026-10-06 13:42:04 Column status · rule type · pass INFO 2026-10-06 13:42:06 Column updated_at · rule range · warn INFO 2026-10-06 13:42:07 Column amount · rule regex · pass INFO 2026-10-06 13:42:08 Column email · rule null · pass INFO 2026-10-06 13:42:10 Column status · rule type · pass INFO 2026-10-06 13:42:11 Column updated_at · rule range · pass INFO 2026-10-06 13:42:13 Column amount · rule regex · pass INFO 2026-10-06 13:42:14 Column email · rule null · pass INFO 2026-10-06 13:42:15 Column status · rule type · pass INFO 2026-10-06 13:42:17 Column updated_at · rule range · pass INFO 2026-10-06 13:42:18 Column amount · rule regex · warn

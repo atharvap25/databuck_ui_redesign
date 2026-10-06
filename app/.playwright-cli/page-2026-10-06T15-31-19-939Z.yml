@@ -1,0 +1,161 @@
+- generic [ref=e34]:
+  - complementary [ref=e36]:
+    - navigation "Primary" [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - button "Executive Dashboard" [ref=e46]
+        - listitem [ref=e54]:
+          - button "Connections" [ref=e55]
+        - listitem [ref=e59]:
+          - button "Data Quality" [ref=e60]
+        - listitem [ref=e65]:
+          - button "Matching" [ref=e66]
+        - listitem [ref=e73]:
+          - button "Observability" [ref=e74]
+        - listitem [ref=e78]:
+          - button "Jobs & Tasks" [ref=e79]
+        - listitem [ref=e85]:
+          - button "Administration" [ref=e86]
+  - generic [ref=e91]:
+    - banner [ref=e92]:
+      - generic [ref=e93]:
+        - button "Acme Corp — Production" [ref=e95]
+        - generic [ref=e102]:
+          - button "Notifications, unread" [ref=e103]
+          - button "Settings" [ref=e108]
+          - button "Data Trust Agent" [ref=e113]
+          - button "Alex Rivera, Data Steward" [ref=e117]:
+            - generic [ref=e118]: AR
+            - generic [ref=e119]:
+              - generic [ref=e120]: Alex Rivera
+              - generic [ref=e121]: Data Steward
+          - button "Log out" [ref=e122]
+    - generic [ref=e960]:
+      - generic [ref=e962]:
+        - banner [ref=e963]:
+          - generic [ref=e964]:
+            - heading "Connect to Your Data" [level=1] [ref=e965]
+            - paragraph [ref=e966]: Pick a database you’ve already connected, or set up a new one
+          - button "Configure from History" [ref=e967]
+        - generic [ref=e972]:
+          - generic [ref=e973]:
+            - button "Select Existing 22" [ref=e974]:
+              - text: Select Existing
+              - generic [ref=e980]: "22"
+            - button [pressed] [ref=e981]
+          - generic [ref=e984]:
+            - generic [ref=e985]:
+              - generic [ref=e986]:
+                - heading [level=2] [ref=e987]
+                - generic [ref=e993]:
+                  - generic [ref=e994]:
+                    - generic [ref=e995]:
+                      - text: Data source type
+                      - generic [aria-hidden] [ref=e996]: "*"
+                    - combobox [ref=e997]:
+                      - option "Apache Kafka"
+                      - option "Azure Cosmos DB"
+                      - option "Azure Data Lake Storage Gen1"
+                      - option "Azure Data Lake Storage Gen2 (Batch)"
+                      - option "Azure Synapse MSSQL"
+                      - option "Big Query"
+                      - option "Databricks Delta Lake"
+                      - option "File System (Batch)"
+                      - option "Hive (Kerberos)"
+                      - option "Impala"
+                      - option "MapR Hive"
+                      - option "MongoDB"
+                      - option "MSSQL" [selected]
+                      - option "MSSQL (Active Directory)"
+                      - option "MYSQL"
+                      - option "Oracle (Standalone)"
+                      - option "Postgres"
+                      - option "Snowflake"
+                      - option "S3 (Batch)"
+                      - option "S3 IAMRole (Batch)"
+                      - option "S3 IAMRole Config (Batch)"
+                      - option "Teradata"
+                      - option "MicroStrategy Cubes"
+                      - option "GCS (Batch)"
+                      - option "DB2"
+                      - option "OpenSearch"
+                  - generic [ref=e998]:
+                    - generic [ref=e999]:
+                      - text: Source nickname
+                      - generic [aria-hidden] [ref=e1000]: "*"
+                    - textbox "e.g. Production DB" [ref=e1001]: MSSQL source
+                  - generic [ref=e1002]:
+                    - generic [ref=e1003]:
+                      - text: URI / Host
+                      - generic [aria-hidden] [ref=e1004]: "*"
+                    - textbox "e.g. sql.internal" [ref=e1005]: sql.internal
+                  - generic [ref=e1006]:
+                    - generic [ref=e1007]:
+                      - text: Database / Schema
+                      - generic [aria-hidden] [ref=e1008]: "*"
+                    - textbox "e.g. erp.dbo" [ref=e1009]: app.dbo
+                  - generic [ref=e1010]:
+                    - generic [ref=e1011]:
+                      - text: Port
+                      - generic [aria-hidden] [ref=e1012]: "*"
+                    - textbox [ref=e1013]: "1433"
+                  - generic [ref=e1014]:
+                    - generic [ref=e1015]: Tags
+                    - generic [ref=e1016]:
+                      - textbox "Add tag…" [ref=e1017]
+                      - button "Add tag" [ref=e1018]
+                    - button "MSSQL Remove MSSQL" [ref=e1021]:
+                      - text: MSSQL
+                      - generic [aria-hidden] [ref=e1022]: ×
+                      - generic [ref=e1023]: Remove MSSQL
+              - generic [ref=e1024]:
+                - heading [level=2] [ref=e1025]
+                - generic [ref=e1029]:
+                  - generic [ref=e1030]:
+                    - generic [ref=e1031]: Username
+                    - textbox "e.g. reader" [ref=e1032]: readonly
+                  - generic [ref=e1033]:
+                    - generic [ref=e1034]: Password
+                    - generic [ref=e1035]:
+                      - textbox "Enter password" [ref=e1036]
+                      - button "Show password" [ref=e1037]
+            - generic [ref=e1041]:
+              - generic [ref=e1042]:
+                - heading [level=2] [ref=e1043]
+                - list [ref=e1047]:
+                  - listitem [ref=e1048]: Ensure your database allows external connections from this platform
+                  - listitem [ref=e1050]: Use a read-only user for security best practices
+                  - listitem [ref=e1052]: Source nickname helps you identify this connection later
+                  - listitem [ref=e1054]: Tags help organize sources across your team
+              - generic [ref=e1056]:
+                - heading "Supported Sources" [level=2] [ref=e1057]
+                - generic [ref=e1058]:
+                  - button "Apache Kafka" [ref=e1059]
+                  - button "Azure Cosmos DB" [ref=e1060]
+                  - button "Azure Data Lake Storage Gen1" [ref=e1061]
+                  - button "Azure Data Lake Storage Gen2 (Batch)" [ref=e1062]
+                  - button "Azure Synapse MSSQL" [ref=e1063]
+                  - button "Big Query" [ref=e1064]
+                  - button "Databricks Delta Lake" [ref=e1065]
+                  - button "File System (Batch)" [ref=e1066]
+                  - button "Hive (Kerberos)" [ref=e1067]
+                  - button "Impala" [ref=e1068]
+                  - button "MapR Hive" [ref=e1069]
+                  - button "MongoDB" [ref=e1070]
+                  - button "MSSQL" [ref=e1071]
+                  - button "MSSQL (Active Directory)" [ref=e1072]
+                  - button "MYSQL" [ref=e1073]
+                  - button "Oracle (Standalone)" [ref=e1074]
+                  - button "Postgres" [ref=e1075]
+                  - button "Snowflake" [ref=e1076]
+                  - button "S3 (Batch)" [ref=e1077]
+                  - button "S3 IAMRole (Batch)" [ref=e1078]
+                  - button "S3 IAMRole Config (Batch)" [ref=e1079]
+                  - button "Teradata" [ref=e1080]
+                  - button "MicroStrategy Cubes" [ref=e1081]
+                  - button "GCS (Batch)" [ref=e1082]
+                  - button "DB2" [ref=e1083]
+                  - button "OpenSearch" [ref=e1084]
+      - contentinfo [ref=e1085]:
+        - button "Back" [ref=e1086]
+        - button "Continue" [ref=e1089]

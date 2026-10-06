@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { typeLabels } from '../data/connectionFields.ts'
 import { type DataSource } from '../data/sources.ts'
 import { ChevronIcon, DatabaseIcon, EllipsisIcon } from './icons.tsx'
 import IconBox from './IconBox.tsx'
@@ -8,8 +9,6 @@ import StatusBadge from './StatusBadge.tsx'
 const pageSize = 14
 
 export type SourceSelection = { kind: 'source'; id: string } | { kind: 'table'; id: string }
-
-const sourceActions = ['Copy', 'Edit', 'Deactivate']
 
 function RowMenu({
   label,
@@ -92,7 +91,7 @@ function RowMenu({
                     onSelect?.(item)
                   }}
                   className={`flex h-9 w-full items-center rounded-md px-3 text-left font-sans text-sm transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
-                    item === 'Delete' ? 'text-danger' : 'text-ink'
+                    item === 'Delete' || item === 'Deactivate' ? 'text-danger' : 'text-ink'
                   }`}
                 >
                   {item}
@@ -118,11 +117,13 @@ export default function ConnectionsPanel({
   selection,
   onSelect,
   revealId,
+  onAction,
 }: {
   sources: DataSource[]
   selection: SourceSelection | null
   onSelect: (selection: SourceSelection) => void
   revealId?: string | null
+  onAction?: (source: DataSource, action: 'Copy' | 'Edit' | 'Deactivate') => void
 }) {
   const [collapsed, setCollapsed] = useState(false)
   const [page, setPage] = useState(1)
@@ -190,6 +191,7 @@ export default function ConnectionsPanel({
                   selection={selection}
                   highlightId={revealId}
                   onSelect={onSelect}
+                  onAction={onAction}
                 />
               ))}
             </ul>
@@ -258,11 +260,13 @@ function SourceRow({
   selection,
   highlightId,
   onSelect,
+  onAction,
 }: {
   source: DataSource
   selection: SourceSelection | null
   highlightId?: string | null
   onSelect: (selection: SourceSelection) => void
+  onAction?: (source: DataSource, action: 'Copy' | 'Edit' | 'Deactivate') => void
 }) {
   const selected = isSelected(selection, { kind: 'source', id: source.id })
   const highlighted = highlightId === source.id || source.tables.some((table) => table.id === highlightId)
@@ -289,7 +293,7 @@ function SourceRow({
         <span className="min-w-0">
           <span className="block truncate font-sans text-sm font-medium text-ink">{source.name}</span>
           <span className="mt-0.5 block truncate text-xs text-muted">
-            {source.type}
+            {typeLabels[source.type]}
             <span className="font-mono"> · {source.schema}</span>
           </span>
         </span>
@@ -298,7 +302,14 @@ function SourceRow({
           label={source.active ? 'Active' : 'Inactive'}
           hideLabel
         />
-        <RowMenu label={`Actions for ${source.name}`} items={sourceActions} />
+        <RowMenu
+          label={`Actions for ${source.name}`}
+          items={['Copy', 'Edit', source.active ? 'Deactivate' : 'Activate']}
+          onSelect={(item) => {
+            const action = item === 'Activate' ? 'Deactivate' : item
+            if (action === 'Copy' || action === 'Edit' || action === 'Deactivate') onAction?.(source, action)
+          }}
+        />
       </div>
     </li>
   )

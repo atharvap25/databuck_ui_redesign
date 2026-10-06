@@ -1,0 +1,116 @@
+- generic [ref=e34]:
+  - complementary [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]: Databuck
+      - button "Collapse sidebar" [pressed] [ref=e148]
+    - navigation "Primary" [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - button "Executive Dashboard" [ref=e46]
+        - listitem [ref=e54]:
+          - button "Connections" [ref=e55]
+        - listitem [ref=e59]:
+          - button "Data Quality" [ref=e60]
+        - listitem [ref=e65]:
+          - button "Matching" [ref=e66]
+        - listitem [ref=e73]:
+          - button "Observability" [ref=e74]
+        - listitem [ref=e78]:
+          - button "Jobs & Tasks" [ref=e79]
+        - listitem [ref=e85]:
+          - button "Administration" [ref=e86]
+    - paragraph [ref=e147]: 2026 © FirstEigen
+  - generic [ref=e91]:
+    - banner [ref=e92]:
+      - generic [ref=e93]:
+        - button "Acme Corp — Production" [ref=e95]
+        - generic [ref=e102]:
+          - button "Notifications, unread" [ref=e103]
+          - button "Settings" [ref=e108]
+          - button "Data Trust Agent" [ref=e113]
+          - button "Alex Rivera, Data Steward" [ref=e117]:
+            - generic [ref=e118]: AR
+            - generic [ref=e119]:
+              - generic [ref=e120]: Alex Rivera
+              - generic [ref=e121]: Data Steward
+          - button "Log out" [ref=e122]
+    - generic [ref=e150]:
+      - generic [ref=e151]:
+        - heading "Administration" [level=1] [ref=e152]
+        - generic [ref=e153]:
+          - generic [ref=e154]: Search
+          - textbox "Search" [ref=e155]:
+            - /placeholder: Search tokens
+        - button "New token" [active] [ref=e541]
+      - tablist [ref=e158]:
+        - tab "Access" [ref=e159] [cursor=pointer]
+        - tab "Tokens" [selected] [ref=e160] [cursor=pointer]
+        - tab "Reports" [ref=e161] [cursor=pointer]
+        - tab "Settings" [ref=e162] [cursor=pointer]
+        - tab "Audit" [ref=e163] [cursor=pointer]
+        - tab "Logs" [ref=e164] [cursor=pointer]
+      - generic [ref=e542]:
+        - generic [ref=e543]:
+          - generic [ref=e544]:
+            - generic [ref=e545]:
+              - paragraph [ref=e546]: MCP token
+              - heading "Model context protocol" [level=2] [ref=e547]
+              - paragraph [ref=e548]: A single platform token for MCP clients. Rotate it if a connector is compromised; the previous value stops working immediately.
+            - button "Rotate token" [ref=e549]
+          - generic [ref=e550]:
+            - generic [ref=e551]:
+              - term [ref=e552]: Prefix
+              - definition [ref=e553]: dbk_mcp_7f3a…
+            - generic [ref=e554]:
+              - term [ref=e555]: Last rotated
+              - definition [ref=e556]: 18 Sep 2026
+        - generic [ref=e557]:
+          - generic [ref=e558]:
+            - heading "API tokens" [level=2] [ref=e559]
+            - paragraph [ref=e560]: Use these to call Databuck APIs from jobs, CI, and integrations.
+          - table [ref=e562]:
+            - rowgroup [ref=e563]:
+              - row [ref=e564]:
+                - columnheader "Name" [ref=e565]
+                - columnheader "Created by" [ref=e566]
+                - columnheader "Created" [ref=e567]
+                - columnheader "Last used" [ref=e568]
+                - columnheader "Prefix" [ref=e569]
+                - columnheader "Action" [ref=e570]
+            - rowgroup [ref=e571]:
+              - row [ref=e572]:
+                - cell "CI quality runner" [ref=e573]
+                - cell "Priya Shah" [ref=e574]
+                - cell "12 Sep 2026" [ref=e575]
+                - cell "6 Oct 2026, 6:40 PM" [ref=e576]
+                - cell "dbk_live_9c2a…" [ref=e577]
+                - cell [ref=e578]:
+                  - button "Revoke" [ref=e579]
+              - row [ref=e580]:
+                - cell "Matching API" [ref=e581]
+                - cell "Alex Rivera" [ref=e582]
+                - cell "22 Aug 2026" [ref=e583]
+                - cell "5 Oct 2026, 1:14 PM" [ref=e584]
+                - cell "dbk_live_b71e…" [ref=e585]
+                - cell [ref=e586]:
+                  - button "Revoke" [ref=e587]
+              - row [ref=e588]:
+                - cell "Observability export" [ref=e589]
+                - cell "Marcus Chen" [ref=e590]
+                - cell "4 Jul 2026" [ref=e591]
+                - cell "1 Oct 2026, 8:02 AM" [ref=e592]
+                - cell "dbk_live_e04f…" [ref=e593]
+                - cell [ref=e594]:
+                  - button "Revoke" [ref=e595]
+        - dialog [ref=e597]:
+          - generic [ref=e598]:
+            - heading "New API token" [level=2] [ref=e599]
+            - button "Close" [ref=e600]
+          - generic [ref=e605]:
+            - generic [ref=e606]:
+              - text: Token name
+              - generic [aria-hidden] [ref=e607]: "*"
+            - textbox "CI quality runner" [ref=e608]
+          - generic [ref=e609]:
+            - button "Cancel" [ref=e610]
+            - button "Generate token" [disabled] [ref=e611]

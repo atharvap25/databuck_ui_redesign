@@ -1,0 +1,69 @@
+- generic [ref=e34]:
+  - complementary [ref=e36]:
+    - generic [ref=e37]:
+      - generic [ref=e38]: Databuck
+      - button "Collapse sidebar" [pressed] [ref=e148]
+    - navigation "Primary" [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - button "Executive Dashboard" [ref=e46]
+        - listitem [ref=e54]:
+          - button "Connections" [ref=e55]
+        - listitem [ref=e59]:
+          - button "Data Quality" [ref=e60]
+        - listitem [ref=e65]:
+          - button "Matching" [ref=e66]
+        - listitem [ref=e73]:
+          - button "Observability" [ref=e74]
+        - listitem [ref=e78]:
+          - button "Jobs & Tasks" [ref=e79]
+        - listitem [ref=e85]:
+          - button "Administration" [ref=e86]
+    - paragraph [ref=e147]: 2026 © FirstEigen
+  - generic [ref=e91]:
+    - banner [ref=e92]:
+      - generic [ref=e93]:
+        - button "Acme Corp — Production" [ref=e95]
+        - generic [ref=e102]:
+          - button "Notifications, unread" [ref=e103]
+          - button "Settings" [ref=e108]
+          - button "Data Trust Agent" [ref=e113]
+          - button "Alex Rivera, Data Steward" [ref=e117]:
+            - generic [ref=e118]: AR
+            - generic [ref=e119]:
+              - generic [ref=e120]: Alex Rivera
+              - generic [ref=e121]: Data Steward
+          - button "Log out" [ref=e122]
+    - generic [ref=e150]:
+      - generic [ref=e151]:
+        - heading "Administration" [level=1] [ref=e152]
+        - generic [ref=e153]:
+          - generic [ref=e154]: Search
+          - textbox "Search" [ref=e155]:
+            - /placeholder: Filter log lines
+        - button "Fetch logs" [ref=e982]
+      - tablist [ref=e158]:
+        - tab "Access" [ref=e159] [cursor=pointer]
+        - tab "Tokens" [ref=e160] [cursor=pointer]
+        - tab "Reports" [ref=e161] [cursor=pointer]
+        - tab "Settings" [ref=e162] [cursor=pointer]
+        - tab "Audit" [ref=e163] [cursor=pointer]
+        - tab "Logs" [selected] [ref=e164] [cursor=pointer]
+      - generic [ref=e983]:
+        - generic [ref=e984]:
+          - generic [ref=e986]:
+            - generic [ref=e987]: Source
+            - combobox [ref=e988]:
+              - option "Validation"
+              - option "catalina.out" [selected]
+              - option "Databuck error"
+          - generic [ref=e994]:
+            - generic [ref=e995]: Lines
+            - combobox [ref=e996]:
+              - option "50"
+              - option "100" [selected]
+              - option "250"
+              - option "500"
+              - option "Custom"
+          - button "Fetch logs" [active] [ref=e997]
+        - generic [ref=e1006]: "06-Oct-2026 13:40:11.412 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Server version: Apache Tomcat/9.0.89 06-Oct-2026 13:40:11.418 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log OS Name: Linux 06-Oct-2026 13:40:11.419 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Architecture: amd64 06-Oct-2026 13:40:11.421 INFO [main] org.apache.catalina.startup.VersionLoggerListener.log Java Home: /usr/lib/jvm/java-17 06-Oct-2026 13:40:12.104 INFO [main] org.apache.catalina.core.AprLifecycleListener.lifecycleEvent Loaded Apache Tomcat Native library [1.2.39] 06-Oct-2026 13:40:12.882 INFO [main] org.apache.coyote.AbstractProtocol.init Initializing ProtocolHandler [\"http-nio-8080\"] 06-Oct-2026 13:40:13.441 INFO [main] org.apache.catalina.startup.Catalina.load Server initialization in [2,029] milliseconds 06-Oct-2026 13:40:13.908 INFO [main] org.apache.catalina.core.StandardService.startInternal Starting service [Catalina] 06-Oct-2026 13:40:14.112 INFO [main] org.apache.catalina.core.StandardEngine.startInternal Starting Servlet engine: [Apache Tomcat/9.0.89] 06-Oct-2026 13:40:16.774 INFO [main] org.apache.jasper.servlet.TldScanner.scanJars At least one JAR was scanned for TLDs yet contained no TLDs 06-Oct-2026 13:40:18.201 INFO [main] org.apache.catalina.startup.HostConfig.deployWAR Deploying web application archive [/opt/tomcat/webapps/databuck.war] 06-Oct-2026 13:40:24.663 INFO [main] org.apache.catalina.startup.HostConfig.deployWAR Deployment of web application archive [/opt/tomcat/webapps/databuck.war] has finished in [6,462] ms 06-Oct-2026 13:40:24.701 INFO [main] org.apache.coyote.AbstractProtocol.start Starting ProtocolHandler [\"http-nio-8080\"] 06-Oct-2026 13:40:24.718 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in [10,794] milliseconds 06-Oct-2026 13:44:14.114 INFO [http-nio-8080-exec-3] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:45:15.115 INFO [http-nio-8080-exec-4] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:46:16.116 INFO [http-nio-8080-exec-5] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:47:17.117 INFO [http-nio-8080-exec-6] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:48:18.118 INFO [http-nio-8080-exec-7] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:49:19.119 INFO [http-nio-8080-exec-8] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:40:20.120 INFO [http-nio-8080-exec-9] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:41:21.121 INFO [http-nio-8080-exec-10] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:42:22.122 INFO [http-nio-8080-exec-11] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:43:23.123 INFO [http-nio-8080-exec-12] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:44:24.124 INFO [http-nio-8080-exec-1] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:45:25.125 INFO [http-nio-8080-exec-2] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:46:26.126 INFO [http-nio-8080-exec-3] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:47:27.127 INFO [http-nio-8080-exec-4] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:48:28.128 INFO [http-nio-8080-exec-5] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:49:29.129 INFO [http-nio-8080-exec-6] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:40:30.130 INFO [http-nio-8080-exec-7] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:41:31.131 INFO [http-nio-8080-exec-8] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:42:32.132 INFO [http-nio-8080-exec-9] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:43:33.133 INFO [http-nio-8080-exec-10] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:44:34.134 INFO [http-nio-8080-exec-11] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:45:35.135 INFO [http-nio-8080-exec-12] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:46:36.136 INFO [http-nio-8080-exec-1] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:47:37.137 INFO [http-nio-8080-exec-2] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:48:38.138 INFO [http-nio-8080-exec-3] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:49:39.139 INFO [http-nio-8080-exec-4] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:40:40.140 INFO [http-nio-8080-exec-5] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:41:41.141 INFO [http-nio-8080-exec-6] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:42:42.142 INFO [http-nio-8080-exec-7] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:43:43.143 INFO [http-nio-8080-exec-8] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:44:44.144 INFO [http-nio-8080-exec-9] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:45:45.145 INFO [http-nio-8080-exec-10] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:46:46.146 INFO [http-nio-8080-exec-11] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:47:47.147 INFO [http-nio-8080-exec-12] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:48:48.148 INFO [http-nio-8080-exec-1] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:49:49.149 INFO [http-nio-8080-exec-2] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:40:50.150 INFO [http-nio-8080-exec-3] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:41:51.151 INFO [http-nio-8080-exec-4] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:42:52.152 INFO [http-nio-8080-exec-5] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:43:53.153 INFO [http-nio-8080-exec-6] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:44:54.154 INFO [http-nio-8080-exec-7] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:45:55.155 INFO [http-nio-8080-exec-8] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:46:56.156 INFO [http-nio-8080-exec-9] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:47:57.157 INFO [http-nio-8080-exec-10] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:48:58.158 INFO [http-nio-8080-exec-11] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:49:59.159 INFO [http-nio-8080-exec-12] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:40:00.160 INFO [http-nio-8080-exec-1] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:41:01.161 INFO [http-nio-8080-exec-2] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:42:02.162 INFO [http-nio-8080-exec-3] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:43:03.163 INFO [http-nio-8080-exec-4] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:44:04.164 INFO [http-nio-8080-exec-5] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:45:05.165 INFO [http-nio-8080-exec-6] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:46:06.166 INFO [http-nio-8080-exec-7] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:47:07.167 INFO [http-nio-8080-exec-8] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:48:08.168 INFO [http-nio-8080-exec-9] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:49:09.169 INFO [http-nio-8080-exec-10] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:40:10.170 INFO [http-nio-8080-exec-11] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:41:11.171 INFO [http-nio-8080-exec-12] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:42:12.172 INFO [http-nio-8080-exec-1] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:43:13.173 INFO [http-nio-8080-exec-2] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:44:14.174 INFO [http-nio-8080-exec-3] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:45:15.175 INFO [http-nio-8080-exec-4] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:46:16.176 INFO [http-nio-8080-exec-5] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:47:17.177 INFO [http-nio-8080-exec-6] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:48:18.178 INFO [http-nio-8080-exec-7] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:49:19.179 INFO [http-nio-8080-exec-8] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:40:20.180 INFO [http-nio-8080-exec-9] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:41:21.181 INFO [http-nio-8080-exec-10] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:42:22.182 INFO [http-nio-8080-exec-11] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:43:23.183 INFO [http-nio-8080-exec-12] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:44:24.184 INFO [http-nio-8080-exec-1] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:45:25.185 INFO [http-nio-8080-exec-2] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:46:26.186 INFO [http-nio-8080-exec-3] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:47:27.187 INFO [http-nio-8080-exec-4] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:48:28.188 INFO [http-nio-8080-exec-5] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:49:29.189 INFO [http-nio-8080-exec-6] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:40:30.190 INFO [http-nio-8080-exec-7] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:41:31.191 INFO [http-nio-8080-exec-8] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:42:32.192 INFO [http-nio-8080-exec-9] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:43:33.193 INFO [http-nio-8080-exec-10] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:44:34.194 INFO [http-nio-8080-exec-11] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:45:35.195 INFO [http-nio-8080-exec-12] com.databuck.web.RequestLog POST /api/jobs/run 202 06-Oct-2026 13:46:36.196 INFO [http-nio-8080-exec-1] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:47:37.197 INFO [http-nio-8080-exec-2] com.databuck.web.RequestLog GET /api/validations 200 06-Oct-2026 13:48:38.198 INFO [http-nio-8080-exec-3] com.databuck.web.RequestLog GET /health 200 06-Oct-2026 13:49:39.199 INFO [http-nio-8080-exec-4] com.databuck.web.RequestLog GET /api/validations 200"

@@ -1,6 +1,6 @@
 import { useEffect, useId, useRef, useState } from 'react'
 import type { JobKind } from '../data/jobs.ts'
-import { dataSources, type DataSource } from '../data/sources.ts'
+import { dataSources, duplicateSource, type DataSource } from '../data/sources.ts'
 import ConnectionDetail from './ConnectionDetail.tsx'
 import ConnectionsPanel, { type SourceSelection } from './ConnectionsPanel.tsx'
 import EmptyState from './EmptyState.tsx'
@@ -49,6 +49,7 @@ export default function Layout1Workspace({
   const [validationsCollapsed, setValidationsCollapsed] = useState(false)
   const [matchingId, setMatchingId] = useState(matchingSummaryId)
   const [matchingsCollapsed, setMatchingsCollapsed] = useState(false)
+  const [editSignal, setEditSignal] = useState(0)
 
   useEffect(() => {
     setQuery('')
@@ -219,6 +220,21 @@ export default function Layout1Workspace({
             selection={selection}
             onSelect={setSelection}
             revealId={revealId}
+            onAction={(source, action) => {
+              if (action === 'Copy') {
+                const next = duplicateSource(source, sources)
+                setSources((current) => [...current, next])
+                setSelection({ kind: 'source', id: next.id })
+                return
+              }
+              setSelection({ kind: 'source', id: source.id })
+              if (action === 'Edit') setEditSignal((current) => current + 1)
+              if (action === 'Deactivate') {
+                setSources((current) =>
+                  current.map((item) => (item.id === source.id ? { ...item, active: !item.active } : item)),
+                )
+              }
+            }}
           />
         ) : (
           <MatchingPanel
@@ -249,6 +265,17 @@ export default function Layout1Workspace({
             <ConnectionDetail
               sources={sources}
               selection={selection}
+              editSignal={editSignal}
+              onCopySource={(source) => {
+                const next = duplicateSource(source, sources)
+                setSources((current) => [...current, next])
+                setSelection({ kind: 'source', id: next.id })
+              }}
+              onToggleActive={(source) => {
+                setSources((current) =>
+                  current.map((item) => (item.id === source.id ? { ...item, active: !item.active } : item)),
+                )
+              }}
               onSaveSource={(next) => {
                 setSources((current) => current.map((item) => (item.id === next.id ? next : item)))
               }}

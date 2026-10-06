@@ -1,0 +1,26 @@
+- main [ref=e3]:
+  - generic [ref=e5]:
+    - heading "Databuck" [level=1] [ref=e11]
+    - paragraph [ref=e12]: Agentic AI for Enterprise Data Trust at Scale
+  - generic [ref=e14]:
+    - generic [ref=e15]:
+      - heading "Welcome back" [level=2] [ref=e16]
+      - paragraph [ref=e17]: Sign in to continue to your workspace.
+    - generic [ref=e18]:
+      - generic [ref=e19]:
+        - generic [ref=e20]: Username
+        - textbox "Username" [ref=e21]:
+          - /placeholder: Enter your username
+      - generic [ref=e22]:
+        - generic [ref=e23]: Password
+        - textbox "Password" [ref=e24]:
+          - /placeholder: Enter your password
+      - generic [ref=e25]:
+        - button "Single sign-on" [ref=e26]
+        - button "Login" [ref=e27]
+    - paragraph [ref=e28]: 2026 © FirstEigen
+    - generic [ref=e29]:
+      - paragraph [ref=e30]: Preview workspace
+      - generic [ref=e31]:
+        - button "Layout 1" [ref=e32]
+        - button "Layout 2" [disabled] [ref=e33]

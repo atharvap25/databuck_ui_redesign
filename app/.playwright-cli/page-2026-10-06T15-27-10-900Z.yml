@@ -1,0 +1,248 @@
+- generic [ref=e34]:
+  - complementary [ref=e36]:
+    - navigation "Primary" [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - button "Executive Dashboard" [ref=e46]
+        - listitem [ref=e54]:
+          - button "Connections" [ref=e55]
+        - listitem [ref=e59]:
+          - button "Data Quality" [ref=e60]
+        - listitem [ref=e65]:
+          - button "Matching" [ref=e66]
+        - listitem [ref=e73]:
+          - button "Observability" [ref=e74]
+        - listitem [ref=e78]:
+          - button "Jobs & Tasks" [ref=e79]
+        - listitem [ref=e85]:
+          - button "Administration" [ref=e86]
+  - generic [ref=e91]:
+    - banner [ref=e92]:
+      - generic [ref=e93]:
+        - button "Acme Corp — Production" [ref=e95]
+        - generic [ref=e102]:
+          - button "Notifications, unread" [ref=e103]
+          - button "Settings" [ref=e108]
+          - button "Data Trust Agent" [ref=e113]
+          - button "Alex Rivera, Data Steward" [ref=e117]:
+            - generic [ref=e118]: AR
+            - generic [ref=e119]:
+              - generic [ref=e120]: Alex Rivera
+              - generic [ref=e121]: Data Steward
+          - button "Log out" [ref=e122]
+    - generic [ref=e149]:
+      - generic [ref=e150]:
+        - heading "Connections" [level=1] [ref=e151]
+        - generic [ref=e152]:
+          - generic [ref=e153]: Search
+          - combobox "Search" [ref=e154]
+        - generic [ref=e155]:
+          - group "Date range" [ref=e156]:
+            - textbox "Start date" [ref=e159]
+            - generic [aria-hidden] [ref=e160]: –
+            - textbox "End date" [ref=e161]
+          - button "Export" [ref=e162]
+          - button "Add Data Source" [ref=e165]
+      - generic [ref=e167]:
+        - complementary [ref=e168]:
+          - generic [ref=e169]:
+            - generic [ref=e170]:
+              - heading "Data Sources" [level=2] [ref=e171]
+              - button "Collapse data sources" [ref=e172]
+            - list [ref=e177]:
+              - listitem [ref=e178]:
+                - button "Acme ERP MSSQL · erp.dbo Active Actions for Acme ERP" [active] [ref=e179] [cursor=pointer]:
+                  - generic [ref=e185]:
+                    - generic [ref=e186]: Acme ERP
+                    - generic [ref=e187]:
+                      - text: MSSQL
+                      - generic [ref=e188]: · erp.dbo
+                  - generic [ref=e189]: Active
+                  - button "Actions for Acme ERP" [ref=e192]
+              - listitem [ref=e197]:
+                - button "Analytics Warehouse BigQuery · acme.analytics Active Actions for Analytics Warehouse" [ref=e198] [cursor=pointer]:
+                  - generic [ref=e204]:
+                    - generic [ref=e205]: Analytics Warehouse
+                    - generic [ref=e206]:
+                      - text: BigQuery
+                      - generic [ref=e207]: · acme.analytics
+                  - generic [ref=e208]: Active
+                  - button "Actions for Analytics Warehouse" [ref=e211]
+              - listitem [ref=e216]:
+                - button "Finance Mart MSSQL · finance.dbo Active Actions for Finance Mart" [ref=e217] [cursor=pointer]:
+                  - generic [ref=e223]:
+                    - generic [ref=e224]: Finance Mart
+                    - generic [ref=e225]:
+                      - text: MSSQL
+                      - generic [ref=e226]: · finance.dbo
+                  - generic [ref=e227]: Active
+                  - button "Actions for Finance Mart" [ref=e230]
+              - listitem [ref=e235]:
+                - button "Marketing Events BigQuery · acme.events Inactive Actions for Marketing Events" [ref=e236] [cursor=pointer]:
+                  - generic [ref=e242]:
+                    - generic [ref=e243]: Marketing Events
+                    - generic [ref=e244]:
+                      - text: BigQuery
+                      - generic [ref=e245]: · acme.events
+                  - generic [ref=e246]: Inactive
+                  - button "Actions for Marketing Events" [ref=e249]
+              - listitem [ref=e254]:
+                - button "Staging Sandbox MSSQL · stage.sandbox Active Actions for Staging Sandbox" [ref=e255] [cursor=pointer]:
+                  - generic [ref=e261]:
+                    - generic [ref=e262]: Staging Sandbox
+                    - generic [ref=e263]:
+                      - text: MSSQL
+                      - generic [ref=e264]: · stage.sandbox
+                  - generic [ref=e265]: Active
+                  - button "Actions for Staging Sandbox" [ref=e268]
+              - listitem [ref=e273]:
+                - button "PeopleSoft HR MSSQL · hr.dbo Active Actions for PeopleSoft HR" [ref=e274] [cursor=pointer]:
+                  - generic [ref=e280]:
+                    - generic [ref=e281]: PeopleSoft HR
+                    - generic [ref=e282]:
+                      - text: MSSQL
+                      - generic [ref=e283]: · hr.dbo
+                  - generic [ref=e284]: Active
+                  - button "Actions for PeopleSoft HR" [ref=e287]
+              - listitem [ref=e292]:
+                - button "Inventory Facts DatabricksDeltaLake · inventory.gold Active Actions for Inventory Facts" [ref=e293] [cursor=pointer]:
+                  - generic [ref=e299]:
+                    - generic [ref=e300]: Inventory Facts
+                    - generic [ref=e301]:
+                      - text: DatabricksDeltaLake
+                      - generic [ref=e302]: · inventory.gold
+                  - generic [ref=e303]: Active
+                  - button "Actions for Inventory Facts" [ref=e306]
+              - listitem [ref=e311]:
+                - button "CRM Sync MSSQL · crm.dbo Active Actions for CRM Sync" [ref=e312] [cursor=pointer]:
+                  - generic [ref=e318]:
+                    - generic [ref=e319]: CRM Sync
+                    - generic [ref=e320]:
+                      - text: MSSQL
+                      - generic [ref=e321]: · crm.dbo
+                  - generic [ref=e322]: Active
+                  - button "Actions for CRM Sync" [ref=e325]
+              - listitem [ref=e330]:
+                - button "Teradata Core Teradata · edw_prod Inactive Actions for Teradata Core" [ref=e331] [cursor=pointer]:
+                  - generic [ref=e337]:
+                    - generic [ref=e338]: Teradata Core
+                    - generic [ref=e339]:
+                      - text: Teradata
+                      - generic [ref=e340]: · edw_prod
+                  - generic [ref=e341]: Inactive
+                  - button "Actions for Teradata Core" [ref=e344]
+              - listitem [ref=e349]:
+                - button "Lakehouse Gold DatabricksDeltaLake · lakehouse.gold Active Actions for Lakehouse Gold" [ref=e350] [cursor=pointer]:
+                  - generic [ref=e356]:
+                    - generic [ref=e357]: Lakehouse Gold
+                    - generic [ref=e358]:
+                      - text: DatabricksDeltaLake
+                      - generic [ref=e359]: · lakehouse.gold
+                  - generic [ref=e360]: Active
+                  - button "Actions for Lakehouse Gold" [ref=e363]
+              - listitem [ref=e368]:
+                - button "Billing Ledger MSSQL · billing.dbo Active Actions for Billing Ledger" [ref=e369] [cursor=pointer]:
+                  - generic [ref=e375]:
+                    - generic [ref=e376]: Billing Ledger
+                    - generic [ref=e377]:
+                      - text: MSSQL
+                      - generic [ref=e378]: · billing.dbo
+                  - generic [ref=e379]: Active
+                  - button "Actions for Billing Ledger" [ref=e382]
+              - listitem [ref=e387]:
+                - button "Claims Mart Teradata · claims_prod Active Actions for Claims Mart" [ref=e388] [cursor=pointer]:
+                  - generic [ref=e394]:
+                    - generic [ref=e395]: Claims Mart
+                    - generic [ref=e396]:
+                      - text: Teradata
+                      - generic [ref=e397]: · claims_prod
+                  - generic [ref=e398]: Active
+                  - button "Actions for Claims Mart" [ref=e401]
+              - listitem [ref=e406]:
+                - button "Clickstream BigQuery · acme.clickstream Active Actions for Clickstream" [ref=e407] [cursor=pointer]:
+                  - generic [ref=e413]:
+                    - generic [ref=e414]: Clickstream
+                    - generic [ref=e415]:
+                      - text: BigQuery
+                      - generic [ref=e416]: · acme.clickstream
+                  - generic [ref=e417]: Active
+                  - button "Actions for Clickstream" [ref=e420]
+              - listitem [ref=e425]:
+                - button "Supplier Hub DatabricksDeltaLake · supplier.silver Inactive Actions for Supplier Hub" [ref=e426] [cursor=pointer]:
+                  - generic [ref=e432]:
+                    - generic [ref=e433]: Supplier Hub
+                    - generic [ref=e434]:
+                      - text: DatabricksDeltaLake
+                      - generic [ref=e435]: · supplier.silver
+                  - generic [ref=e436]: Inactive
+                  - button "Actions for Supplier Hub" [ref=e439]
+            - generic [ref=e444]:
+              - paragraph [ref=e445]: 21 sources
+              - generic [ref=e446]:
+                - button "Prev" [disabled] [ref=e447]
+                - button "1" [ref=e448]
+                - button "2" [ref=e449]
+                - button "Next" [ref=e450]
+        - generic [ref=e459]:
+          - generic [ref=e460]:
+            - generic [ref=e467]:
+              - heading "Acme ERP" [level=2] [ref=e468]
+              - generic [ref=e469]:
+                - generic [ref=e470]: MSSQL
+                - generic [ref=e471]: Active
+            - generic [ref=e474]:
+              - button "Edit" [ref=e475]
+              - button "Copy" [ref=e476]
+          - tablist [ref=e477]:
+            - tab "Details" [selected] [ref=e478] [cursor=pointer]
+            - tab "Tables" [ref=e479] [cursor=pointer]
+          - generic [ref=e481]:
+            - generic [ref=e482]:
+              - heading "Identity" [level=3] [ref=e483]
+              - generic [ref=e485]:
+                - generic [ref=e486]:
+                  - term [ref=e487]: Name
+                  - definition [ref=e488]: Acme ERP
+                - generic [ref=e489]:
+                  - term [ref=e490]: Schema
+                  - definition [ref=e491]: erp.dbo
+                - generic [ref=e492]:
+                  - term [ref=e493]: Project
+                  - definition [ref=e494]: Production
+                - generic [ref=e495]:
+                  - term [ref=e496]: Domain
+                  - definition [ref=e497]: Operations
+                - generic [ref=e498]:
+                  - term [ref=e499]: Created on
+                  - definition [ref=e500]: 12 Mar 2024
+                - generic [ref=e501]:
+                  - term [ref=e502]: Created by
+                  - definition [ref=e503]: Admin User
+            - generic [ref=e504]:
+              - heading "Connection" [level=3] [ref=e505]
+              - generic [ref=e507]:
+                - generic [ref=e508]:
+                  - term [ref=e509]: Host
+                  - definition [ref=e510]: sql-erp.internal
+                - generic [ref=e511]:
+                  - term [ref=e512]: Port
+                  - definition [ref=e513]: "1433"
+                - generic [ref=e514]:
+                  - term [ref=e515]: Database / schema
+                  - definition [ref=e516]: erp.dbo
+                - generic [ref=e517]:
+                  - term [ref=e518]: Username
+                  - definition [ref=e519]: erp_reader
+                - generic [ref=e520]:
+                  - term [ref=e521]: Password
+                  - definition [ref=e522]: ••••••••
+                - generic [ref=e523]:
+                  - term [ref=e524]: SSL
+                  - definition [ref=e525]: "Yes"
+                - generic [ref=e526]:
+                  - term [ref=e527]: Trust store path
+                  - definition [ref=e528]: —
+                - generic [ref=e529]:
+                  - term [ref=e530]: Trust store password
+                  - definition [ref=e531]: —
+            - button "Deactivate" [ref=e533]

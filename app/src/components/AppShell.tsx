@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { useJobs } from '../jobs/jobStore.ts'
 import AgentPanel from './AgentPanel.tsx'
 import AgentWorkspace from './AgentWorkspace.tsx'
+import AdminWorkspace, { type AdminTab } from './admin/AdminWorkspace.tsx'
 import EmptyState from './EmptyState.tsx'
 import Header from './Header.tsx'
 import { ClockIcon } from './icons.tsx'
@@ -18,11 +19,7 @@ const layoutTitle: Record<LayoutId, string> = {
   'layout-2': 'Layout 2',
 }
 
-const underDevelopment = new Set([
-  'executive-dashboard',
-  'observability',
-  'administration',
-])
+const underDevelopment = new Set(['executive-dashboard', 'observability'])
 
 const layout1Workspaces = new Set<WorkspaceId>(['connections', 'data-quality', 'matching'])
 
@@ -68,7 +65,15 @@ export default function AppShell({
   const [agentOpen, setAgentOpen] = useState(false)
   const [agentWorkspace, setAgentWorkspace] = useState(false)
   const [activeId, setActiveId] = useState('executive-dashboard')
+  const [adminTab, setAdminTab] = useState<AdminTab>('access')
   const { liveJobs, wave, enqueue, isRunning } = useJobs()
+
+  function openSettings() {
+    setAgentWorkspace(false)
+    setAgentOpen(false)
+    setActiveId('administration')
+    setAdminTab('settings')
+  }
 
   const expanded = narrow ? open : !held && (pinned || hovered)
 
@@ -143,6 +148,7 @@ export default function AppShell({
             agentWorkspace
             onToggleAgent={toggleAgent}
             onLeaveAgent={closeAgentWorkspace}
+            onOpenSettings={openSettings}
           />
           <AgentWorkspace />
         </div>
@@ -162,7 +168,10 @@ export default function AppShell({
         pinned={pinned}
         narrow={narrow}
         activeId={activeId}
-        onSelect={setActiveId}
+        onSelect={(id) => {
+          if (id === 'administration' && activeId !== 'administration') setAdminTab('access')
+          setActiveId(id)
+        }}
         onToggle={() => setOpen((current) => !current)}
         onPinToggle={() => {
           heldRef.current = false
@@ -173,11 +182,13 @@ export default function AppShell({
         onHoverChange={onHoverChange}
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header onLogout={onLogout} agentOpen={agentOpen} onToggleAgent={toggleAgent} />
+        <Header onLogout={onLogout} agentOpen={agentOpen} onToggleAgent={toggleAgent} onOpenSettings={openSettings} />
         <div className="relative flex min-h-0 flex-1">
           <div className="flex min-w-0 flex-1 flex-col">
             {activeId === 'jobs' ? (
               <JobsWorkspace />
+            ) : activeId === 'administration' ? (
+              <AdminWorkspace tab={adminTab} onTabChange={setAdminTab} />
             ) : layout === 'layout-1' && isWorkspace(activeId) ? (
               <Layout1Workspace
                 screen={activeId}

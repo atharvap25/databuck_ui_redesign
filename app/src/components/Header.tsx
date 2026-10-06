@@ -31,12 +31,14 @@ export default function Header({
   onToggleAgent,
   agentWorkspace = false,
   onLeaveAgent,
+  onOpenSettings,
 }: {
   onLogout: () => void
   agentOpen: boolean
   onToggleAgent: () => void
   agentWorkspace?: boolean
   onLeaveAgent?: () => void
+  onOpenSettings?: () => void
 }) {
   const catalog = useMemo(() => cloneCatalog(), [])
   const [domains, setDomains] = useState(catalog.domains)
@@ -172,7 +174,7 @@ export default function Header({
             type="button"
             className={iconButtonClass}
             aria-label="Settings"
-            onClick={() => setNoticeOpen(true)}
+            onClick={() => (onOpenSettings ? onOpenSettings() : setNoticeOpen(true))}
           >
             <SunIcon />
           </button>

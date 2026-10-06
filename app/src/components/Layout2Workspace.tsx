@@ -2,10 +2,12 @@ import { useCallback, useEffect, useId, useRef, useState, type ReactNode, type R
 import { createPortal } from 'react-dom'
 import {
   dataSources as initialSources,
+  duplicateSource,
   tableMetrics,
   type DataSource,
   type SourceType,
 } from '../data/sources.ts'
+import { endpointMeta, typeLabels } from '../data/connectionFields.ts'
 import { scoreTone, validationRuns, type ValidationRun } from '../data/validations.ts'
 import ConnectionDetail from './ConnectionDetail.tsx'
 import type { SourceSelection } from './ConnectionsPanel.tsx'
@@ -40,15 +42,23 @@ type FilterOption = { id: string; label: string; count: number }
 type FilterGroup = { id: FilterKey; legend: string; options: FilterOption[] }
 type TableRecord = { source: DataSource; table: DataSource['tables'][number] }
 
-const sourceTypes: SourceType[] = ['BigQuery', 'Databricks', 'MSSQL', 'Teradata']
+function presentTypes(values: string[]) {
+  return Array.from(new Set(values)).sort()
+}
+
+function typeLabel(type: string) {
+  return typeLabels[type as SourceType] ?? type
+}
 const validationSchemas = Array.from(new Set(validationRuns.map((run) => run.schema))).sort()
 
-const sourceMenu: MenuItem[] = [
-  { id: 'add-table', label: 'Add Table' },
-  { id: 'copy', label: 'Copy' },
-  { id: 'edit', label: 'Edit' },
-  { id: 'deactivate', label: 'Deactivate' },
-]
+function sourceMenuFor(source: DataSource): MenuItem[] {
+  return [
+    { id: 'add-table', label: 'Add Table' },
+    { id: 'copy', label: 'Copy' },
+    { id: 'edit', label: 'Edit' },
+    { id: 'deactivate', label: source.active ? 'Deactivate' : 'Activate', tone: source.active ? 'danger' : undefined },
+  ]
+}
 
 const tableMenu: MenuItem[] = [
   { id: 'create-validation', label: 'Create validation' },
@@ -129,9 +139,7 @@ function selectedCount(screen: Layout2Screen, filters: Filters) {
 }
 
 function endpointOf(source: DataSource) {
-  if (source.type === 'BigQuery') return { label: 'Project', value: source.connection.project }
-  if (source.type === 'Databricks') return { label: 'Workspace URL', value: source.connection.workspaceUrl }
-  return { label: 'Host', value: source.connection.host }
+  return endpointMeta(source)
 }
 
 function matchesQuery(value: string, query: string) {
@@ -556,7 +564,7 @@ function SourceList({
 }: {
   sources: DataSource[]
   onOpen: (id: string) => void
-  onAction: (id: string) => void
+  onAction: (actionId: string, sourceId: string) => void
 }) {
   return (
     <div className="db-scroll min-h-0 flex-1 overflow-auto">
@@ -586,7 +594,7 @@ function SourceList({
                     <span className="mt-0.5 block text-xs text-muted">No tables onboarded.</span>
                   ) : null}
                 </td>
-                <td className={`${cellClass} font-sans text-sm text-ink`}>{source.type}</td>
+                <td className={`${cellClass} font-sans text-sm text-ink`}>{typeLabel(source.type)}</td>
                 <td className={`${cellClass} max-w-[12rem]`}>
                   <span className="block truncate font-mono text-sm text-ink" title={source.schema}>
                     {source.schema}
@@ -610,13 +618,17 @@ function SourceList({
                       type="button"
                       onClick={(event) => {
                         event.stopPropagation()
-                        onAction('add-table')
+                        onAction('add-table', source.id)
                       }}
                       className={nudgeButton}
                     >
                       Add Table
                     </button>
-                    <ActionsMenu label={`Actions for ${source.name}`} items={sourceMenu} onSelect={onAction} />
+                    <ActionsMenu
+                      label={`Actions for ${source.name}`}
+                      items={sourceMenuFor(source)}
+                      onSelect={(id) => onAction(id, source.id)}
+                    />
                   </div>
                 </td>
               </tr>
@@ -635,7 +647,7 @@ function SourceCards({
 }: {
   sources: DataSource[]
   onOpen: (id: string) => void
-  onAction: (id: string) => void
+  onAction: (actionId: string, sourceId: string) => void
 }) {
   return (
     <div className="db-scroll min-h-0 flex-1 overflow-auto p-4">
@@ -655,23 +667,27 @@ function SourceCards({
                       {source.name}
                     </button>
                     <div className="mt-1 flex flex-wrap items-center gap-x-3 gap-y-1">
-                      <span className="font-sans text-sm text-muted">{source.type}</span>
+                      <span className="font-sans text-sm text-muted">{typeLabel(source.type)}</span>
                       <StatusBadge tone={source.active ? 'success' : 'danger'} label={source.active ? 'Active' : 'Inactive'} />
                     </div>
                   </div>
-                  <ActionsMenu label={`Actions for ${source.name}`} items={sourceMenu} onSelect={onAction} />
+                  <ActionsMenu
+                    label={`Actions for ${source.name}`}
+                    items={sourceMenuFor(source)}
+                    onSelect={(id) => onAction(id, source.id)}
+                  />
                 </div>
                 <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3">
                   <Meta label="Schema" value={source.schema} mono wide />
                   <Meta label={endpoint.label} value={endpoint.value} mono wide />
                   <Meta label="Tables" value={String(source.tables.length)} mono />
-                  <Meta label="Created on" value={source.connection.createdOn} mono />
+                  <Meta label="Created on" value={source.properties.createdAtStr || '—'} mono />
                 </dl>
                 <div className="flex flex-1 flex-col">
                   {empty ? <p className="mt-3 text-sm text-muted">No tables onboarded.</p> : null}
                   <div className="mt-auto pt-3">
                     <div className="border-t border-line pt-3">
-                      <button type="button" onClick={() => onAction('add-table')} className={nudgeButton}>
+                      <button type="button" onClick={() => onAction('add-table', source.id)} className={nudgeButton}>
                         Add Table
                       </button>
                     </div>
@@ -987,6 +1003,7 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
   const [validationId, setValidationId] = useState<string | null>(null)
   const [creating, setCreating] = useState(false)
   const [notice, setNotice] = useState(false)
+  const [editSignal, setEditSignal] = useState(0)
   const [trackedScreen, setTrackedScreen] = useState(screen)
   const [trackedNarrow, setTrackedNarrow] = useState(narrow)
 
@@ -1053,9 +1070,9 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
     {
       id: 'type',
       legend: 'Type',
-      options: sourceTypes.map((type) => ({
+      options: presentTypes(sources.map((source) => source.type)).map((type) => ({
         id: type,
-        label: type,
+        label: typeLabel(type),
         count: sources.filter((source) => sourcePasses(source, filters, query, 'type') && source.type === type).length,
       })),
     },
@@ -1080,9 +1097,9 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
     {
       id: 'type',
       legend: 'Type',
-      options: sourceTypes.map((type) => ({
+      options: presentTypes(tableRecords.map((record) => record.source.type)).map((type) => ({
         id: type,
-        label: type,
+        label: typeLabel(type),
         count: tableRecords.filter(
           (record) => tablePasses(record, filters, query, 'type') && record.source.type === type,
         ).length,
@@ -1116,9 +1133,9 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
     {
       id: 'type',
       legend: 'Type',
-      options: sourceTypes.map((type) => ({
+      options: presentTypes(validationRuns.map((run) => run.sourceType)).map((type) => ({
         id: type,
-        label: type,
+        label: typeLabel(type),
         count: validationRuns.filter((run) => validationPasses(run, filters, query, 'type') && run.sourceType === type)
           .length,
       })),
@@ -1139,12 +1156,12 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
   const chips: Chip[] = []
   if (screen === 'data-sources') {
     for (const id of filters.status) chips.push({ group: 'status', id, label: id === 'active' ? 'Active' : 'Inactive' })
-    for (const id of filters.type) chips.push({ group: 'type', id, label: id })
+    for (const id of filters.type) chips.push({ group: 'type', id, label: typeLabel(id) })
   } else if (screen === 'tables') {
     for (const id of filters.approved) {
       chips.push({ group: 'approved', id, label: id === 'approved' ? 'Approved' : 'Pending' })
     }
-    for (const id of filters.type) chips.push({ group: 'type', id, label: id })
+    for (const id of filters.type) chips.push({ group: 'type', id, label: typeLabel(id) })
     for (const id of filters.connection) {
       chips.push({
         group: 'connection',
@@ -1154,7 +1171,7 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
     }
   } else {
     for (const id of filters.result) chips.push({ group: 'result', id, label: resultLabel(id) })
-    for (const id of filters.type) chips.push({ group: 'type', id, label: id })
+    for (const id of filters.type) chips.push({ group: 'type', id, label: typeLabel(id) })
     for (const id of filters.schema) chips.push({ group: 'schema', id, label: id })
   }
 
@@ -1170,9 +1187,34 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
     setFilters(clearedFilters())
   }
 
-  function onSourceAction(actionId: string) {
-    if (actionId === 'add-table') setCreating(true)
-    else setNotice(true)
+  function onSourceAction(actionId: string, sourceId: string) {
+    const source = sources.find((item) => item.id === sourceId)
+    if (actionId === 'add-table') {
+      setCreating(true)
+      return
+    }
+    if (!source) {
+      setNotice(true)
+      return
+    }
+    if (actionId === 'copy') {
+      const next = duplicateSource(source, sources)
+      setSources((current) => [...current, next])
+      setSelection({ kind: 'source', id: next.id })
+      return
+    }
+    if (actionId === 'edit') {
+      setSelection({ kind: 'source', id: source.id })
+      setEditSignal((current) => current + 1)
+      return
+    }
+    if (actionId === 'deactivate') {
+      setSources((current) =>
+        current.map((item) => (item.id === source.id ? { ...item, active: !item.active } : item)),
+      )
+      return
+    }
+    setNotice(true)
   }
 
   function onTableAction(actionId: string) {
@@ -1225,7 +1267,18 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
           <ConnectionDetail
             sources={sources}
             selection={selection}
+            editSignal={editSignal}
             onCreateValidation={selection.kind === 'table' ? () => setCreating(true) : undefined}
+            onCopySource={(source) => {
+              const next = duplicateSource(source, sources)
+              setSources((current) => [...current, next])
+              setSelection({ kind: 'source', id: next.id })
+            }}
+            onToggleActive={(source) => {
+              setSources((current) =>
+                current.map((item) => (item.id === source.id ? { ...item, active: !item.active } : item)),
+              )
+            }}
             onSaveSource={(next) => {
               setSources((current) => current.map((item) => (item.id === next.id ? next : item)))
             }}

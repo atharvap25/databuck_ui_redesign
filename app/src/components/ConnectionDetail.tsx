@@ -1,29 +1,38 @@
 ﻿import { useEffect, useState, type ReactNode } from 'react'
 import {
-  columnProfiles,
+  fieldGroupsFor,
+  formatFieldValue,
+  isYes,
+  typeLabels,
+  type ConnectionField,
+} from '../data/connectionFields.ts'
+import {
+  tableMetadata,
   tableMetrics,
+  columnProfiles,
   type DataSource,
-  type SourceConnection,
   type SourceTable,
 } from '../data/sources.ts'
 import type { SourceSelection } from './ConnectionsPanel.tsx'
 import EmptyState from './EmptyState.tsx'
-import { DatabaseIcon, InboxIcon, TableIcon } from './icons.tsx'
+import { BackIcon, DatabaseIcon, InboxIcon, TableIcon } from './icons.tsx'
 import IconBox from './IconBox.tsx'
 import StatusBadge from './StatusBadge.tsx'
 import TableProfile from './TableProfile.tsx'
+import {
+  Field,
+  fieldClass,
+  Modal,
+  primaryButton,
+  secondaryButton,
+  SwitchControl,
+} from './wizard/ui.tsx'
 
-type SourceTab = 'overview' | 'configure'
+type SourceTab = 'details' | 'tables'
 type TableTab = 'overview' | 'configure' | 'profile' | 'validations'
 
-const inputClass =
-  'h-11 w-full rounded-md border border-line bg-canvas px-3 font-sans text-sm text-ink transition-colors duration-150 ease-databuck focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo'
-
-const secondaryButton =
-  'inline-flex h-10 items-center rounded-md border border-line-strong bg-canvas px-3 font-sans text-sm font-medium text-ink transition-colors duration-150 ease-databuck hover:border-ink hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo'
-
-const primaryButton =
-  'inline-flex h-10 items-center rounded-md bg-indigo px-4 font-sans text-sm font-medium text-white transition-colors duration-150 ease-databuck hover:bg-indigo-hover active:bg-indigo-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink'
+const dangerButton =
+  'inline-flex h-10 items-center rounded-md px-3 font-sans text-sm font-medium text-danger transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo'
 
 function Tabs({
   tabs,
@@ -71,92 +80,23 @@ function Tabs({
   )
 }
 
-function DetailGrid({ rows }: { rows: { label: string; value: string }[] }) {
-  return (
-    <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
-      {rows.map((row) => (
-        <div key={row.label}>
-          <dt className="font-label text-xs font-medium tracking-[0.08em] text-muted uppercase">{row.label}</dt>
-          <dd className="mt-1 font-mono text-sm break-all text-ink">{row.value || '—'}</dd>
-        </div>
-      ))}
-    </dl>
-  )
-}
-
-function sourceRows(source: DataSource) {
-  const connection = source.connection
-  const created = { label: 'Created on', value: connection.createdOn }
-  const username = { label: 'Username', value: connection.username }
-  if (source.type === 'BigQuery') {
-    return [
-      { label: 'Project', value: connection.project },
-      { label: 'Dataset', value: source.schema },
-      { label: 'Location', value: connection.location },
-      { label: 'Service account', value: connection.serviceAccount },
-      username,
-      created,
-    ]
-  }
-  if (source.type === 'Databricks') {
-    return [
-      { label: 'Workspace URL', value: connection.workspaceUrl },
-      { label: 'Catalog', value: connection.catalog },
-      { label: 'Schema', value: source.schema },
-      { label: 'Warehouse', value: connection.warehouse },
-      username,
-      created,
-    ]
-  }
-  if (source.type === 'Teradata') {
-    return [
-      { label: 'Host', value: connection.host },
-      { label: 'Port', value: connection.port },
-      { label: 'Database', value: source.schema },
-      username,
-      { label: 'Logon mechanism', value: connection.logon },
-      created,
-    ]
-  }
-  return [
-    { label: 'Host', value: connection.host },
-    { label: 'Port', value: connection.port },
-    { label: 'Database', value: source.schema },
-    username,
-    { label: 'Encrypt', value: connection.encrypt },
-    created,
-  ]
-}
-
-function Field({
-  label,
-  value,
-  onChange,
-}: {
-  label: string
-  value: string
-  onChange: (value: string) => void
-}) {
-  const id = label.toLowerCase().replace(/[^a-z]+/g, '-')
-  return (
-    <label htmlFor={id} className="block">
-      <span className="mb-2 block font-label text-xs font-medium tracking-[0.08em] text-muted uppercase">{label}</span>
-      <input id={id} value={value} onChange={(event) => onChange(event.target.value)} className={inputClass} />
-    </label>
-  )
-}
-
 export default function ConnectionDetail({
   sources,
   selection,
   onSaveSource,
   onSaveTable,
+  onCopySource,
+  onToggleActive,
+  editSignal = 0,
   onCreateValidation,
 }: {
   sources: DataSource[]
   selection: SourceSelection
   onSaveSource: (source: DataSource) => void
   onSaveTable: (sourceId: string, table: SourceTable) => void
+  onCopySource?: (source: DataSource) => void
+  onToggleActive?: (source: DataSource) => void
+  editSignal?: number
   onCreateValidation?: () => void
 }) {
   const source =
@@ -164,11 +104,21 @@ export default function ConnectionDetail({
       ? sources.find((item) => item.id === selection.id)
       : sources.find((item) => item.tables.some((table) => table.id === selection.id))
   const table = source?.tables.find((item) => selection.kind === 'table' && item.id === selection.id)
-  const [tab, setTab] = useState<SourceTab | TableTab>('overview')
+  const [tab, setTab] = useState<SourceTab | TableTab>(selection.kind === 'table' ? 'overview' : 'details')
+  const [editing, setEditing] = useState(false)
+  const [notice, setNotice] = useState<string | null>(null)
 
   useEffect(() => {
-    setTab('overview')
+    setTab(selection.kind === 'table' ? 'overview' : 'details')
+    setEditing(false)
   }, [selection.kind, selection.id])
+
+  useEffect(() => {
+    if (editSignal && selection.kind === 'source') {
+      setTab('details')
+      setEditing(true)
+    }
+  }, [editSignal, selection.kind])
 
   if (!source) return null
 
@@ -177,8 +127,32 @@ export default function ConnectionDetail({
       {table ? (
         <TableHeader table={table} sourceName={source.name} />
       ) : (
-        <SourceHeader source={source} />
+        <SourceHeader
+          source={source}
+          editing={editing}
+          onEdit={() => {
+            setTab('details')
+            setEditing(true)
+          }}
+          onCancel={() => setEditing(false)}
+          onCopy={() => onCopySource?.(source)}
+        />
       )}
+      {!table && source.type === 'BigQuery' ? (
+        <div className="flex shrink-0 flex-wrap gap-2 border-b border-line px-6 py-3">
+          <button type="button" className={secondaryButton} onClick={() => setNotice('CDE updated for this source.')}>
+            Update CDE
+          </button>
+          <button
+            type="button"
+            className={secondaryButton}
+            aria-label="Discover/Update Cross-table relationships"
+            onClick={() => setNotice('Cross-table relationships were refreshed.')}
+          >
+            Cross-table relationships
+          </button>
+        </div>
+      ) : null}
       <Tabs
         active={tab}
         onChange={(id) => setTab(id as SourceTab | TableTab)}
@@ -191,8 +165,8 @@ export default function ConnectionDetail({
                 { id: 'validations', label: 'Validations' },
               ]
             : [
-                { id: 'overview', label: 'Overview' },
-                { id: 'configure', label: 'Configure' },
+                { id: 'details', label: 'Details' },
+                { id: 'tables', label: 'Tables' },
               ]
         }
       />
@@ -204,13 +178,306 @@ export default function ConnectionDetail({
             onSave={(next) => onSaveTable(source.id, next)}
             onCreateValidation={onCreateValidation}
           />
-        ) : tab === 'configure' ? (
-          <SourceForm source={source} onSave={onSaveSource} />
+        ) : tab === 'tables' ? (
+          <TablesTab source={source} />
         ) : (
-          <SourceOverview source={source} />
+          <SourceDetails
+            source={source}
+            editing={editing}
+            onSave={(next) => {
+              onSaveSource(next)
+              setEditing(false)
+            }}
+            onToggleActive={() => onToggleActive?.(source)}
+          />
+        )}
+      </div>
+      {notice ? (
+        <Modal
+          title="Done"
+          onClose={() => setNotice(null)}
+          footer={
+            <button type="button" className={primaryButton} onClick={() => setNotice(null)}>
+              Close
+            </button>
+          }
+        >
+          <p className="text-sm leading-6 text-muted">{notice}</p>
+        </Modal>
+      ) : null}
+    </div>
+  )
+}
+
+function SourceHeader({
+  source,
+  editing,
+  onEdit,
+  onCancel,
+  onCopy,
+}: {
+  source: DataSource
+  editing: boolean
+  onEdit: () => void
+  onCancel: () => void
+  onCopy: () => void
+}) {
+  return (
+    <div className="flex shrink-0 flex-wrap items-center justify-between gap-3 border-b border-line px-6 py-4">
+      <div className="flex min-w-0 items-center gap-3">
+        <IconBox size="lg">
+          <DatabaseIcon size={18} />
+        </IconBox>
+        <div className="min-w-0">
+          <h2 className="truncate font-sans text-lg font-semibold tracking-[-0.02em] text-ink">{source.name}</h2>
+          <div className="mt-1 flex items-center gap-3">
+            <span className="font-sans text-sm text-muted">{typeLabels[source.type]}</span>
+            <StatusBadge tone={source.active ? 'success' : 'danger'} label={source.active ? 'Active' : 'Inactive'} />
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-wrap gap-2">
+        {editing ? (
+          <>
+            <button type="button" className={secondaryButton} onClick={onCancel}>
+              Cancel
+            </button>
+            <button type="submit" form="source-details-form" className={primaryButton}>
+              Save
+            </button>
+          </>
+        ) : (
+          <>
+            <button type="button" className={secondaryButton} onClick={onEdit}>
+              Edit
+            </button>
+            <button type="button" className={secondaryButton} onClick={onCopy}>
+              Copy
+            </button>
+          </>
         )}
       </div>
     </div>
+  )
+}
+
+function SourceDetails({
+  source,
+  editing,
+  onSave,
+  onToggleActive,
+}: {
+  source: DataSource
+  editing: boolean
+  onSave: (source: DataSource) => void
+  onToggleActive: () => void
+}) {
+  const [name, setName] = useState(source.name)
+  const [schema, setSchema] = useState(source.schema)
+  const [values, setValues] = useState<Record<string, string>>(source.properties)
+  const groups = fieldGroupsFor(source.type)
+
+  useEffect(() => {
+    setName(source.name)
+    setSchema(source.schema)
+    setValues(source.properties)
+  }, [source, editing])
+
+  function setValue(key: string, value: string) {
+    setValues((current) => ({ ...current, [key]: value }))
+  }
+
+  return (
+    <form
+      id="source-details-form"
+      className="flex flex-col gap-6"
+      onSubmit={(event) => {
+        event.preventDefault()
+        onSave({
+          ...source,
+          name: name.trim() || source.name,
+          schema: schema.trim() || values.datasetName || values.databaseSchema || source.schema,
+          properties: values,
+        })
+      }}
+    >
+      {groups.map((group) => (
+        <Panel key={group.id} title={group.label}>
+          {editing ? (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {group.fields.map((field) => (
+                <div key={field.key} className={field.kind === 'boolean' ? 'sm:col-span-2' : undefined}>
+                  {field.key === '_name' ? (
+                    <Field label={field.label}>
+                      <input value={name} onChange={(event) => setName(event.target.value)} className={fieldClass} />
+                    </Field>
+                  ) : field.key === '_schema' ? (
+                    <Field label={field.label}>
+                      <input value={schema} onChange={(event) => setSchema(event.target.value)} className={fieldClass} />
+                    </Field>
+                  ) : (
+                    <PropertyField field={field} value={values[field.key] ?? ''} onChange={(value) => setValue(field.key, value)} />
+                  )}
+                </div>
+              ))}
+            </div>
+          ) : (
+            <dl className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+              {group.fields.map((field) => {
+                const value = field.key === '_name' ? name : field.key === '_schema' ? schema : values[field.key] ?? ''
+                return (
+                  <div key={field.key}>
+                    <dt className="font-label text-xs font-medium tracking-[0.08em] text-muted uppercase">{field.label}</dt>
+                    <dd className="mt-1 font-mono text-sm break-all text-ink">{formatFieldValue(field, value)}</dd>
+                  </div>
+                )
+              })}
+            </dl>
+          )}
+        </Panel>
+      ))}
+      {editing ? null : (
+        <div className="flex justify-end">
+          <button type="button" className={dangerButton} onClick={onToggleActive}>
+            {source.active ? 'Deactivate' : 'Activate'}
+          </button>
+        </div>
+      )}
+    </form>
+  )
+}
+
+function PropertyField({
+  field,
+  value,
+  onChange,
+}: {
+  field: ConnectionField
+  value: string
+  onChange: (value: string) => void
+}) {
+  if (field.kind === 'readonly') {
+    return (
+      <div>
+        <p className="mb-2 font-label text-xs font-medium tracking-[0.08em] text-muted uppercase">{field.label}</p>
+        <p className="font-mono text-sm text-ink">{value || '—'}</p>
+      </div>
+    )
+  }
+  if (field.kind === 'boolean') {
+    return (
+      <div className="flex h-10 items-center justify-between gap-3 rounded-md border border-line px-3">
+        <span className="font-sans text-sm text-ink">{field.label}</span>
+        <SwitchControl checked={isYes(value)} onChange={(on) => onChange(on ? 'Y' : 'N')} />
+      </div>
+    )
+  }
+  if (field.kind === 'enum' && field.options) {
+    return (
+      <Field label={field.label}>
+        <select value={value} onChange={(event) => onChange(event.target.value)} className={fieldClass}>
+          {field.options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+      </Field>
+    )
+  }
+  return (
+    <Field label={field.label}>
+      <input
+        type={field.kind === 'password' ? 'password' : field.kind === 'number' ? 'number' : 'text'}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        className={fieldClass}
+      />
+    </Field>
+  )
+}
+
+function TablesTab({ source }: { source: DataSource }) {
+  const [openId, setOpenId] = useState<string | null>(null)
+  const selected = source.tables.find((table) => table.id === openId) ?? null
+
+  useEffect(() => {
+    setOpenId(null)
+  }, [source.id])
+
+  if (source.tables.length === 0) {
+    return <p className="text-sm text-muted">No tables in this data source.</p>
+  }
+
+  if (selected) {
+    const meta = tableMetadata(selected, source.type)
+    return (
+      <div className="flex flex-col gap-4">
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
+            className="inline-flex size-8 items-center justify-center rounded-md text-muted transition-colors duration-150 ease-databuck hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
+            aria-label="Back to tables"
+            onClick={() => setOpenId(null)}
+          >
+            <BackIcon />
+          </button>
+          <div className="min-w-0">
+            <h3 className="truncate font-sans text-base font-semibold tracking-[-0.02em] text-ink">{selected.nickname}</h3>
+            <p className="mt-0.5 font-mono text-xs text-muted">
+              {selected.name} · {selected.columns} columns
+            </p>
+          </div>
+        </div>
+        <div className="overflow-hidden rounded-lg border border-line">
+          <table className="w-full min-w-[28rem] border-collapse text-sm">
+            <thead>
+              <tr>
+                {meta.headers.map((header) => (
+                  <th
+                    key={header}
+                    className="bg-canvas px-4 py-2 text-left font-label text-xs font-medium tracking-[0.08em] text-muted uppercase"
+                  >
+                    {header}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {meta.rows.map((row) => (
+                <tr key={row[0]} className="border-t border-line">
+                  {row.map((cell, index) => (
+                    <td key={`${row[0]}-${index}`} className="px-4 py-2.5 font-mono text-ink">
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    )
+  }
+
+  return (
+    <ul className="divide-y divide-line rounded-lg border border-line">
+      {source.tables.map((item) => (
+        <li key={item.id}>
+          <button
+            type="button"
+            onClick={() => setOpenId(item.id)}
+            className="flex w-full items-center justify-between gap-4 px-4 py-3 text-left transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
+          >
+            <span className="min-w-0">
+              <span className="block truncate font-sans text-sm font-medium text-ink">{item.nickname}</span>
+              <span className="mt-0.5 block truncate font-mono text-xs text-muted">{item.name}</span>
+            </span>
+            <span className="shrink-0 font-mono text-xs text-muted tabular-nums">{item.columns} columns</span>
+          </button>
+        </li>
+      ))}
+    </ul>
   )
 }
 
@@ -234,117 +501,6 @@ function Metric({ label, value }: { label: string; value: string }) {
       <p className="mt-2 font-sans text-3xl font-bold tracking-[-0.03em] text-ink tabular-nums">{value}</p>
     </div>
   )
-}
-
-function SourceOverview({ source }: { source: DataSource }) {
-  return (
-    <div className="flex flex-col gap-6">
-      <Panel title="Connection details">
-        <DetailGrid rows={sourceRows(source)} />
-      </Panel>
-      <Panel title="Tables">
-        {source.tables.length === 0 ? (
-          <p className="text-sm text-muted">No tables in this data source.</p>
-        ) : (
-          <ul className="divide-y divide-line">
-            {source.tables.map((item) => (
-              <li key={item.id} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
-                <span className="min-w-0">
-                  <span className="block truncate font-sans text-sm font-medium text-ink">{item.nickname}</span>
-                  <span className="mt-0.5 block truncate font-mono text-xs text-muted">{item.name}</span>
-                </span>
-                <span className="shrink-0 font-mono text-xs text-muted tabular-nums">{item.columns} columns</span>
-              </li>
-            ))}
-          </ul>
-        )}
-      </Panel>
-    </div>
-  )
-}
-
-function SourceHeader({ source }: { source: DataSource }) {
-  return (
-    <div className="flex shrink-0 items-center gap-3 border-b border-line px-6 py-4">
-      <IconBox size="lg">
-        <DatabaseIcon size={18} />
-      </IconBox>
-      <div className="min-w-0">
-        <h2 className="truncate font-sans text-lg font-semibold tracking-[-0.02em] text-ink">{source.name}</h2>
-        <div className="mt-1 flex items-center gap-3">
-          <span className="font-sans text-sm text-muted">{source.type}</span>
-          <StatusBadge tone={source.active ? 'success' : 'danger'} label={source.active ? 'Active' : 'Inactive'} />
-        </div>
-      </div>
-    </div>
-  )
-}
-
-function SourceForm({ source, onSave }: { source: DataSource; onSave: (source: DataSource) => void }) {
-  const [draft, setDraft] = useState(source)
-
-  useEffect(() => {
-    setDraft(source)
-  }, [source])
-
-  function setConnection(key: keyof SourceConnection, value: string) {
-    setDraft((current) => ({ ...current, connection: { ...current.connection, [key]: value } }))
-  }
-
-  const fields = sourceRows(draft).filter((row) => row.label !== 'Created on')
-
-  return (
-    <form
-      className="flex max-w-lg flex-col gap-4"
-      onSubmit={(event) => {
-        event.preventDefault()
-        onSave(draft)
-      }}
-    >
-      <Field label="Name" value={draft.name} onChange={(name) => setDraft((current) => ({ ...current, name }))} />
-      {fields.map((field) => (
-        <Field
-          key={field.label}
-          label={field.label}
-          value={field.value}
-          onChange={(value) => {
-            if (field.label === 'Database' || field.label === 'Dataset' || field.label === 'Schema') {
-              setDraft((current) => ({ ...current, schema: value }))
-              return
-            }
-            const key = connectionKey(field.label)
-            if (key) setConnection(key, value)
-          }}
-        />
-      ))}
-      <div>
-        <span className="mb-2 block font-label text-xs font-medium tracking-[0.08em] text-muted uppercase">
-          Created on
-        </span>
-        <p className="font-mono text-sm text-ink">{draft.connection.createdOn}</p>
-      </div>
-      <button type="submit" className={`${primaryButton} mt-2 w-fit`}>
-        Save
-      </button>
-    </form>
-  )
-}
-
-function connectionKey(label: string): keyof SourceConnection | null {
-  const keys: Record<string, keyof SourceConnection> = {
-    Host: 'host',
-    Port: 'port',
-    Username: 'username',
-    Encrypt: 'encrypt',
-    'Logon mechanism': 'logon',
-    Project: 'project',
-    Location: 'location',
-    'Service account': 'serviceAccount',
-    'Workspace URL': 'workspaceUrl',
-    Catalog: 'catalog',
-    Warehouse: 'warehouse',
-  }
-  return keys[label] ?? null
 }
 
 function TableHeader({ table, sourceName }: { table: SourceTable; sourceName: string }) {
@@ -494,28 +650,28 @@ function TableForm({ table, onSave }: { table: SourceTable; onSave: (table: Sour
         onSave(draft)
       }}
     >
-      <Field
-        label="Nickname"
-        value={draft.nickname}
-        onChange={(nickname) => setDraft((current) => ({ ...current, nickname }))}
-      />
-      <label htmlFor="table-description" className="block">
-        <span className="mb-2 block font-label text-xs font-medium tracking-[0.08em] text-muted uppercase">
-          Description
-        </span>
+      <Field label="Nickname">
+        <input
+          value={draft.nickname}
+          onChange={(event) => setDraft((current) => ({ ...current, nickname: event.target.value }))}
+          className={fieldClass}
+        />
+      </Field>
+      <Field label="Description">
         <textarea
-          id="table-description"
           value={draft.description}
           rows={3}
           onChange={(event) => setDraft((current) => ({ ...current, description: event.target.value }))}
           className="w-full rounded-md border border-line bg-canvas px-3 py-2 font-sans text-sm leading-6 text-ink transition-colors duration-150 ease-databuck focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo"
         />
-      </label>
-      <Field
-        label="Row filter"
-        value={draft.rowFilter}
-        onChange={(rowFilter) => setDraft((current) => ({ ...current, rowFilter }))}
-      />
+      </Field>
+      <Field label="Row filter">
+        <input
+          value={draft.rowFilter}
+          onChange={(event) => setDraft((current) => ({ ...current, rowFilter: event.target.value }))}
+          className={fieldClass}
+        />
+      </Field>
       <button type="submit" className={`${primaryButton} mt-2 w-fit`}>
         Save
       </button>
