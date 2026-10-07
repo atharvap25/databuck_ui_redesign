@@ -10,6 +10,8 @@ import {
   type JobMember,
 } from '../../data/jobs.ts'
 import { createSchedule, useJobs } from '../../jobs/jobStore.ts'
+import { useWorkspaceAi } from '../../ai/WorkspaceAiContext.tsx'
+import { AiBanner, aiSecondaryButton } from '../ai/AiKit.tsx'
 import EmptyState from '../EmptyState.tsx'
 import { ClockIcon, JobsIcon } from '../icons.tsx'
 import IconBox from '../IconBox.tsx'
@@ -27,6 +29,7 @@ export default function JobGroupsView({
   onCreatingChange: (open: boolean) => void
 }) {
   const { groups, schedules, triggers, upsertGroup, toggleGroup, enqueue, upsertSchedule } = useJobs()
+  const { requestRca, enabled } = useWorkspaceAi()
   const [selectedId, setSelectedId] = useState(groups[0]?.id ?? '')
   const [editing, setEditing] = useState<JobGroup | null>(null)
 
@@ -103,6 +106,20 @@ export default function JobGroupsView({
               </div>
             </header>
             <div className="db-scroll min-h-0 flex-1 overflow-auto p-6">
+              {enabled ? (
+                <div className="mb-4">
+                  <AiBanner
+                    title="Last group run"
+                    actions={
+                      <button type="button" className={aiSecondaryButton} onClick={() => requestRca('orders')}>
+                        Open RCA
+                      </button>
+                    }
+                  >
+                    4 of 5 members passed. Orders failed the null check on the overnight load.
+                  </AiBanner>
+                </div>
+              ) : null}
               <div className="grid gap-4 sm:grid-cols-3">
                 <FactCard label="Schedule" value={schedule?.name ?? 'On demand'} />
                 <FactCard label="Trigger" value={trigger?.name ?? 'None'} />

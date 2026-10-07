@@ -1,9 +1,16 @@
 import { useEffect, useId, useRef, useState, type FormEvent } from 'react'
+import type { AgentAction } from '../data/aiMocks.ts'
 import { agentPrompts, type AgentMessage } from '../data/agentChat.ts'
 import { SendIcon } from './icons.tsx'
 import Mark from './Mark.tsx'
 
-export function ChatMessage({ message }: { message: AgentMessage }) {
+export function ChatMessage({
+  message,
+  onAction,
+}: {
+  message: AgentMessage
+  onAction?: (action: AgentAction) => void
+}) {
   if (message.role === 'user') {
     return (
       <div className="flex justify-end">
@@ -19,9 +26,46 @@ export function ChatMessage({ message }: { message: AgentMessage }) {
       <Mark className="size-8" />
       <div className="min-w-0 flex-1">
         <p className="font-label text-[0.6875rem] font-medium tracking-[0.08em] text-muted uppercase">Data Trust Agent</p>
-        <p className="mt-1.5 rounded-lg border border-line bg-surface px-3 py-2 font-sans text-sm leading-6 text-ink">
-          {message.text}
-        </p>
+        <div className="mt-1.5 rounded-lg border border-line bg-surface px-3 py-2">
+          {message.pending ? (
+            <p className="animate-pulse font-sans text-sm leading-6 text-muted">Reviewing the open table…</p>
+          ) : (
+            <p className="font-sans text-sm leading-6 text-ink">{message.text}</p>
+          )}
+          {message.citations && message.citations.length > 0 ? (
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {message.citations.map((citation) => (
+                <span
+                  key={citation.label}
+                  title={citation.hint}
+                  className="rounded-full border border-line bg-canvas px-2 py-0.5 font-label text-[0.625rem] tracking-[0.06em] text-muted uppercase"
+                >
+                  {citation.label}
+                </span>
+              ))}
+            </div>
+          ) : null}
+          {message.insights?.map((insight) => (
+            <div key={insight.title} className="mt-2 rounded-md border border-line bg-canvas px-2.5 py-2">
+              <p className="font-sans text-xs font-semibold text-ink">{insight.title}</p>
+              <p className="mt-0.5 text-xs leading-5 text-muted">{insight.body}</p>
+            </div>
+          ))}
+          {message.actions && onAction ? (
+            <div className="mt-2 flex flex-wrap gap-2">
+              {message.actions.map((action) => (
+                <button
+                  key={action.id}
+                  type="button"
+                  onClick={() => onAction(action)}
+                  className="font-sans text-xs font-medium text-indigo hover:text-indigo-hover"
+                >
+                  {action.label}
+                </button>
+              ))}
+            </div>
+          ) : null}
+        </div>
       </div>
     </div>
   )

@@ -1,0 +1,139 @@
+- generic [ref=e29]:
+  - complementary [ref=e31]:
+    - navigation "Primary" [ref=e38]:
+      - list [ref=e39]:
+        - listitem [ref=e40]:
+          - button "Executive Dashboard" [ref=e41]
+        - listitem [ref=e49]:
+          - button "Connections" [ref=e50]
+        - listitem [ref=e54]:
+          - button "Data Quality" [ref=e55]
+        - listitem [ref=e60]:
+          - button "Matching" [ref=e61]
+        - listitem [ref=e68]:
+          - button "Observability" [ref=e69]
+        - listitem [ref=e73]:
+          - button "Jobs & Tasks" [ref=e74]
+        - listitem [ref=e80]:
+          - button "Administration" [ref=e81]
+  - generic [ref=e86]:
+    - banner [ref=e87]:
+      - generic [ref=e88]:
+        - button "Acme Corp — Production" [ref=e90]
+        - generic [ref=e97]:
+          - button "Notifications, unread" [ref=e98]
+          - button "Settings" [ref=e103]
+          - button "Data Trust Agent" [ref=e108]
+          - button "Alex Rivera, Data Steward" [ref=e112]:
+            - generic [ref=e113]: AR
+            - generic [ref=e114]:
+              - generic [ref=e115]: Alex Rivera
+              - generic [ref=e116]: Data Steward
+          - button "Log out" [ref=e117]
+    - generic [ref=e2190]:
+      - generic [ref=e2192]:
+        - list [ref=e2194]:
+          - listitem [ref=e2195]:
+            - button [ref=e2198]
+            - paragraph [ref=e2204]: Connect
+            - paragraph [ref=e2205]: Where is your data?
+          - listitem [ref=e2206]:
+            - button [disabled] [ref=e2209]
+            - paragraph [ref=e2213]: Choose Table
+            - paragraph [ref=e2214]: What to check?
+          - listitem [ref=e2215]:
+            - button [disabled] [ref=e2218]
+            - paragraph [ref=e2223]: Configure
+            - paragraph [ref=e2224]: Foundation settings
+          - listitem [ref=e2225]:
+            - button [disabled] [ref=e2228]
+            - paragraph [ref=e2232]: Rule Catalog
+            - paragraph [ref=e2233]: Suggested checks
+          - listitem [ref=e2234]:
+            - button [disabled] [ref=e2237]
+            - paragraph [ref=e2242]: Custom Rules
+            - paragraph [ref=e2243]: Reusable rules
+          - listitem [ref=e2244]:
+            - button [disabled] [ref=e2247]
+            - paragraph [ref=e2251]: Preview and Run
+            - paragraph [ref=e2252]: Review then run
+          - listitem [ref=e2253]:
+            - button [disabled] [ref=e2256]
+            - paragraph [ref=e2261]: Notifications
+            - paragraph [ref=e2262]: Stay informed
+          - listitem [ref=e2263]:
+            - button [disabled] [ref=e2266]
+            - paragraph [ref=e2271]: Schedule
+            - paragraph [ref=e2272]: When to run?
+        - banner [ref=e2273]:
+          - heading "Choose a Table" [level=1] [ref=e2598]
+          - paragraph [ref=e2275]: Select which table you want to monitor for data quality
+        - generic [ref=e2276]:
+          - generic [ref=e2277]:
+            - generic [ref=e2278]:
+              - heading "Describe what you want" [level=2] [ref=e2279]
+              - paragraph [ref=e2280]: A phrase prefills this wizard. You still review every step.
+            - button "Generate draft" [ref=e2281]
+          - textbox "Nightly null + email checks on Customers, Slack on fail" [ref=e2286]
+          - generic [ref=e2287]:
+            - button "Nightly null + email checks on Customers, Slack on fail" [ref=e2288]
+            - 'button "Finance invoices: amount must be positive, email on fail" [ref=e2289]'
+            - button "Compare Orders to Order Facts and flag mismatches" [ref=e2290]
+        - generic [ref=e2599]:
+          - generic [ref=e2600]:
+            - button "Data Tables 3" [pressed] [ref=e2601]:
+              - text: Data Tables
+              - generic [ref=e2605]: "3"
+            - button [ref=e2606]
+            - button [ref=e2613]
+          - generic [ref=e2617]:
+            - generic [ref=e2619]:
+              - generic [ref=e2620]:
+                - generic [ref=e2621]: Data source type
+                - generic [ref=e2622]: MSSQL
+              - generic [ref=e2623]:
+                - generic [ref=e2624]: Data source
+                - generic [ref=e2625]: Acme ERP
+              - generic [ref=e2626]:
+                - generic [ref=e2627]:
+                  - text: Table name
+                  - generic [aria-hidden] [ref=e2628]: "*"
+                - combobox [ref=e2629]:
+                  - option "Select table" [selected]
+                  - option "Customer Master"
+                  - option "Orders"
+                  - option "Order Lines"
+              - generic [ref=e2630]:
+                - generic [ref=e2631]: Table nickname
+                - textbox "Enter table nickname" [ref=e2632]
+              - generic [ref=e2633]:
+                - generic [ref=e2634]: Suggested validation name
+                - generic [ref=e2635]: New_Table_dq
+                - button "Use name" [ref=e2636]
+              - generic [ref=e2637]:
+                - generic [ref=e2638]: Description
+                - textbox "What this table is used for" [ref=e2639]
+              - generic [ref=e2640]:
+                - generic [ref=e2641]: Tags
+                - generic [ref=e2642]:
+                  - textbox "Add tag…" [ref=e2643]
+                  - button "Add tag" [ref=e2644]
+              - generic [ref=e2647]:
+                - generic [ref=e2648]: BuckGPT domain
+                - combobox [ref=e2653]:
+                  - option "Select BuckGPT domain" [selected]
+                  - option "Finance"
+                  - option "Customer"
+                  - option "Inventory"
+                  - option "People"
+                  - option "Operations"
+            - generic [ref=e2654]:
+              - heading "Column Preview" [level=2] [ref=e2656]
+              - paragraph [ref=e2661]: Select a table to preview its schema
+          - generic [ref=e2663]:
+            - switch [ref=e2664]
+            - generic [ref=e2671]: Advanced Option
+      - contentinfo [ref=e2588]:
+        - button "Back" [ref=e2589]
+        - paragraph [ref=e2592]: Step 2 of 8
+        - button "Continue" [disabled] [ref=e2593]

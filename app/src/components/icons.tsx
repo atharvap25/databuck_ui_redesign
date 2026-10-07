@@ -289,6 +289,16 @@ export function ExpandIcon({ size = 16 }: { size?: number }) {
   )
 }
 
+export function UploadIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <path d="M12 16V6" />
+      <path d="m8 10 4-4 4 4" />
+      <path d="M5 19h14" />
+    </Glyph>
+  )
+}
+
 export function SwapIcon({ size = 16 }: { size?: number }) {
   return (
     <Glyph size={size}>
@@ -296,6 +306,15 @@ export function SwapIcon({ size = 16 }: { size?: number }) {
       <path d="m14 4 3 3-3 3" />
       <path d="M17 17H7" />
       <path d="m10 20-3-3 3-3" />
+    </Glyph>
+  )
+}
+
+export function PencilIcon({ size = 16 }: { size?: number }) {
+  return (
+    <Glyph size={size}>
+      <path d="M4 16.5 15.5 5a1.8 1.8 0 0 1 2.5 2.5L6.5 19H4v-2.5Z" />
+      <path d="M13.5 6.5 17.5 10.5" />
     </Glyph>
   )
 }

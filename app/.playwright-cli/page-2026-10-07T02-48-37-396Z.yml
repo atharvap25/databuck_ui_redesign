@@ -1,0 +1,200 @@
+- generic [ref=e29]:
+  - complementary [ref=e31]:
+    - generic [ref=e32]:
+      - generic [ref=e33]: Databuck
+      - button "Keep sidebar open" [ref=e1952]
+    - navigation "Primary" [ref=e38]:
+      - list [ref=e39]:
+        - listitem [ref=e40]:
+          - button "Executive Dashboard" [ref=e41]
+        - listitem [ref=e49]:
+          - button "Connections" [ref=e50]
+        - listitem [ref=e54]:
+          - button "Data Quality" [active] [ref=e55]
+        - listitem [ref=e60]:
+          - button "Matching" [ref=e61]
+        - listitem [ref=e68]:
+          - button "Observability" [ref=e69]
+        - listitem [ref=e73]:
+          - button "Jobs & Tasks" [ref=e74]
+        - listitem [ref=e80]:
+          - button "Administration" [ref=e81]
+    - paragraph [ref=e1963]: 2026 © FirstEigen
+  - generic [ref=e86]:
+    - banner [ref=e87]:
+      - generic [ref=e88]:
+        - button "Acme Corp — Production" [ref=e90]
+        - generic [ref=e97]:
+          - button "Notifications, unread" [ref=e98]
+          - button "Settings" [ref=e103]
+          - button "Data Trust Agent" [ref=e108]
+          - button "Alex Rivera, Data Steward" [ref=e112]:
+            - generic [ref=e113]: AR
+            - generic [ref=e114]:
+              - generic [ref=e115]: Alex Rivera
+              - generic [ref=e116]: Data Steward
+          - button "Log out" [ref=e117]
+    - generic [ref=e1973]:
+      - generic [ref=e1974]:
+        - heading "Data Quality" [level=1] [ref=e1975]
+        - generic [ref=e1976]:
+          - generic [ref=e1977]: Search
+          - combobox "Search" [ref=e1978]
+        - generic [ref=e1979]:
+          - group "Date range" [ref=e1980]:
+            - textbox "Start date" [ref=e1983]
+            - generic [aria-hidden] [ref=e1984]: –
+            - textbox "End date" [ref=e1985]
+          - button "Export" [ref=e1986]
+          - button "New Validation" [ref=e1989]
+      - generic [ref=e1991]:
+        - complementary [ref=e1992]:
+          - generic [ref=e1993]:
+            - generic [ref=e1994]:
+              - heading "Validations" [level=2] [ref=e1996]
+              - button "Collapse validations" [ref=e1997]
+            - group "Table kind" [ref=e2001]:
+              - button "Direct table" [pressed] [ref=e2002]
+              - button "Derived table" [ref=e2003]
+              - button "Reference data" [ref=e2004]
+            - generic [ref=e2005]:
+              - button "Summary Portfolio overview" [ref=e2006] [cursor=pointer]:
+                - generic [ref=e2013]:
+                  - generic [ref=e2014]: Summary
+                  - generic [ref=e2015]: Portfolio overview
+              - list [ref=e2016]:
+                - listitem [ref=e2017]:
+                  - button "Customer Master 98.4% VAL-0001 Customer_Master_Validation MSSQL · erp.dbo" [ref=e2018] [cursor=pointer]:
+                    - generic [ref=e2023]:
+                      - generic [ref=e2024]:
+                        - generic [ref=e2025]: Customer Master
+                        - generic [ref=e2026]: 98.4%
+                      - generic [ref=e2027]: VAL-0001
+                      - generic [ref=e2028]: Customer_Master_Validation
+                      - generic [ref=e2029]:
+                        - text: MSSQL
+                        - generic [ref=e2030]: · erp.dbo
+                - listitem [ref=e2031]:
+                  - button "Orders 91.9% VAL-0002 Orders_Validation MSSQL · erp.dbo" [ref=e2032] [cursor=pointer]:
+                    - generic [ref=e2037]:
+                      - generic [ref=e2038]:
+                        - generic [ref=e2039]: Orders
+                        - generic [ref=e2040]: 91.9%
+                      - generic [ref=e2041]: VAL-0002
+                      - generic [ref=e2042]: Orders_Validation
+                      - generic [ref=e2043]:
+                        - text: MSSQL
+                        - generic [ref=e2044]: · erp.dbo
+                - listitem [ref=e2045]:
+                  - button "Order Lines 86.6% VAL-0003 Order_Lines_Validation MSSQL · erp.dbo 4 checks failed" [ref=e2046] [cursor=pointer]:
+                    - generic [ref=e2051]:
+                      - generic [ref=e2052]:
+                        - generic [ref=e2053]: Order Lines
+                        - generic [ref=e2054]: 86.6%
+                      - generic [ref=e2055]: VAL-0003
+                      - generic [ref=e2056]: Order_Lines_Validation
+                      - generic [ref=e2057]:
+                        - text: MSSQL
+                        - generic [ref=e2058]: · erp.dbo
+                    - generic [ref=e2059]: 4 checks failed
+                - listitem [ref=e2060]:
+                  - button "Shipments 99.7% VAL-0004 Shipments_Validation BigQuery · acme.analytics" [ref=e2061] [cursor=pointer]:
+                    - generic [ref=e2066]:
+                      - generic [ref=e2067]:
+                        - generic [ref=e2068]: Shipments
+                        - generic [ref=e2069]: 99.7%
+                      - generic [ref=e2070]: VAL-0004
+                      - generic [ref=e2071]: Shipments_Validation
+                      - generic [ref=e2072]:
+                        - text: BigQuery
+                        - generic [ref=e2073]: · acme.analytics
+                - listitem [ref=e2074]:
+                  - button "AR Invoices 88.3% VAL-0005 AR_Invoices_Validation MSSQL · finance.dbo 1 check failed" [ref=e2075] [cursor=pointer]:
+                    - generic [ref=e2080]:
+                      - generic [ref=e2081]:
+                        - generic [ref=e2082]: AR Invoices
+                        - generic [ref=e2083]: 88.3%
+                      - generic [ref=e2084]: VAL-0005
+                      - generic [ref=e2085]: AR_Invoices_Validation
+                      - generic [ref=e2086]:
+                        - text: MSSQL
+                        - generic [ref=e2087]: · finance.dbo
+                    - generic [ref=e2088]: 1 check failed
+                - listitem [ref=e2089]:
+                  - button "AR Payments 84.6% VAL-0006 AR_Payments_Validation MSSQL · finance.dbo 1 check failed" [ref=e2090] [cursor=pointer]:
+                    - generic [ref=e2095]:
+                      - generic [ref=e2096]:
+                        - generic [ref=e2097]: AR Payments
+                        - generic [ref=e2098]: 84.6%
+                      - generic [ref=e2099]: VAL-0006
+                      - generic [ref=e2100]: AR_Payments_Validation
+                      - generic [ref=e2101]:
+                        - text: MSSQL
+                        - generic [ref=e2102]: · finance.dbo
+                    - generic [ref=e2103]: 1 check failed
+                - listitem [ref=e2104]:
+                  - button "Workers 100.0% VAL-0007 Workers_Validation MSSQL · hr.dbo" [ref=e2105] [cursor=pointer]:
+                    - generic [ref=e2110]:
+                      - generic [ref=e2111]:
+                        - generic [ref=e2112]: Workers
+                        - generic [ref=e2113]: 100.0%
+                      - generic [ref=e2114]: VAL-0007
+                      - generic [ref=e2115]: Workers_Validation
+                      - generic [ref=e2116]:
+                        - text: MSSQL
+                        - generic [ref=e2117]: · hr.dbo
+                - listitem [ref=e2118]:
+                  - button "Balances 96.2% VAL-0008 Balances_Validation DatabricksDeltaLake · inventory.gold" [ref=e2119] [cursor=pointer]:
+                    - generic [ref=e2124]:
+                      - generic [ref=e2125]:
+                        - generic [ref=e2126]: Balances
+                        - generic [ref=e2127]: 96.2%
+                      - generic [ref=e2128]: VAL-0008
+                      - generic [ref=e2129]: Balances_Validation
+                      - generic [ref=e2130]:
+                        - text: DatabricksDeltaLake
+                        - generic [ref=e2131]: · inventory.gold
+                - listitem [ref=e2132]:
+                  - button "General Ledger 0.0% VAL-0009 General_Ledger_Validation Teradata · edw_prod 6 checks failed" [ref=e2133] [cursor=pointer]:
+                    - generic [ref=e2138]:
+                      - generic [ref=e2139]:
+                        - generic [ref=e2140]: General Ledger
+                        - generic [ref=e2141]: 0.0%
+                      - generic [ref=e2142]: VAL-0009
+                      - generic [ref=e2143]: General_Ledger_Validation
+                      - generic [ref=e2144]:
+                        - text: Teradata
+                        - generic [ref=e2145]: · edw_prod
+                    - generic [ref=e2146]: 6 checks failed
+                - listitem [ref=e2147]:
+                  - button "Returns 90.4% VAL-0012 Returns_Validation BigQuery · acme.analytics" [ref=e2148] [cursor=pointer]:
+                    - generic [ref=e2153]:
+                      - generic [ref=e2154]:
+                        - generic [ref=e2155]: Returns
+                        - generic [ref=e2156]: 90.4%
+                      - generic [ref=e2157]: VAL-0012
+                      - generic [ref=e2158]: Returns_Validation
+                      - generic [ref=e2159]:
+                        - text: BigQuery
+                        - generic [ref=e2160]: · acme.analytics
+                - listitem [ref=e2161]:
+                  - button "Journals 76.5% VAL-0014 Journals_Validation Teradata · edw_prod 3 checks failed" [ref=e2162] [cursor=pointer]:
+                    - generic [ref=e2167]:
+                      - generic [ref=e2168]:
+                        - generic [ref=e2169]: Journals
+                        - generic [ref=e2170]: 76.5%
+                      - generic [ref=e2171]: VAL-0014
+                      - generic [ref=e2172]: Journals_Validation
+                      - generic [ref=e2173]:
+                        - text: Teradata
+                        - generic [ref=e2174]: · edw_prod
+                    - generic [ref=e2175]: 3 checks failed
+            - generic [ref=e2176]:
+              - paragraph [ref=e2177]: 11 validations
+              - generic [ref=e2178]:
+                - button "Prev" [disabled] [ref=e2179]
+                - button "1" [ref=e2180]
+                - button "Next" [disabled] [ref=e2181]
+        - generic [ref=e2183]:
+          - heading "Dashboard" [level=2] [ref=e2188]
+          - paragraph [ref=e2189]: This area is not available yet.

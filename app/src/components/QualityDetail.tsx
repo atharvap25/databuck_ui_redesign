@@ -1,14 +1,24 @@
 import { useEffect, useState, type KeyboardEvent, type ReactNode } from 'react'
+import { useWorkspaceAi } from '../ai/WorkspaceAiContext.tsx'
+import { catalogIdForCheck } from '../data/checkResults.ts'
+import {
+  exceptionClusterFor,
+  piiColumnsFor,
+  profileInsightsFor,
+} from '../data/aiMocks.ts'
 import { tableForNickname } from '../data/sources.ts'
 import { scoreTone, validationRuns, type ValidationRun } from '../data/validations.ts'
+import { AiAction, AiBanner, ConfidencePill } from './ai/AiKit.tsx'
+import CheckResults from './CheckResults.tsx'
 import EmptyState from './EmptyState.tsx'
-import { BackIcon, ClockIcon, SparkIcon } from './icons.tsx'
+import { ClockIcon } from './icons.tsx'
 import { qualitySummaryId } from './QualityPanel.tsx'
 import RuleCatalog from './RuleCatalog.tsx'
 import StatusBadge from './StatusBadge.tsx'
 import TableProfile from './TableProfile.tsx'
+import CustomRulesStep from './wizard/CustomRulesStep.tsx'
 import ConfigureStep from './wizard/ConfigureStep.tsx'
-import { defaultConfigure, inferDomain, type ConfigureState } from './wizard/model.ts'
+import { defaultConfigure, inferDomain, schemaFor, type ConfigureState } from './wizard/model.ts'
 
 type QualityTab = 'checks' | 'catalog' | 'custom' | 'profile' | 'configure'
 type Tone = 'success' | 'warning' | 'danger'
@@ -54,6 +64,7 @@ const advancedCatalog = [
   { id: 'distribution-metric', name: 'Data Distribution Metric Check', summary: 'Tracks whether the distribution stays stable.' },
   { id: 'data-drift', name: 'Data Drift Check', summary: 'Compares the current profile with the last run.' },
   { id: 'distribution', name: 'Distribution Check', summary: 'Checks the spread of values in a column.' },
+  { id: 'record-count', name: 'Record Count Anomaly', summary: 'Flags a sudden jump or drop in row count versus the usual mean.' },
   { id: 'apply-rules', name: 'Apply Rules', summary: 'Runs the configured rule set for this table.' },
 ]
 
@@ -65,9 +76,6 @@ const customNames = [
   'currency_amount_combo',
   'discount_auth_check',
 ]
-
-const secondaryButton =
-  'inline-flex h-10 items-center gap-2 rounded-md border border-line-strong bg-canvas px-3 font-sans text-sm font-medium text-ink transition-colors duration-150 ease-databuck hover:border-ink hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo'
 
 const primaryButton =
   'inline-flex h-10 items-center rounded-md bg-indigo px-4 font-sans text-sm font-medium text-white transition-colors duration-150 ease-databuck hover:bg-indigo-hover active:bg-indigo-active focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ink disabled:cursor-not-allowed disabled:bg-container-high disabled:text-outline disabled:hover:bg-container-high'
@@ -138,10 +146,17 @@ function resultFor(run: ValidationRun, key: string, failuresLeft: { count: numbe
 
 function appliedChecks(run: ValidationRun, failuresLeft: { count: number }): AppliedCheck[] {
   const essential = essentialCatalog.filter((_, index) => (hash(run.id) + index) % 2 === 0).slice(0, 6)
-  const advanced = advancedCatalog.filter((_, index) => (hash(`${run.id}:adv`) + index) % 2 === 0).slice(0, 3)
+  const advanced = advancedCatalog
+    .filter((check) => check.id !== 'record-count')
+    .filter((_, index) => (hash(`${run.id}:adv`) + index) % 2 === 0)
+    .slice(0, 3)
+  const recordCount = advancedCatalog.find((check) => check.id === 'record-count')
   return [
     ...essential.map((check) => ({ ...check, group: 'Essential' as const, ...resultFor(run, check.id, failuresLeft) })),
     ...advanced.map((check) => ({ ...check, group: 'Advanced' as const, ...resultFor(run, check.id, failuresLeft) })),
+    ...(recordCount
+      ? [{ ...recordCount, group: 'Advanced' as const, ...resultFor(run, recordCount.id, failuresLeft) }]
+      : []),
   ]
 }
 
@@ -171,15 +186,20 @@ export default function QualityDetail({
   runBusy?: boolean
 }) {
   const run = validationRuns.find((item) => item.id === validationId)
+  const { enabled, requestReview, requestRca, openAgent } = useWorkspaceAi()
   const [tab, setTab] = useState<QualityTab>('checks')
   const [openCheck, setOpenCheck] = useState<string | null>(null)
+  const [catalogFocusId, setCatalogFocusId] = useState<string | null>(null)
   const [configure, setConfigure] = useState<ConfigureState>(() => defaultConfigure())
   const [domain, setDomain] = useState(() => (run ? inferDomain(run.schema, run.tableName) : ''))
   const [description, setDescription] = useState(() => (run ? `Quality checks for ${run.tableName}` : ''))
+  const [selectedCustomIds, setSelectedCustomIds] = useState<string[]>([])
+  const [selectedDdmIds, setSelectedDdmIds] = useState<string[]>([])
 
   useEffect(() => {
     setTab('checks')
     setOpenCheck(null)
+    setCatalogFocusId(null)
     const next = validationRuns.find((item) => item.id === validationId)
     setConfigure(defaultConfigure())
     if (next) {
@@ -197,19 +217,20 @@ export default function QualityDetail({
     )
   }
 
-  if (openCheck) {
+  if (openCheck && run) {
     return (
-      <div className="flex h-full flex-col p-8">
-        <button
-          type="button"
-          onClick={() => setOpenCheck(null)}
-          className="inline-flex h-11 w-fit shrink-0 items-center gap-1 rounded-md px-2 font-sans text-sm font-medium text-ink transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
-        >
-          <BackIcon />
-          Back
-        </button>
-        <EmptyState icon={<ClockIcon />} title={openCheck} description="This area is not available yet." className="flex-1" />
-      </div>
+      <CheckResults
+        run={run}
+        checkName={openCheck}
+        onBack={() => setOpenCheck(null)}
+        onConfigure={() => {
+          const focusId = catalogIdForCheck(openCheck)
+          setOpenCheck(null)
+          setTab('catalog')
+          setCatalogFocusId(focusId)
+          onOpenCatalog?.()
+        }}
+      />
     )
   }
 
@@ -239,7 +260,7 @@ export default function QualityDetail({
             aria-selected={tab === id}
             onClick={() => {
               setTab(id)
-              if (id === 'catalog') onOpenCatalog?.()
+              if (id === 'catalog' || id === 'custom') onOpenCatalog?.()
             }}
             className={`-mb-px cursor-pointer border-b-2 py-3 font-label text-xs font-medium tracking-[0.08em] uppercase transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
               tab === id ? 'border-indigo text-indigo' : 'border-transparent text-muted hover:text-ink'
@@ -273,14 +294,12 @@ export default function QualityDetail({
             </div>
           </div>
           <div className="flex flex-wrap items-center gap-2">
-            <button type="button" className={secondaryButton}>
-              <SparkIcon size={16} />
-              Buck's Review
-            </button>
-            <button type="button" className={secondaryButton}>
-              <SparkIcon size={16} />
-              Root Cause Analysis
-            </button>
+            {enabled ? (
+              <>
+                <AiAction onClick={() => requestReview(run.id)}>Buck's Review</AiAction>
+                <AiAction onClick={() => requestRca(run.id)}>Root Cause Analysis</AiAction>
+              </>
+            ) : null}
             <button
               type="button"
               className={primaryButton}
@@ -302,27 +321,31 @@ export default function QualityDetail({
         }
       >
         <div className={tab === 'checks' ? undefined : 'hidden'}>
-          <CheckSummary run={run} checks={checks} custom={custom} onOpen={setOpenCheck} />
+          <CheckSummary run={run} checks={checks} custom={custom} onOpen={setOpenCheck} enabled={enabled} onAsk={openAgent} />
         </div>
         <RuleCatalog
           key={validationId}
           validationId={validationId}
           shown={tab === 'catalog'}
+          focusCheckId={catalogFocusId}
           onOpen={setOpenCheck}
           onRun={() => onRun?.(run.id, run.tableName)}
         />
         {tab === 'custom' ? (
-          <div className="flex min-h-0 flex-1 items-center justify-center">
-            <EmptyState
-              icon={<ClockIcon />}
-              title="Under Development"
-              description="Custom rules are not available yet."
+          <div className="db-scroll min-h-0 flex-1 overflow-auto p-6">
+            <CustomRulesStep
+              selectedIds={selectedCustomIds}
+              onSelected={setSelectedCustomIds}
+              selectedDdmIds={selectedDdmIds}
+              onSelectedDdms={setSelectedDdmIds}
+              tableName={run.tableName}
+              schema={schemaFor(tableForNickname(run.tableName))}
             />
           </div>
         ) : null}
         {tab === 'profile' ? (
           <div className="db-scroll min-h-0 flex-1 overflow-auto p-6">
-            <TableProfile table={tableForNickname(run.tableName)} />
+            <TableProfile table={tableForNickname(run.tableName)} insights={enabled ? profileInsightsFor(tableForNickname(run.tableName)) : []} />
           </div>
         ) : null}
         {tab === 'configure' ? (
@@ -334,6 +357,7 @@ export default function QualityDetail({
               onDomain={setDomain}
               description={description}
               onDescription={setDescription}
+              schema={schemaFor(tableForNickname(run.tableName))}
             />
           </div>
         ) : null}
@@ -497,30 +521,35 @@ function ScoreTrendCard({ run }: { run: ValidationRun }) {
   )
 }
 
-function SensitiveDataCard({ columns, seed }: { columns: number; seed: number }) {
-  const total = Math.max(24, columns + (seed % 40))
-  const shares = [
-    { label: 'Restricted Sensitive', tone: 'bg-danger', swatch: 'bg-danger', count: 8 + (seed % 4) },
-    { label: 'Direct PII', tone: 'bg-warning', swatch: 'bg-warning', count: 9 + (seed % 5) },
-    { label: 'Financial', tone: 'bg-warning', swatch: 'bg-warning', count: 36 + (seed % 12) },
-    { label: 'Mixed PII', tone: 'bg-success', swatch: 'bg-success', count: 6 + (seed % 4) },
-    { label: 'Internal', tone: 'bg-info', swatch: 'bg-info', count: 2 + (seed % 3) },
-    { label: 'Public', tone: 'bg-slate-500', swatch: 'bg-slate-500', count: 2 },
-  ]
-  const counted = shares.reduce((sum, item) => sum + item.count, 0)
-  const scaled = shares.map((item) => ({ ...item, count: Math.max(1, Math.round((item.count / counted) * total)) }))
-  const sensitive = scaled.slice(0, 3).reduce((sum, item) => sum + item.count, 0)
-  const percent = Math.round((sensitive / total) * 100)
+function SensitiveDataCard({
+  table,
+  enabled,
+  onAsk,
+}: {
+  table: ReturnType<typeof tableForNickname>
+  enabled: boolean
+  onAsk: () => void
+}) {
+  const columns = piiColumnsFor(table)
+  const sensitive = columns.filter((column) => column.label === 'Direct PII' || column.label === 'Restricted' || column.label === 'Financial')
+  const percent = Math.round((sensitive.length / Math.max(columns.length, 1)) * 100)
   const radius = 36
   const length = 2 * Math.PI * radius
   const offset = length - (percent / 100) * length
+  const swatch: Record<(typeof columns)[number]['label'], string> = {
+    Restricted: 'bg-danger',
+    'Direct PII': 'bg-warning',
+    Financial: 'bg-warning',
+    Internal: 'bg-info',
+    Public: 'bg-success',
+  }
 
   return (
     <section className="flex h-full flex-col justify-between gap-6 rounded-lg border border-line bg-canvas p-4 shadow-card">
       <div className="flex items-start justify-between gap-3">
         <div>
           <h3 className="font-sans text-sm font-semibold text-ink">Sensitive Data</h3>
-          <p className="mt-1 text-xs text-muted">Table-level classification across {total} tables</p>
+          <p className="mt-1 text-xs text-muted">Column-level labels for {table.nickname}</p>
         </div>
         <p className="text-right font-label text-[0.6875rem] font-medium tracking-[0.08em] text-danger uppercase">
           <span className="block font-mono text-2xl leading-none font-semibold tracking-[-0.04em] tabular-nums">{percent}%</span>
@@ -548,26 +577,24 @@ function SensitiveDataCard({ columns, seed }: { columns: number; seed: number })
             Sensitive
           </span>
         </div>
-        <div className="min-w-0 flex-1">
-          <p className="font-label text-[0.6875rem] font-medium tracking-[0.08em] text-muted uppercase">Classification distribution</p>
-          <div className="mt-2 flex h-2.5 overflow-hidden rounded-full">
-            {scaled.map((item) => (
-              <span key={item.label} className={item.tone} style={{ width: `${(item.count / total) * 100}%` }} />
-            ))}
-          </div>
-          <ul className="mt-4 grid grid-cols-2 gap-x-4 gap-y-2 sm:grid-cols-3">
-            {scaled.map((item) => (
-              <li key={item.label} className="flex items-center gap-2 text-xs text-ink">
-                <span className={`size-2 shrink-0 rounded-full ${item.swatch}`} aria-hidden="true" />
-                <span className="min-w-0 truncate">{item.label}</span>
-                <span className="ml-auto font-mono text-muted tabular-nums">
-                  {item.count}/{total}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="min-w-0 flex-1">
+          {columns.slice(0, 6).map((column) => (
+            <li key={column.name} className="flex items-center gap-2 py-1 text-xs text-ink">
+              <span className={`size-2 shrink-0 rounded-full ${swatch[column.label]}`} aria-hidden="true" />
+              <span className="min-w-0 truncate font-mono">{column.name}</span>
+              <span className="text-muted">{column.label}</span>
+              <span className="ml-auto">
+                <ConfidencePill value={column.confidence} />
+              </span>
+            </li>
+          ))}
+        </ul>
       </div>
+      {enabled ? (
+        <button type="button" onClick={onAsk} className="self-start font-sans text-xs font-medium text-indigo">
+          Ask agent to summarize
+        </button>
+      ) : null}
     </section>
   )
 }
@@ -577,23 +604,39 @@ function CheckSummary({
   checks,
   custom,
   onOpen,
+  enabled,
+  onAsk,
 }: {
   run: ValidationRun
   checks: AppliedCheck[]
   custom: CustomRule[]
   onOpen: (id: string) => void
+  enabled: boolean
+  onAsk: () => void
 }) {
   const groups = (['Essential', 'Advanced'] as const).map((group) => ({
     label: group,
     rows: checks.filter((check) => check.group === group),
   }))
   const table = tableForNickname(run.tableName)
+  const cluster = exceptionClusterFor(run)
+  const review = enabled ? run : null
 
   return (
     <div className="flex flex-col gap-4 p-4">
+      {review ? (
+        <AiBanner title="Run versus prior">
+          {run.failedChecks > 0
+            ? `DTS ${run.score.toFixed(1)}% · ${run.failedChecks} failed checks. Nulls and load timing drove the change versus the prior run.`
+            : `DTS ${run.score.toFixed(1)}% with no failed checks. Score is within noise of the last three runs.`}
+        </AiBanner>
+      ) : null}
+      {cluster && enabled ? (
+        <AiBanner title="Exception cluster">{`${cluster.title}. ${cluster.body}`}</AiBanner>
+      ) : null}
       <div className="grid gap-4 xl:grid-cols-2">
         <ScoreTrendCard run={run} />
-        <SensitiveDataCard columns={table.columns} seed={hash(run.id)} />
+        <SensitiveDataCard table={table} enabled={enabled} onAsk={onAsk} />
       </div>
       <div className="hidden flex-col gap-8 lg:flex">
         {groups.map((group) =>

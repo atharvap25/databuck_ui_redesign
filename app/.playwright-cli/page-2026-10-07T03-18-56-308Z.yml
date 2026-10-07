@@ -1,0 +1,219 @@
+- generic [ref=e29]:
+  - complementary [ref=e31]:
+    - navigation "Primary" [ref=e38]:
+      - list [ref=e39]:
+        - listitem [ref=e40]:
+          - button "Executive Dashboard" [ref=e41]
+        - listitem [ref=e49]:
+          - button "Connections" [ref=e50]
+        - listitem [ref=e54]:
+          - button "Data Quality" [ref=e55]
+        - listitem [ref=e60]:
+          - button "Matching" [ref=e61]
+        - listitem [ref=e68]:
+          - button "Observability" [ref=e69]
+        - listitem [ref=e73]:
+          - button "Jobs & Tasks" [ref=e74]
+        - listitem [ref=e80]:
+          - button "Administration" [ref=e81]
+  - generic [ref=e86]:
+    - banner [ref=e87]:
+      - generic [ref=e88]:
+        - button "Acme Corp — Production" [ref=e90]
+        - generic [ref=e97]:
+          - button "Notifications, unread" [ref=e98]
+          - button "Settings" [ref=e103]
+          - button "Data Trust Agent" [ref=e108]
+          - button "Alex Rivera, Data Steward" [ref=e112]:
+            - generic [ref=e113]: AR
+            - generic [ref=e114]:
+              - generic [ref=e115]: Alex Rivera
+              - generic [ref=e116]: Data Steward
+          - button "Log out" [ref=e117]
+    - generic [ref=e204]:
+      - generic [ref=e205]:
+        - heading "Data Quality" [level=1] [ref=e206]
+        - generic [ref=e207]:
+          - generic [ref=e208]: Search
+          - combobox "Search" [ref=e209]
+        - generic [ref=e210]:
+          - group "Date range" [ref=e211]:
+            - textbox "Start date" [ref=e214]
+            - generic [aria-hidden] [ref=e215]: –
+            - textbox "End date" [ref=e216]
+          - button "Export" [ref=e217]
+          - button "New Validation" [ref=e220]
+      - generic [ref=e222]:
+        - complementary [ref=e223]:
+          - generic [ref=e224]:
+            - button "Expand validations" [ref=e1176]
+            - generic [ref=e1180]: AR Invoices
+        - generic [ref=e3584]:
+          - tablist [ref=e3585]:
+            - tab "Check Summary" [ref=e3586] [cursor=pointer]
+            - tab "Rule Catalog" [selected] [ref=e3587] [cursor=pointer]
+            - tab "Custom Rules" [ref=e3588] [cursor=pointer]
+            - tab "Profile" [ref=e3589] [cursor=pointer]
+            - tab "Configure" [ref=e3590] [cursor=pointer]
+          - generic [ref=e3976]:
+            - complementary [ref=e3977]:
+              - generic [ref=e3978]:
+                - generic [ref=e3979]: Search checks
+                - textbox "Search checks" [ref=e3981]
+                - group "Check group" [ref=e3982]:
+                  - button "Essential" [ref=e3983] [cursor=pointer]
+                  - button "Advanced" [pressed] [ref=e3984] [cursor=pointer]
+              - list [ref=e3986]:
+                - listitem [ref=e4192]:
+                  - button "Value Anomaly Off" [ref=e4193] [cursor=pointer]:
+                    - generic [ref=e4197]: Value Anomaly
+                    - generic [ref=e4198]: "Off"
+                - listitem [ref=e4200]:
+                  - button "Microsegment Based Data Drift Off" [ref=e4201] [cursor=pointer]:
+                    - generic [ref=e4205]: Microsegment Based Data Drift
+                    - generic [ref=e4206]: "Off"
+                - listitem [ref=e4208]:
+                  - button "Data Distribution Metric Check Off" [ref=e4209] [cursor=pointer]:
+                    - generic [ref=e4212]: Data Distribution Metric Check
+                    - generic [ref=e4213]: "Off"
+                - listitem [ref=e4215]:
+                  - button "Data Drift Check Off" [ref=e4216] [cursor=pointer]:
+                    - generic [ref=e4220]: Data Drift Check
+                    - generic [ref=e4221]: "Off"
+                - listitem [ref=e4223]:
+                  - button "Distribution Check Off" [active] [ref=e4224] [cursor=pointer]:
+                    - generic [ref=e4227]: Distribution Check
+                    - generic [ref=e4228]: "Off"
+            - generic [ref=e4077]:
+              - generic [ref=e4078]:
+                - generic [ref=e4079]:
+                  - heading "Distribution Check" [level=3] [ref=e4261]
+                  - paragraph [ref=e4081]: Checks the spread of values in a column.
+                - button "See results" [ref=e4262]
+              - generic [ref=e4083]:
+                - paragraph [ref=e4084]: Select at least one column to run this check.
+                - generic [ref=e4085]:
+                  - generic [ref=e4086]: Filter columns
+                  - textbox "Filter columns" [ref=e4087]
+              - table [ref=e4263]:
+                - caption [ref=e4090]: Distribution Check columns
+                - rowgroup [ref=e4091]:
+                  - row [ref=e4264]:
+                    - columnheader [ref=e4093]:
+                      - checkbox "Select visible columns" [ref=e4094]
+                    - columnheader "Column" [ref=e4095]
+                    - columnheader "Format" [ref=e4096]
+                    - columnheader "Distribution threshold (%)" [ref=e4265]
+                    - columnheader [ref=e4098]:
+                      - generic [ref=e4099]:
+                        - checkbox "Mark visible columns critical" [ref=e4100]
+                        - text: Critical
+                - rowgroup [ref=e4101]:
+                  - row [ref=e4234]:
+                    - cell [ref=e4103]:
+                      - checkbox "Select invoice_number" [ref=e4104]
+                    - cell "invoice_number" [ref=e4105]
+                    - cell "String" [ref=e4106]
+                    - cell [ref=e4235]:
+                      - generic [ref=e4108]:
+                        - textbox "Distribution threshold (%)" [disabled] [ref=e4266]:
+                          - /placeholder: "0"
+                        - generic: "%"
+                    - cell [ref=e4110]:
+                      - checkbox "Critical for invoice_number" [disabled] [ref=e4111]
+                  - row [ref=e4237]:
+                    - cell [ref=e4113]:
+                      - checkbox "Select customer_id" [ref=e4114]
+                    - cell "customer_id" [ref=e4115]
+                    - cell "Integer" [ref=e4116]
+                    - cell [ref=e4238]:
+                      - generic [ref=e4118]:
+                        - textbox "Distribution threshold (%)" [disabled] [ref=e4267]:
+                          - /placeholder: "0"
+                        - generic: "%"
+                    - cell [ref=e4120]:
+                      - checkbox "Critical for customer_id" [disabled] [ref=e4121]
+                  - row [ref=e4240]:
+                    - cell [ref=e4123]:
+                      - checkbox "Select invoice_date" [ref=e4124]
+                    - cell "invoice_date" [ref=e4125]
+                    - cell "Date" [ref=e4126]
+                    - cell [ref=e4241]:
+                      - generic [ref=e4128]:
+                        - textbox "Distribution threshold (%)" [disabled] [ref=e4268]:
+                          - /placeholder: "0"
+                        - generic: "%"
+                    - cell [ref=e4130]:
+                      - checkbox "Critical for invoice_date" [disabled] [ref=e4131]
+                  - row [ref=e4243]:
+                    - cell [ref=e4133]:
+                      - checkbox "Select due_date" [ref=e4134]
+                    - cell "due_date" [ref=e4135]
+                    - cell "Date" [ref=e4136]
+                    - cell [ref=e4244]:
+                      - generic [ref=e4138]:
+                        - textbox "Distribution threshold (%)" [disabled] [ref=e4269]:
+                          - /placeholder: "0"
+                        - generic: "%"
+                    - cell [ref=e4140]:
+                      - checkbox "Critical for due_date" [disabled] [ref=e4141]
+                  - row [ref=e4246]:
+                    - cell [ref=e4143]:
+                      - checkbox "Select currency" [ref=e4144]
+                    - cell "currency" [ref=e4145]
+                    - cell "String" [ref=e4146]
+                    - cell [ref=e4247]:
+                      - generic [ref=e4148]:
+                        - textbox "Distribution threshold (%)" [disabled] [ref=e4270]:
+                          - /placeholder: "0"
+                        - generic: "%"
+                    - cell [ref=e4150]:
+                      - checkbox "Critical for currency" [disabled] [ref=e4151]
+                  - row [ref=e4249]:
+                    - cell [ref=e4153]:
+                      - checkbox "Select amount" [ref=e4154]
+                    - cell "amount" [ref=e4155]
+                    - cell "Decimal" [ref=e4156]
+                    - cell [ref=e4250]:
+                      - generic [ref=e4158]:
+                        - textbox "Distribution threshold (%)" [disabled] [ref=e4271]:
+                          - /placeholder: "0"
+                        - generic: "%"
+                    - cell [ref=e4160]:
+                      - checkbox "Critical for amount" [disabled] [ref=e4161]
+                  - row [ref=e4252]:
+                    - cell [ref=e4163]:
+                      - checkbox "Select tax_amount" [ref=e4164]
+                    - cell "tax_amount" [ref=e4165]
+                    - cell "Decimal" [ref=e4166]
+                    - cell [ref=e4253]:
+                      - generic [ref=e4168]:
+                        - textbox "Distribution threshold (%)" [disabled] [ref=e4272]:
+                          - /placeholder: "0"
+                        - generic: "%"
+                    - cell [ref=e4170]:
+                      - checkbox "Critical for tax_amount" [disabled] [ref=e4171]
+                  - row [ref=e4255]:
+                    - cell [ref=e4173]:
+                      - checkbox "Select balance_due" [ref=e4174]
+                    - cell "balance_due" [ref=e4175]
+                    - cell "Decimal" [ref=e4176]
+                    - cell [ref=e4256]:
+                      - generic [ref=e4178]:
+                        - textbox "Distribution threshold (%)" [disabled] [ref=e4273]:
+                          - /placeholder: "0"
+                        - generic: "%"
+                    - cell [ref=e4180]:
+                      - checkbox "Critical for balance_due" [disabled] [ref=e4181]
+                  - row [ref=e4258]:
+                    - cell [ref=e4183]:
+                      - checkbox "Select status" [ref=e4184]
+                    - cell "status" [ref=e4185]
+                    - cell "String" [ref=e4186]
+                    - cell [ref=e4259]:
+                      - generic [ref=e4188]:
+                        - textbox "Distribution threshold (%)" [disabled] [ref=e4274]:
+                          - /placeholder: "0"
+                        - generic: "%"
+                    - cell [ref=e4190]:
+                      - checkbox "Critical for status" [disabled] [ref=e4191]

@@ -68,6 +68,8 @@ export default function RuleCatalog({
   shown = true,
   onOpen,
   onRun,
+  suggestionWhy,
+  focusCheckId,
 }: {
   validationId?: string
   columns?: CatalogColumn[]
@@ -76,6 +78,8 @@ export default function RuleCatalog({
   shown?: boolean
   onOpen?: (name: string) => void
   onRun?: () => void
+  suggestionWhy?: (checkId: string) => string
+  focusCheckId?: string | null
 }) {
   const searchId = useId()
   const columnSearchId = useId()
@@ -103,6 +107,17 @@ export default function RuleCatalog({
   useEffect(() => {
     setColumnQuery('')
   }, [activeId])
+
+  useEffect(() => {
+    if (!focusCheckId) return
+    const check = catalogChecks.find((item) => item.id === focusCheckId)
+    if (!check) return
+    setGroup(check.group)
+    setActiveId(check.id)
+    window.requestAnimationFrame(() => {
+      document.querySelector(`[data-check-id="${check.id}"]`)?.scrollIntoView({ block: 'nearest' })
+    })
+  }, [focusCheckId])
 
   const checkQueryText = checkQuery.trim().toLowerCase()
   const visibleChecks = catalogChecks.filter(
@@ -215,7 +230,6 @@ export default function RuleCatalog({
   }
 
   const selected = selectedColumns(config, columns)
-  const applied = active.enableOnly ? config.enabled : selected.length > 0
   const dirty = JSON.stringify(state) !== JSON.stringify(saved)
   const changes = dirty ? catalogDiff(saved, state, columns) : []
 
@@ -273,6 +287,7 @@ export default function RuleCatalog({
                     config={state.checks[check.id]}
                     columns={columns}
                     selected={check.id === active.id}
+                    why={suggestionWhy?.(check.id)}
                     onSelect={() => setActiveId(check.id)}
                   />
                 </li>
@@ -289,7 +304,7 @@ export default function RuleCatalog({
               <h3 className="font-sans text-lg font-semibold tracking-[-0.02em] text-ink">{active.name}</h3>
               <p className="mt-1 max-w-3xl text-sm leading-6 text-muted">{active.summary}</p>
             </div>
-            {applied && onOpen ? (
+            {onOpen ? (
               <button
                 type="button"
                 onClick={() => onOpen(active.name)}
@@ -428,12 +443,14 @@ function CheckListButton({
   columns,
   selected,
   onSelect,
+  why,
 }: {
   check: CheckDefinition
   config: CheckConfig
   columns: CatalogColumn[]
   selected: boolean
   onSelect: () => void
+  why?: string
 }) {
   const count = check.enableOnly ? 0 : selectedColumns(config, columns).length
   const critical = check.enableOnly ? 0 : criticalCount(config, columns)
@@ -446,7 +463,9 @@ function CheckListButton({
   return (
     <button
       type="button"
+      data-check-id={check.id}
       aria-current={selected ? 'true' : undefined}
+      title={why}
       onClick={onSelect}
       className={`flex w-full cursor-pointer items-center gap-2 rounded-md px-2 py-2 text-left transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
         selected ? 'bg-secondary-fixed' : 'hover:bg-surface'
@@ -459,7 +478,12 @@ function CheckListButton({
       >
         <CheckGlyph id={check.id} />
       </span>
-      <span className="min-w-0 flex-1 truncate font-sans text-sm font-medium text-ink">{check.name}</span>
+      <span className="min-w-0 flex-1 truncate font-sans text-sm font-medium text-ink">
+        {check.name}
+        {why && !quiet ? (
+          <span className="ml-2 font-label text-[0.625rem] tracking-[0.08em] text-indigo uppercase">Suggested</span>
+        ) : null}
+      </span>
       <span className="shrink-0 text-right">
         <span className={`block font-mono text-xs tabular-nums ${quiet ? 'text-muted' : 'text-ink'}`}>{status}</span>
         {showCritical ? <span className="block font-mono text-[11px] text-danger">{criticalLabel}</span> : null}

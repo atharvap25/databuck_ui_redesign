@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { catalogSummary, type CatalogColumn, type CatalogState } from '../../data/ruleCatalog.ts'
-import type { CustomRule } from '../../data/customRules.ts'
+import { categoryLabel, type CustomRule, type DistributionMetric } from '../../data/customRules.ts'
 import type { AlertState, ConfigureState, ScheduleState } from './model.ts'
 import { schedulePlanFacts } from './model.ts'
 import { cardClass, Glyph, primaryButton, secondaryButton } from './ui.tsx'
@@ -16,6 +16,8 @@ export default function PreviewStep({
   catalog,
   customRules,
   selectedCustomIds,
+  ddms,
+  selectedDdmIds,
   alerts,
   schedule,
   visitedAlerts,
@@ -32,6 +34,8 @@ export default function PreviewStep({
   catalog: CatalogState
   customRules: CustomRule[]
   selectedCustomIds: string[]
+  ddms: DistributionMetric[]
+  selectedDdmIds: string[]
   alerts: AlertState
   schedule: ScheduleState
   visitedAlerts: boolean
@@ -42,6 +46,7 @@ export default function PreviewStep({
   const { schedules, triggers, groups } = useJobs()
   const summary = catalogSummary(catalog, columns)
   const selectedCustom = customRules.filter((rule) => selectedCustomIds.includes(rule.id))
+  const selectedMetrics = ddms.filter((item) => selectedDdmIds.includes(item.id))
 
   return (
     <div className="flex flex-col gap-4">
@@ -93,19 +98,33 @@ export default function PreviewStep({
         title="Custom rules"
         step={5}
         onJump={onJump}
-        facts={[['Selected', String(selectedCustom.length)]]}
+        facts={[
+          ['Selected', String(selectedCustom.length)],
+          ['DDM', String(selectedMetrics.length)],
+        ]}
       >
         {selectedCustom.length > 0 ? (
           <ul className="mt-4 flex flex-col gap-1.5">
             {selectedCustom.map((rule) => (
-              <li key={rule.id} className="font-mono text-xs text-ink">
-                {rule.name}
+              <li key={rule.id} className="flex flex-wrap items-baseline gap-2">
+                <span className="font-mono text-xs text-ink">{rule.name}</span>
+                <span className="font-label text-[10px] tracking-[0.08em] text-muted uppercase">{categoryLabel(rule.category)}</span>
               </li>
             ))}
           </ul>
         ) : (
           <p className="mt-3 text-sm text-muted">No custom rules selected.</p>
         )}
+        {selectedMetrics.length > 0 ? (
+          <ul className="mt-3 flex flex-col gap-1.5 border-t border-line pt-3">
+            {selectedMetrics.map((item) => (
+              <li key={item.id} className="flex flex-wrap items-baseline gap-2">
+                <span className="font-sans text-xs font-medium text-ink">{item.name}</span>
+                <span className="font-mono text-[11px] text-muted">{item.fn}</span>
+              </li>
+            ))}
+          </ul>
+        ) : null}
       </PreviewCard>
       <PreviewCard
         title="Notifications"

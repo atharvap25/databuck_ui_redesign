@@ -1,0 +1,134 @@
+- generic [ref=e29]:
+  - complementary [ref=e31]:
+    - navigation "Primary" [ref=e38]:
+      - list [ref=e39]:
+        - listitem [ref=e40]:
+          - button "Executive Dashboard" [ref=e41]
+        - listitem [ref=e49]:
+          - button "Connections" [ref=e50]
+        - listitem [ref=e54]:
+          - button "Data Quality" [ref=e55]
+        - listitem [ref=e60]:
+          - button "Matching" [ref=e61]
+        - listitem [ref=e68]:
+          - button "Observability" [ref=e69]
+        - listitem [ref=e73]:
+          - button "Jobs & Tasks" [ref=e74]
+        - listitem [ref=e80]:
+          - button "Administration" [ref=e81]
+  - generic [ref=e86]:
+    - banner [ref=e87]:
+      - generic [ref=e88]:
+        - button "Acme Corp — Production" [ref=e90]
+        - generic [ref=e97]:
+          - button "Notifications, unread" [ref=e98]
+          - button "Settings" [ref=e103]
+          - button "Data Trust Agent" [pressed] [ref=e108]
+          - button "Alex Rivera, Data Steward" [ref=e112]:
+            - generic [ref=e113]: AR
+            - generic [ref=e114]:
+              - generic [ref=e115]: Alex Rivera
+              - generic [ref=e116]: Data Steward
+          - button "Log out" [ref=e117]
+    - generic [ref=e121]:
+      - generic [ref=e123]:
+        - banner [ref=e124]:
+          - generic [ref=e125]:
+            - paragraph [ref=e126]: Acme Corp — Production
+            - heading "Executive Dashboard" [level=1] [ref=e127]
+            - paragraph [ref=e128]: As of 7 Oct 2026
+          - button "Get Daily Briefing" [active] [ref=e129]
+        - tablist [ref=e134]:
+          - tab "Dashboard" [ref=e135] [cursor=pointer]
+          - tab "Buck's Executive Review" [selected] [ref=e136] [cursor=pointer]
+        - generic [ref=e411]:
+          - generic [ref=e412]:
+            - generic [ref=e413]:
+              - generic [ref=e414]:
+                - heading "Buck’s Executive Review" [level=2] [ref=e415]
+                - generic [ref=e416]: 86% conf.
+              - paragraph [ref=e417]: AI summary of this dashboard · 7 Oct 2026
+            - button "Regenerate" [ref=e418]
+          - complementary [ref=e423]:
+            - generic [ref=e425]:
+              - paragraph [ref=e426]: Headline
+              - generic [ref=e430]: Acme Corp — Production is at 85.5% enterprise DTS (-1.4 vs 30 days). 7 of 18 tables are high-trust. Campaigns and General Ledger still set the floor.
+          - generic [ref=e431]:
+            - article [ref=e432]:
+              - paragraph [ref=e433]: Enterprise DTS
+              - paragraph [ref=e434]: 85.5%
+              - paragraph [ref=e435]: "-1.4 vs 30d"
+            - article [ref=e436]:
+              - paragraph [ref=e437]: High-trust tables
+              - paragraph [ref=e438]: "7"
+              - paragraph [ref=e439]: of 18 monitored
+            - article [ref=e440]:
+              - paragraph [ref=e441]: Time recovered
+              - paragraph [ref=e442]: 258 hrs
+              - paragraph [ref=e443]: $26K
+          - generic [ref=e444]:
+            - heading "Score" [level=3] [ref=e446]
+            - paragraph [ref=e448]: Portfolio DTS sits at 85.5% as of 7 Oct 2026. The 90-day line held in the low-90s until the last two weeks, when Campaigns (62.4%) and a truncated General Ledger extract (0%) pulled the estate down 1.4 points versus the prior month.
+          - generic [ref=e449]:
+            - heading "What moved the score" [level=3] [ref=e451]
+            - list [ref=e453]:
+              - listitem [ref=e454]:
+                - paragraph [ref=e455]: General Ledger · 0.0%
+                - paragraph [ref=e456]: Teradata extract looks truncated. Six checks failed. Hold publish until the reload lands.
+              - listitem [ref=e457]:
+                - paragraph [ref=e458]: Campaigns · 62.4%
+                - paragraph [ref=e459]: Late event load. Five checks failed. Open Buck’s Review before the 09:00 matching pack.
+              - listitem [ref=e460]:
+                - paragraph [ref=e461]: Journals · 76.5%
+                - paragraph [ref=e462]: 3 failed checks. Treat as a watch-to-fail promotion until the next clean run.
+              - listitem [ref=e463]:
+                - paragraph [ref=e464]: Movements · 81.2%
+                - paragraph [ref=e465]: 2 failed checks. Treat as a watch-to-fail promotion until the next clean run.
+          - generic [ref=e466]:
+            - generic [ref=e467]:
+              - heading "Trust mix" [level=3] [ref=e469]
+              - paragraph [ref=e471]: "Trust mix on 18 monitored tables: 7 high-trust (38.9%), 4 watch-band, 7 failed. 4 tables have not scored since mid-September and read as stale rather than unvalidated."
+            - generic [ref=e472]:
+              - heading "Issues" [level=3] [ref=e474]
+              - paragraph [ref=e476]: Failed checks total 22 on this run, concentrated on nulls, then drift and matching unmatched. General Ledger (0.0%), Campaigns (62.4%), Journals (76.5%), Movements (81.2%) account for the DTS loss. Duplicate and anomaly volume stayed inside noise.
+            - generic [ref=e477]:
+              - heading "Matching watch" [level=3] [ref=e479]
+              - paragraph [ref=e481]: "Matching watch: Campaigns by Channel · 318 unmatched; Order Lines by Region · 142 unmatched; AR Invoices to GL · 24 unmatched; AR Payments to GL · 11 unmatched. Padding and case on join keys remain the usual cause, not missing entities."
+            - generic [ref=e482]:
+              - heading "Savings" [level=3] [ref=e484]
+              - paragraph [ref=e486]: Stewards avoided an estimated 258 hours of firefighting in the last 30 days. At $100/hr that is $26K of recovered time — driven by the 7 high-trust tables staying on autopilot.
+          - generic [ref=e487]:
+            - heading "Board actions" [level=3] [ref=e489]
+            - list [ref=e491]:
+              - listitem [ref=e492]:
+                - generic [ref=e493]: "1"
+                - text: Hold General Ledger publish until the Teradata extract is complete; then rerun and open RCA.
+              - listitem [ref=e494]:
+                - generic [ref=e495]: "2"
+                - text: Open Buck’s Review on Campaigns before the weekday matching pack ships.
+              - listitem [ref=e496]:
+                - generic [ref=e497]: "3"
+                - text: Confirm the campaign_code / AR invoice join-key cleanup, then accept the suggested mapping.
+          - paragraph [ref=e498]: Based on Enterprise DTS · Check summary · Campaigns · Check summary · General Ledger · Matching · Campaigns by Channel
+      - complementary [ref=e499]:
+        - generic [ref=e500]:
+          - generic [ref=e505]:
+            - heading "Data Trust Agent" [level=2] [ref=e506]
+            - paragraph [ref=e507]: Ask about data trust
+          - button "Open Data Trust Agent window" [ref=e508]
+          - button "Close Data Trust Agent" [ref=e514]
+        - generic [ref=e518]:
+          - generic [ref=e524]:
+            - paragraph [ref=e525]: Data Trust Agent
+            - paragraph [ref=e527]: Ask about a check, a threshold, or a failing column.
+          - paragraph [ref=e529]: Get the daily data-trust briefing for Acme Corp — Production
+          - generic [ref=e535]:
+            - paragraph [ref=e536]: Data Trust Agent
+            - paragraph [ref=e538]: Reviewing the open table…
+        - generic [ref=e541]:
+          - generic [ref=e542]: Message
+          - textbox "Message" [ref=e543]:
+            - /placeholder: Ask about a check, a DTS drop, or a column
+          - generic [ref=e544]:
+            - paragraph [ref=e545]: Enter to send · Shift+Enter for a new line
+            - button "Send" [disabled] [ref=e546]

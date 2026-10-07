@@ -1,0 +1,135 @@
+- generic [ref=e29]:
+  - complementary [ref=e31]:
+    - navigation "Primary" [ref=e38]:
+      - list [ref=e39]:
+        - listitem [ref=e40]:
+          - button "Executive Dashboard" [ref=e41]
+        - listitem [ref=e49]:
+          - button "Connections" [ref=e50]
+        - listitem [ref=e54]:
+          - button "Data Quality" [ref=e55]
+        - listitem [ref=e60]:
+          - button "Matching" [ref=e61]
+        - listitem [ref=e68]:
+          - button "Observability" [ref=e69]
+        - listitem [ref=e73]:
+          - button "Jobs & Tasks" [ref=e74]
+        - listitem [ref=e80]:
+          - button "Administration" [ref=e81]
+  - generic [ref=e86]:
+    - banner [ref=e87]:
+      - generic [ref=e88]:
+        - button "Acme Corp — Production" [ref=e90]
+        - generic [ref=e97]:
+          - button "Notifications, unread" [ref=e98]
+          - button "Settings" [ref=e103]
+          - button "Data Trust Agent" [ref=e108]
+          - button "Alex Rivera, Data Steward" [ref=e112]:
+            - generic [ref=e113]: AR
+            - generic [ref=e114]:
+              - generic [ref=e115]: Alex Rivera
+              - generic [ref=e116]: Data Steward
+          - button "Log out" [ref=e117]
+    - generic [ref=e204]:
+      - generic [ref=e205]:
+        - heading "Data Quality" [level=1] [ref=e206]
+        - generic [ref=e207]:
+          - generic [ref=e208]: Search
+          - combobox "Search" [ref=e209]
+        - generic [ref=e210]:
+          - group "Date range" [ref=e211]:
+            - textbox "Start date" [ref=e214]
+            - generic [aria-hidden] [ref=e215]: –
+            - textbox "End date" [ref=e216]
+          - button "Export" [ref=e217]
+          - button "New Validation" [ref=e220]
+      - generic [ref=e222]:
+        - complementary [ref=e223]:
+          - generic [ref=e224]:
+            - button "Expand validations" [ref=e795]
+            - generic [ref=e799]: AR Invoices
+        - generic [ref=e421]:
+          - tablist [ref=e422]:
+            - tab "Check Summary" [ref=e423] [cursor=pointer]
+            - tab "Rule Catalog" [ref=e424] [cursor=pointer]
+            - tab "Custom Rules" [selected] [ref=e425] [cursor=pointer]
+            - tab "Profile" [ref=e426] [cursor=pointer]
+            - tab "Configure" [ref=e427] [cursor=pointer]
+          - generic [ref=e1172]:
+            - generic [ref=e1173]:
+              - generic [ref=e1174]:
+                - button "Back to rules" [ref=e1175]
+                - heading "Create custom rule" [level=2] [ref=e1178]
+                - paragraph [ref=e1179]: Upload a spec, or write the rule directly. Direct query is the usual starting point.
+              - button "Add rule" [disabled] [ref=e1180]
+            - generic [ref=e1182] [cursor=pointer]:
+              - generic [ref=e1186]:
+                - generic [ref=e1187]: Upload a document
+                - generic [ref=e1188]: PDF, DOCX, or TXT. BuckGPT reads it and proposes rules.
+              - generic [ref=e1189]: Choose file
+              - button "Upload a document PDF, DOCX, or TXT. BuckGPT reads it and proposes rules. Choose file" [ref=e1190]
+            - separator "Or write the rule" [ref=e1191]:
+              - generic [ref=e1193]: Or
+            - generic [ref=e1195]:
+              - generic [ref=e1196]:
+                - generic [ref=e1197]:
+                  - generic [ref=e1198]:
+                    - text: Name
+                    - generic [aria-hidden] [ref=e1199]: "*"
+                  - textbox "e.g. amount_positive_check" [ref=e1200]
+                - generic [ref=e1201]:
+                  - generic [ref=e1202]:
+                    - text: Category
+                    - generic [aria-hidden] [ref=e1203]: "*"
+                  - combobox [ref=e1204]:
+                    - option "Direct Query" [selected]
+                    - option "Sql Internal Rule"
+                    - option "Push Down Query"
+                    - option "Referential"
+                    - option "Orphan"
+                    - option "Cross Referential"
+                    - option "Conditional Referential"
+                    - option "Conditional Orphan"
+                    - option "Conditional Cross Referential"
+                    - option "Conditional Sql Internal Rule"
+                    - option "Conditional Duplicate Check"
+                    - option "Conditional Completeness Check"
+                - paragraph [ref=e1206]: Executes a direct query against the data source to validate data.
+                - generic [ref=e1207]:
+                  - generic [ref=e1208]: Description
+                  - textbox "What this rule checks" [ref=e1209]
+                - generic [ref=e1210]:
+                  - generic [ref=e1211]: Rule Threshold
+                  - spinbutton [ref=e1212]: "0"
+                - generic [ref=e1213]:
+                  - generic [ref=e1214]: Dimension
+                  - combobox [ref=e1215]:
+                    - option "Accuracy"
+                    - option "Completeness"
+                    - option "Consistency"
+                    - option "Integrity"
+                    - option "Uniqueness"
+                    - option "Validity" [selected]
+                    - option "Timeliness"
+                - generic [ref=e1216]:
+                  - generic [ref=e1217]: Anchor Column
+                  - combobox [ref=e1218]:
+                    - option "Select column"
+                    - option "invoice_number" [selected]
+                    - option "customer_id"
+                    - option "invoice_date"
+                    - option "due_date"
+                    - option "currency"
+                    - option "amount"
+                    - option "tax_amount"
+                    - option "balance_due"
+                    - option "status"
+              - generic [ref=e1220]:
+                - generic [ref=e1221]:
+                  - text: Rule Expression
+                  - generic [aria-hidden] [ref=e1222]: "*"
+                - generic [ref=e1223]:
+                  - textbox "Describe the query in plain English" [ref=e1224]
+                  - button "Generate with BuckGPT" [disabled] [ref=e1225]
+                - textbox "SELECT * FROM table WHERE …" [ref=e1230]
+                - paragraph [ref=e1231]: Generated SQL stays editable. Direct query is the most common category.

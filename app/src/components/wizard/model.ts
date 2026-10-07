@@ -312,6 +312,7 @@ export type AlertState = {
   showRules: boolean
   includeSummary: boolean
   onlyOnFailure: boolean
+  message: string
 }
 
 export type ScheduleState = {
@@ -447,6 +448,7 @@ export function defaultAlerts(): AlertState {
     showRules: true,
     includeSummary: true,
     onlyOnFailure: false,
+    message: '',
   }
 }
 

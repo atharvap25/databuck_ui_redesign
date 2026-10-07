@@ -5,8 +5,10 @@ import {
   previewRows,
   type SourceTable,
 } from '../data/sources.ts'
+import type { ProfileInsight } from '../data/aiMocks.ts'
+import { AiBanner } from './ai/AiKit.tsx'
 
-export default function TableProfile({ table }: { table: SourceTable }) {
+export default function TableProfile({ table, insights = [] }: { table: SourceTable; insights?: ProfileInsight[] }) {
   const columns = columnProfiles(table)
   const segments = microsegments(table)
   const pairs = correlations(table)
@@ -14,6 +16,15 @@ export default function TableProfile({ table }: { table: SourceTable }) {
 
   return (
     <div className="flex flex-col gap-8">
+      {insights.length > 0 ? (
+        <div className="flex flex-col gap-2">
+          {insights.map((insight) => (
+            <AiBanner key={insight.title} title={insight.title}>
+              {insight.body}
+            </AiBanner>
+          ))}
+        </div>
+      ) : null}
       <section>
         <h3 className="mb-4 font-sans text-sm font-semibold text-ink">Column profile</h3>
         <div className="db-scroll overflow-x-auto rounded-lg border border-line">

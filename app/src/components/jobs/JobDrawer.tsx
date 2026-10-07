@@ -1,5 +1,7 @@
 import { useEffect } from 'react'
+import { useWorkspaceAi } from '../../ai/WorkspaceAiContext.tsx'
 import { kindLabel, type JobRun } from '../../data/jobs.ts'
+import { jobBriefFor } from '../../data/aiMocks.ts'
 import { Fact, Glyph, primaryButton, secondaryButton } from '../wizard/ui.tsx'
 import { JobStatus, KindBadge } from './chrome.tsx'
 
@@ -22,6 +24,8 @@ export default function JobDrawer({
     return () => document.removeEventListener('keydown', onKey)
   }, [onClose])
 
+  const { requestRca, enabled } = useWorkspaceAi()
+  const brief = jobBriefFor(job.name, job.result === 'failed')
   const active = job.status === 'running' || job.status === 'queued'
 
   return (
@@ -66,6 +70,24 @@ export default function JobDrawer({
           {job.status === 'running' ? (
             <div className="mt-5 h-1 overflow-hidden rounded-full bg-container-high">
               <div className="h-full bg-indigo transition-[width] duration-150 ease-databuck" style={{ width: `${job.progress}%` }} />
+            </div>
+          ) : null}
+
+          {brief ? (
+            <div className="mt-5 rounded-lg border border-line bg-surface p-3">
+              <p className="font-label text-[10px] tracking-[0.14em] text-indigo uppercase">Job brief</p>
+              <p className="mt-1 font-sans text-sm font-medium text-ink">{brief.title}</p>
+              <p className="mt-1 text-sm leading-6 text-muted">{brief.body}</p>
+              <p className="mt-2 text-xs text-muted">{brief.next}</p>
+              {enabled ? (
+                <button
+                  type="button"
+                  className="mt-2 font-sans text-xs font-medium text-indigo"
+                  onClick={() => requestRca(job.name.toLowerCase().includes('ledger') ? 'ledger' : 'campaigns')}
+                >
+                  Open RCA
+                </button>
+              ) : null}
             </div>
           ) : null}
 

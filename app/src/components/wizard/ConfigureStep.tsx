@@ -1,3 +1,4 @@
+import { configureHint } from '../../data/aiMocks.ts'
 import {
   anomalyTypes,
   applicationTypes,
@@ -8,6 +9,7 @@ import {
   type Cyclicality,
 } from './model.ts'
 import { cardClass, Field, fieldClass, Glyph, Segment, Segmented, SwitchControl } from './ui.tsx'
+import { AiBanner } from '../ai/AiKit.tsx'
 
 export default function ConfigureStep({
   configure,
@@ -16,6 +18,7 @@ export default function ConfigureStep({
   onDomain,
   description,
   onDescription,
+  schema = [],
 }: {
   configure: ConfigureState
   onConfigure: (next: ConfigureState) => void
@@ -23,12 +26,17 @@ export default function ConfigureStep({
   onDomain: (value: string) => void
   description: string
   onDescription: (value: string) => void
+  schema?: { name: string; format: string }[]
 }) {
   function patch(partial: Partial<ConfigureState>) {
     onConfigure({ ...configure, ...partial })
   }
 
+  const hint = configureHint(schema)
+
   return (
+    <div className="flex flex-col gap-4">
+      {hint ? <AiBanner title="Anomaly hint">{hint}</AiBanner> : null}
     <section className={`${cardClass} p-5`}>
       <h2 className="flex items-center gap-2 font-sans text-sm font-semibold text-ink">
         <span className="text-indigo">
@@ -138,5 +146,6 @@ export default function ConfigureStep({
         </div>
       </div>
     </section>
+    </div>
   )
 }

@@ -1,4 +1,5 @@
-import { useId, useMemo, useRef, useState } from 'react'
+import { useId, useMemo, useRef, useState, useEffect } from 'react'
+import { useWorkspaceAi } from '../../ai/WorkspaceAiContext.tsx'
 import { memberCatalog } from '../../data/jobs.ts'
 import { useJobs } from '../../jobs/jobStore.ts'
 import { PlusIcon, SearchIcon } from '../icons.tsx'
@@ -32,6 +33,11 @@ export default function JobsWorkspace() {
   const [query, setQuery] = useState('')
   const [creating, setCreating] = useState(false)
   const [runOpen, setRunOpen] = useState(false)
+  const { setFocus } = useWorkspaceAi()
+
+  useEffect(() => {
+    setFocus({ screen: 'jobs' })
+  }, [setFocus])
 
   function onCta() {
     if (tab === 'jobs') setRunOpen(true)

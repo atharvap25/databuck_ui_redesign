@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { kindLabel, type JobRun } from '../../data/jobs.ts'
 import { mergeBoardJobs, useJobs } from '../../jobs/jobStore.ts'
+import { jobBriefFor } from '../../data/aiMocks.ts'
 import { Segment, Segmented } from '../wizard/ui.tsx'
 import { headClass, JobStatus, KindBadge, KpiCard, PageBar } from './chrome.tsx'
 import JobDrawer from './JobDrawer.tsx'
@@ -90,7 +91,12 @@ export default function JobsBoard({ query }: { query: string }) {
                   className="cursor-pointer border-t border-line transition-colors duration-150 ease-databuck hover:bg-surface"
                   onClick={() => setOpenId(job.id)}
                 >
-                  <td className="px-3 py-3 font-sans font-medium text-ink">{job.name}</td>
+                  <td className="px-3 py-3 font-sans font-medium text-ink">
+                    {job.name}
+                    {job.result === 'failed' && jobBriefFor(job.name, true) ? (
+                      <p className="mt-1 text-xs font-normal leading-5 text-muted">{jobBriefFor(job.name, true)?.title}</p>
+                    ) : null}
+                  </td>
                   <td className="px-3 py-3">
                     <KindBadge label={kindLabel(job.kind)} />
                   </td>

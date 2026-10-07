@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { auditPlain } from '../../data/aiMocks.ts'
 import { useAdmin } from '../../admin/adminStore.ts'
 import EmptyState from '../EmptyState.tsx'
 import { ClockIcon } from '../icons.tsx'
@@ -13,6 +14,7 @@ export default function AuditView({ query }: { query: string }) {
   const { audit } = useAdmin()
   const [filter, setFilter] = useState<Filter>('all')
   const [page, setPage] = useState(1)
+  const [openId, setOpenId] = useState<string | null>(null)
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -57,10 +59,15 @@ export default function AuditView({ query }: { query: string }) {
           </thead>
           <tbody>
             {visible.map((event) => (
-              <tr key={event.id} className={rowClass}>
+              <tr key={event.id} className={rowClass} onClick={() => setOpenId((current) => (current === event.id ? null : event.id))}>
                 <td className={`${cellClass} whitespace-nowrap font-mono text-xs text-ink`}>{event.at}</td>
                 <td className={`${cellClass} font-sans font-medium text-ink`}>{event.actor}</td>
-                <td className={`${cellClass} text-ink`}>{event.action}</td>
+                <td className={`${cellClass} text-ink`}>
+                  {event.action}
+                  {openId === event.id ? (
+                    <p className="mt-1 text-xs leading-5 text-muted">{auditPlain(event.action, event.actor, event.target)}</p>
+                  ) : null}
+                </td>
                 <td className={`${cellClass} text-muted`}>{event.target}</td>
                 <td className={`${cellClass} font-mono text-xs text-muted`}>{event.ip}</td>
               </tr>

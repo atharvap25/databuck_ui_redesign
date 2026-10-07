@@ -1,9 +1,14 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { WorkspaceAiProvider } from '../ai/WorkspaceAiContext.tsx'
+import { WorkspaceSessionProvider } from '../workspace/WorkspaceSession.tsx'
+import { useAdmin } from '../admin/adminStore.ts'
 import { useJobs } from '../jobs/jobStore.ts'
 import AgentPanel from './AgentPanel.tsx'
 import AgentWorkspace from './AgentWorkspace.tsx'
 import AdminWorkspace, { type AdminTab } from './admin/AdminWorkspace.tsx'
+import { WorkspaceReviewHost } from './ai/ReviewDrawers.tsx'
 import EmptyState from './EmptyState.tsx'
+import ExecutiveDashboard from './executive/ExecutiveDashboard.tsx'
 import Header from './Header.tsx'
 import { ClockIcon } from './icons.tsx'
 import JobDeck from './JobDeck.tsx'
@@ -19,7 +24,7 @@ const layoutTitle: Record<LayoutId, string> = {
   'layout-2': 'Layout 2',
 }
 
-const underDevelopment = new Set(['executive-dashboard', 'observability'])
+const underDevelopment = new Set(['observability'])
 
 const layout1Workspaces = new Set<WorkspaceId>(['connections', 'data-quality', 'matching'])
 
@@ -55,6 +60,8 @@ export default function AppShell({
   layout: LayoutId
   onLogout: () => void
 }) {
+  const { applicationValues } = useAdmin()
+  const aiEnabled = (applicationValues['ai.enabled'] ?? 'Y') !== 'N'
   const narrow = useNarrow()
   const [hovered, setHovered] = useState(false)
   const [pinned, setPinned] = useState(false)
@@ -95,15 +102,27 @@ export default function AppShell({
     setHovered(next)
   }
 
-  function toggleAgent() {
+  function openAgentPanel() {
+    if (!aiEnabled) return
     if (agentWorkspace) return
     setAgentOpen((current) => {
       if (!current) collapseSidebar()
-      return !current
+      return true
     })
   }
 
+  function toggleAgent() {
+    if (!aiEnabled) return
+    if (agentWorkspace) return
+    if (agentOpen) {
+      setAgentOpen(false)
+      return
+    }
+    openAgentPanel()
+  }
+
   function openAgentWorkspace() {
+    if (!aiEnabled) return
     setAgentOpen(false)
     setAgentWorkspace(true)
   }
@@ -139,7 +158,9 @@ export default function AppShell({
   }, [agentOpen])
 
   return (
-    <div className="flex h-svh overflow-hidden bg-surface">
+    <WorkspaceAiProvider onOpenAgent={openAgentPanel}>
+    <WorkspaceSessionProvider>
+    <div className="relative flex h-svh overflow-hidden bg-surface">
       {agentWorkspace ? (
         <div className="flex min-w-0 flex-1 flex-col">
           <Header
@@ -149,6 +170,7 @@ export default function AppShell({
             onToggleAgent={toggleAgent}
             onLeaveAgent={closeAgentWorkspace}
             onOpenSettings={openSettings}
+            aiEnabled={aiEnabled}
           />
           <AgentWorkspace />
         </div>
@@ -182,13 +204,21 @@ export default function AppShell({
         onHoverChange={onHoverChange}
       />
       <div className="flex min-w-0 flex-1 flex-col">
-        <Header onLogout={onLogout} agentOpen={agentOpen} onToggleAgent={toggleAgent} onOpenSettings={openSettings} />
+        <Header
+          onLogout={onLogout}
+          agentOpen={agentOpen}
+          onToggleAgent={toggleAgent}
+          onOpenSettings={openSettings}
+          aiEnabled={aiEnabled}
+        />
         <div className="relative flex min-h-0 flex-1">
           <div className="flex min-w-0 flex-1 flex-col">
             {activeId === 'jobs' ? (
               <JobsWorkspace />
             ) : activeId === 'administration' ? (
               <AdminWorkspace tab={adminTab} onTabChange={setAdminTab} />
+            ) : activeId === 'executive-dashboard' ? (
+              <ExecutiveDashboard />
             ) : layout === 'layout-1' && isWorkspace(activeId) ? (
               <Layout1Workspace
                 screen={activeId}
@@ -208,7 +238,7 @@ export default function AppShell({
               </div>
             )}
           </div>
-          {agentOpen ? (
+          {agentOpen && aiEnabled ? (
             <AgentPanel onClose={() => setAgentOpen(false)} onOpenWorkspace={openAgentWorkspace} />
           ) : null}
         </div>
@@ -216,6 +246,9 @@ export default function AppShell({
       <JobDeck jobs={liveJobs} wave={wave} agentOpen={agentOpen} onOpenJobs={() => setActiveId('jobs')} />
         </>
       )}
+      <WorkspaceReviewHost />
     </div>
+    </WorkspaceSessionProvider>
+    </WorkspaceAiProvider>
   )
 }

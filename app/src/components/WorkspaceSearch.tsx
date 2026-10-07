@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type RefObject } from 'react'
 import { createPortal } from 'react-dom'
+import { searchIntents } from '../data/aiMocks.ts'
 import { type DataSource } from '../data/sources.ts'
 import { validationRuns } from '../data/validations.ts'
 import { SearchIcon } from './icons.tsx'
@@ -310,6 +311,28 @@ export default function WorkspaceSearch({
               className="fixed z-40 overflow-hidden rounded-lg border border-line bg-canvas shadow-overlay"
               style={{ top: box.top, left: box.left, width: box.width }}
             >
+              {screen === 'data-quality' ? (
+                <div className="border-b border-line px-3 py-3">
+                  <p className="mb-2 font-label text-[0.6875rem] font-medium tracking-[0.14em] text-muted uppercase">
+                    Intents
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {searchIntents.map((intent) => (
+                      <button
+                        key={intent.id}
+                        type="button"
+                        onClick={() => {
+                          onQuery(intent.query)
+                          place()
+                        }}
+                        className="h-8 rounded-full border border-line px-3 font-label text-xs font-medium tracking-[0.06em] text-muted uppercase transition-colors duration-150 ease-databuck hover:border-line-strong hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
+                      >
+                        {intent.label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
               <div className="border-b border-line px-3 py-3">
                 <p className="mb-2 font-label text-[0.6875rem] font-medium tracking-[0.14em] text-muted uppercase">
                   Search by

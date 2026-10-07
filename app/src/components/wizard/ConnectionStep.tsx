@@ -1,3 +1,4 @@
+import { nicknameSuggestion } from '../../data/aiMocks.ts'
 import { dataSources, type DataSource, type SourceType } from '../../data/sources.ts'
 import { databaseOf, endpointOf, emptyDraft, sourceTypes, tips, typeLabels, type DraftSource } from './model.ts'
 import { endpointMeta } from '../../data/connectionFields.ts'
@@ -208,6 +209,13 @@ export function CreateSource({
                 onChange={(event) => onDraft({ ...draft, nickname: event.target.value })}
                 className={fieldClass}
               />
+              <button
+                type="button"
+                className="mt-1 font-sans text-xs font-medium text-indigo"
+                onClick={() => onDraft({ ...draft, nickname: nicknameSuggestion(draft.type, draft.host, draft.database) })}
+              >
+                Use suggested name
+              </button>
             </Field>
             <Field label="URI / Host" required>
               <input

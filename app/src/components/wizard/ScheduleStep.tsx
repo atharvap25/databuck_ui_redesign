@@ -1,3 +1,4 @@
+import { scheduleHintFor } from '../../data/aiMocks.ts'
 import { useJobs } from '../../jobs/jobStore.ts'
 import {
   apiEndpointFor,
@@ -8,6 +9,7 @@ import {
 import FrequencyBuilder from '../jobs/FrequencyBuilder.tsx'
 import { scheduleCadence, scheduleTips, type RunMode, type ScheduleState } from './model.ts'
 import { cardClass, CheckControl, Field, fieldClass, Glyph } from './ui.tsx'
+import { AiBanner } from '../ai/AiKit.tsx'
 
 const modes: { id: RunMode; label: string; hint: string }[] = [
   { id: 'on-demand', label: 'On demand', hint: 'Run from the UI when you need it' },
@@ -29,6 +31,7 @@ export default function ScheduleStep({
   onChange: (schedule: ScheduleState) => void
 }) {
   const { schedules, groups, triggers } = useJobs()
+  const hint = scheduleHintFor(schedule.validationName)
 
   function patch(partial: Partial<ScheduleState>) {
     onChange({ ...schedule, ...partial })
@@ -42,6 +45,7 @@ export default function ScheduleStep({
   return (
     <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(16rem,0.7fr)]">
       <div className="flex flex-col gap-4">
+        <AiBanner title="Schedule suggestion">{hint}</AiBanner>
         <section className={`${cardClass} p-5`}>
           <h2 className="font-sans text-sm font-semibold text-ink">When should this run?</h2>
           <div className="mt-4 grid gap-2 sm:grid-cols-3">

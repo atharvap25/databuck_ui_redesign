@@ -1,4 +1,6 @@
 import { catalogSummary, type CatalogColumn, type CatalogState } from '../../data/ruleCatalog.ts'
+import { catalogWhy } from '../../data/aiMocks.ts'
+import { SparkIcon } from '../icons.tsx'
 import RuleCatalog from '../RuleCatalog.tsx'
 import { cardClass } from './ui.tsx'
 
@@ -14,39 +16,31 @@ export default function CatalogStep({
   onChange: (state: CatalogState) => void
 }) {
   const summary = catalogSummary(state, columns)
+  const why = `Null — ${catalogWhy('null', columns)} Regex — ${catalogWhy('regex', columns)}`
 
   return (
-    <div className="flex flex-col gap-4">
-      <section className={`${cardClass} px-5 py-4`}>
-        <div className="flex flex-wrap items-start justify-between gap-4">
-          <div className="min-w-0">
-            <p className="font-label text-[11px] tracking-[0.12em] text-indigo uppercase">Databuck suggested</p>
-            <h2 className="mt-1 font-sans text-sm font-semibold text-ink">
-              Checks for {tableName || 'this table'}
-            </h2>
-            <p className="mt-1 max-w-2xl text-sm leading-6 text-muted">
-              Essential and advanced rules are pre-selected from the table schema. Remove, add, or retune any check before you continue.
-            </p>
-          </div>
-          <dl className="flex shrink-0 gap-6">
-            <div>
-              <dt className="font-label text-[10px] tracking-[0.14em] text-muted uppercase">Essential</dt>
-              <dd className="mt-1 font-mono text-lg font-medium text-ink">{summary.essential}</dd>
-            </div>
-            <div>
-              <dt className="font-label text-[10px] tracking-[0.14em] text-muted uppercase">Advanced</dt>
-              <dd className="mt-1 font-mono text-lg font-medium text-ink">{summary.advanced}</dd>
-            </div>
-            <div>
-              <dt className="font-label text-[10px] tracking-[0.14em] text-muted uppercase">Applied</dt>
-              <dd className="mt-1 font-mono text-lg font-medium text-ink">{summary.total}</dd>
-            </div>
-          </dl>
-        </div>
-      </section>
-      <section className={`flex h-[36rem] flex-col overflow-hidden ${cardClass}`}>
-        <RuleCatalog shown columns={columns} state={state} onChange={onChange} />
-      </section>
-    </div>
+    <section className={`flex h-[40rem] flex-col overflow-hidden ${cardClass}`}>
+      <div className="flex shrink-0 flex-wrap items-center gap-x-3 gap-y-2 border-b border-line bg-secondary-fixed px-4 py-2.5">
+        <span className="text-indigo">
+          <SparkIcon size={16} />
+        </span>
+        <p className="font-sans text-sm font-medium text-indigo">Suggested for {tableName || 'this table'}</p>
+        <span className="rounded-full bg-canvas px-2 py-0.5 font-mono text-[11px] tabular-nums text-ink">
+          {summary.essential} Essential
+        </span>
+        <span className="rounded-full bg-canvas px-2 py-0.5 font-mono text-[11px] tabular-nums text-ink">
+          {summary.advanced} Advanced
+        </span>
+        <span className="rounded-full bg-canvas px-2 py-0.5 font-mono text-[11px] tabular-nums text-ink">
+          {summary.total} Applied
+        </span>
+        <p className="min-w-0 flex-1 truncate text-xs leading-5 text-muted" title={why}>
+          {why}
+        </p>
+      </div>
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
+        <RuleCatalog shown columns={columns} state={state} onChange={onChange} suggestionWhy={(id) => catalogWhy(id, columns)} />
+      </div>
+    </section>
   )
 }

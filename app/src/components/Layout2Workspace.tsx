@@ -16,6 +16,7 @@ import IconBox from './IconBox.tsx'
 import QualityDetail from './QualityDetail.tsx'
 import StatusBadge from './StatusBadge.tsx'
 import UnderDevelopmentDialog from './UnderDevelopmentDialog.tsx'
+import { useWorkspaceAi } from '../ai/WorkspaceAiContext.tsx'
 import {
   BackIcon,
   CardIcon,
@@ -855,7 +856,7 @@ function ValidationList({
 }: {
   runs: ValidationRun[]
   onOpen: (id: string) => void
-  onAction: (id: string) => void
+  onAction: (actionId: string, runId: string) => void
 }) {
   return (
     <div className="db-scroll min-h-0 flex-1 overflow-auto">
@@ -903,13 +904,13 @@ function ValidationList({
                       type="button"
                       onClick={(event) => {
                         event.stopPropagation()
-                        onAction('run')
+                        onAction('run', run.id)
                       }}
                       className={nudgeButton}
                     >
                       Run
                     </button>
-                    <ActionsMenu label={`Actions for ${run.tableName}`} items={validationMenu} onSelect={onAction} />
+                    <ActionsMenu label={`Actions for ${run.tableName}`} items={validationMenu} onSelect={(id) => onAction(id, run.id)} />
                   </div>
                 </td>
               </tr>
@@ -928,7 +929,7 @@ function ValidationCards({
 }: {
   runs: ValidationRun[]
   onOpen: (id: string) => void
-  onAction: (id: string) => void
+  onAction: (actionId: string, runId: string) => void
 }) {
   return (
     <div className="db-scroll min-h-0 flex-1 overflow-auto p-4">
@@ -951,7 +952,7 @@ function ValidationCards({
                       <span className="font-mono"> · {run.schema}</span>
                     </p>
                   </div>
-                  <ActionsMenu label={`Actions for ${run.tableName}`} items={validationMenu} onSelect={onAction} />
+                  <ActionsMenu label={`Actions for ${run.tableName}`} items={validationMenu} onSelect={(id) => onAction(id, run.id)} />
                 </div>
                 <div className="mt-4 flex items-end justify-between gap-3">
                   <div className="min-w-0">
@@ -970,7 +971,7 @@ function ValidationCards({
                 </dl>
                 <div className="mt-auto pt-3">
                   <div className="border-t border-line pt-3">
-                    <button type="button" onClick={() => onAction('run')} className={nudgeButton}>
+                    <button type="button" onClick={() => onAction('run', run.id)} className={nudgeButton}>
                       Run
                     </button>
                   </div>
@@ -1004,6 +1005,7 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
   const [creating, setCreating] = useState(false)
   const [notice, setNotice] = useState(false)
   const [editSignal, setEditSignal] = useState(0)
+  const { requestReview, requestRca } = useWorkspaceAi()
   const [trackedScreen, setTrackedScreen] = useState(screen)
   const [trackedNarrow, setTrackedNarrow] = useState(narrow)
 
@@ -1222,7 +1224,15 @@ export default function Layout2Workspace({ screen }: { screen: Layout2Screen }) 
     else setNotice(true)
   }
 
-  function onValidationAction() {
+  function onValidationAction(actionId: string, runId: string) {
+    if (actionId === 'bucks-review') {
+      requestReview(runId)
+      return
+    }
+    if (actionId === 'root-cause') {
+      requestRca(runId)
+      return
+    }
     setNotice(true)
   }
 

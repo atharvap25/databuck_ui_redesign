@@ -1,0 +1,288 @@
+- generic [ref=e29]:
+  - complementary [ref=e31]:
+    - navigation "Primary" [ref=e38]:
+      - list [ref=e39]:
+        - listitem [ref=e40]:
+          - button "Executive Dashboard" [ref=e41]
+        - listitem [ref=e49]:
+          - button "Connections" [ref=e50]
+        - listitem [ref=e54]:
+          - button "Data Quality" [ref=e55]
+        - listitem [ref=e60]:
+          - button "Matching" [ref=e61]
+        - listitem [ref=e68]:
+          - button "Observability" [ref=e69]
+        - listitem [ref=e73]:
+          - button "Jobs & Tasks" [ref=e74]
+        - listitem [ref=e80]:
+          - button "Administration" [ref=e81]
+  - generic [ref=e86]:
+    - banner [ref=e87]:
+      - generic [ref=e88]:
+        - button "Acme Corp — Production" [ref=e90]
+        - generic [ref=e97]:
+          - button "Notifications, unread" [ref=e98]
+          - button "Settings" [ref=e103]
+          - button "Data Trust Agent" [ref=e108]
+          - button "Alex Rivera, Data Steward" [ref=e112]:
+            - generic [ref=e113]: AR
+            - generic [ref=e114]:
+              - generic [ref=e115]: Alex Rivera
+              - generic [ref=e116]: Data Steward
+          - button "Log out" [ref=e117]
+    - generic [ref=e4482]:
+      - generic [ref=e4484]:
+        - list [ref=e4486]:
+          - listitem [ref=e4487]:
+            - button [ref=e4490]
+            - paragraph [ref=e4496]: Connect
+            - paragraph [ref=e4497]: Where is your data?
+          - listitem [ref=e4498]:
+            - button [ref=e4501]
+            - paragraph [ref=e4505]: Choose Table
+            - paragraph [ref=e4506]: What to check?
+          - listitem [ref=e4507]:
+            - button [ref=e4510]
+            - paragraph [ref=e4515]: Configure
+            - paragraph [ref=e4516]: Foundation settings
+          - listitem [ref=e4517]:
+            - button [disabled] [ref=e4520]
+            - paragraph [ref=e4524]: Rule Catalog
+            - paragraph [ref=e4525]: Suggested checks
+          - listitem [ref=e4526]:
+            - button [disabled] [ref=e4529]
+            - paragraph [ref=e4534]: Custom Rules
+            - paragraph [ref=e4535]: Reusable rules
+          - listitem [ref=e4536]:
+            - button [disabled] [ref=e4539]
+            - paragraph [ref=e4543]: Preview and Run
+            - paragraph [ref=e4544]: Review then run
+          - listitem [ref=e4545]:
+            - button [disabled] [ref=e4548]
+            - paragraph [ref=e4553]: Notifications
+            - paragraph [ref=e4554]: Stay informed
+          - listitem [ref=e4555]:
+            - button [disabled] [ref=e4558]
+            - paragraph [ref=e4563]: Schedule
+            - paragraph [ref=e4564]: When to run?
+        - banner [ref=e4565]:
+          - generic [ref=e4566]:
+            - heading "Rule Catalog" [level=1] [ref=e5080]
+            - paragraph [ref=e4568]: Databuck suggested essential and advanced checks for this table
+        - generic [ref=e5081]:
+          - generic [ref=e5082]:
+            - paragraph [ref=e5087]: Suggested for Customer Master
+            - generic [ref=e5088]: 9 Essential
+            - generic [ref=e5089]: 2 Advanced
+            - generic [ref=e5090]: 11 Applied
+            - paragraph [ref=e5091]: Null — Applied to every column from the schema. Regex — String column name contains email.
+          - generic [ref=e5094]:
+            - complementary [ref=e5095]:
+              - generic [ref=e5096]:
+                - generic [ref=e5097]: Search checks
+                - textbox "Search checks" [ref=e5099]
+                - group "Check group" [ref=e5100]:
+                  - button "Essential" [pressed] [ref=e5101] [cursor=pointer]
+                  - button "Advanced" [ref=e5102] [cursor=pointer]
+              - list [ref=e5104]:
+                - listitem [ref=e5105]:
+                  - button "Null CheckSuggested 10 columns" [ref=e5106] [cursor=pointer]:
+                    - generic [ref=e5109]: Null CheckSuggested
+                    - generic [ref=e5110]: 10 columns
+                - listitem [ref=e5112]:
+                  - button "Duplicate CheckSuggested 1 column" [ref=e5113] [cursor=pointer]:
+                    - generic [ref=e5118]: Duplicate CheckSuggested
+                    - generic [ref=e5119]: 1 column
+                - listitem [ref=e5121]:
+                  - button "Default Value CheckSuggested 3 columns" [ref=e5122] [cursor=pointer]:
+                    - generic [ref=e5126]: Default Value CheckSuggested
+                    - generic [ref=e5127]: 3 columns
+                - listitem [ref=e5129]:
+                  - button "Regex Pattern CheckSuggested 1 column" [ref=e5130] [cursor=pointer]:
+                    - generic [ref=e5134]: Regex Pattern CheckSuggested
+                    - generic [ref=e5135]: 1 column
+                - listitem [ref=e5137]:
+                  - button "Length CheckSuggested 7 columns" [ref=e5138] [cursor=pointer]:
+                    - generic [ref=e5142]: Length CheckSuggested
+                    - generic [ref=e5143]: 7 columns
+                - listitem [ref=e5145]:
+                  - button "Date Consistency CheckSuggested 1 column" [ref=e5146] [cursor=pointer]:
+                    - generic [ref=e5151]: Date Consistency CheckSuggested
+                    - generic [ref=e5152]: 1 column
+                - listitem [ref=e5154]:
+                  - button "Microsegment Null Check Off" [ref=e5155] [cursor=pointer]:
+                    - generic [ref=e5158]: Microsegment Null Check
+                    - generic [ref=e5159]: "Off"
+                - listitem [ref=e5161]:
+                  - button "Data Type CheckSuggested 10 columns" [ref=e5162] [cursor=pointer]:
+                    - generic [ref=e5166]: Data Type CheckSuggested
+                    - generic [ref=e5167]: 10 columns
+                - listitem [ref=e5169]:
+                  - button "Default Pattern CheckSuggested 7 columns" [ref=e5170] [cursor=pointer]:
+                    - generic [ref=e5174]: Default Pattern CheckSuggested
+                    - generic [ref=e5175]: 7 columns
+                - listitem [ref=e5177]:
+                  - button "Max Length CheckSuggested 7 columns" [ref=e5178] [cursor=pointer]:
+                    - generic [ref=e5182]: Max Length CheckSuggested
+                    - generic [ref=e5183]: 7 columns
+                - listitem [ref=e5185]:
+                  - button "Microsegment Date Consistency Check Off" [ref=e5186] [cursor=pointer]:
+                    - generic [ref=e5191]: Microsegment Date Consistency Check
+                    - generic [ref=e5192]: "Off"
+            - generic [ref=e5195]:
+              - generic [ref=e5197]:
+                - heading "Null Check" [level=3] [ref=e5198]
+                - paragraph [ref=e5199]: Flags columns whose null rate is above the allowed limit.
+              - generic [ref=e5200]:
+                - paragraph [ref=e5201]: 10 columns selected
+                - generic [ref=e5202]:
+                  - generic [ref=e5203]: Filter columns
+                  - textbox "Filter columns" [ref=e5204]
+              - table [ref=e5206]:
+                - caption [ref=e5207]: Null Check columns
+                - rowgroup [ref=e5208]:
+                  - row [ref=e5209]:
+                    - columnheader [ref=e5210]:
+                      - checkbox "Select visible columns" [checked] [ref=e5211]
+                    - columnheader "Column" [ref=e5212]
+                    - columnheader "Format" [ref=e5213]
+                    - columnheader "Null threshold (%)" [ref=e5214]
+                    - columnheader [ref=e5215]:
+                      - generic [ref=e5216]:
+                        - checkbox "Mark visible columns critical" [ref=e5217]
+                        - text: Critical
+                - rowgroup [ref=e5218]:
+                  - row [ref=e5219]:
+                    - cell [ref=e5220]:
+                      - checkbox "Select customer_id" [checked] [ref=e5221]
+                    - cell "customer_id" [ref=e5222]
+                    - cell "Integer" [ref=e5223]
+                    - cell [ref=e5224]:
+                      - generic [ref=e5225]:
+                        - textbox "Null threshold (%)" [ref=e5226]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5227]:
+                      - checkbox "Critical for customer_id" [ref=e5228]
+                  - row [ref=e5229]:
+                    - cell [ref=e5230]:
+                      - checkbox "Select customer_name" [checked] [ref=e5231]
+                    - cell "customer_name" [ref=e5232]
+                    - cell "String" [ref=e5233]
+                    - cell [ref=e5234]:
+                      - generic [ref=e5235]:
+                        - textbox "Null threshold (%)" [ref=e5236]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5237]:
+                      - checkbox "Critical for customer_name" [ref=e5238]
+                  - row [ref=e5239]:
+                    - cell [ref=e5240]:
+                      - checkbox "Select email" [checked] [ref=e5241]
+                    - cell "email" [ref=e5242]
+                    - cell "String" [ref=e5243]
+                    - cell [ref=e5244]:
+                      - generic [ref=e5245]:
+                        - textbox "Null threshold (%)" [ref=e5246]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5247]:
+                      - checkbox "Critical for email" [ref=e5248]
+                  - row [ref=e5249]:
+                    - cell [ref=e5250]:
+                      - checkbox "Select phone" [checked] [ref=e5251]
+                    - cell "phone" [ref=e5252]
+                    - cell "String" [ref=e5253]
+                    - cell [ref=e5254]:
+                      - generic [ref=e5255]:
+                        - textbox "Null threshold (%)" [ref=e5256]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5257]:
+                      - checkbox "Critical for phone" [ref=e5258]
+                  - row [ref=e5259]:
+                    - cell [ref=e5260]:
+                      - checkbox "Select country" [checked] [ref=e5261]
+                    - cell "country" [ref=e5262]
+                    - cell "String" [ref=e5263]
+                    - cell [ref=e5264]:
+                      - generic [ref=e5265]:
+                        - textbox "Null threshold (%)" [ref=e5266]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5267]:
+                      - checkbox "Critical for country" [ref=e5268]
+                  - row [ref=e5269]:
+                    - cell [ref=e5270]:
+                      - checkbox "Select region" [checked] [ref=e5271]
+                    - cell "region" [ref=e5272]
+                    - cell "String" [ref=e5273]
+                    - cell [ref=e5274]:
+                      - generic [ref=e5275]:
+                        - textbox "Null threshold (%)" [ref=e5276]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5277]:
+                      - checkbox "Critical for region" [ref=e5278]
+                  - row [ref=e5279]:
+                    - cell [ref=e5280]:
+                      - checkbox "Select status" [checked] [ref=e5281]
+                    - cell "status" [ref=e5282]
+                    - cell "String" [ref=e5283]
+                    - cell [ref=e5284]:
+                      - generic [ref=e5285]:
+                        - textbox "Null threshold (%)" [ref=e5286]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5287]:
+                      - checkbox "Critical for status" [ref=e5288]
+                  - row [ref=e5289]:
+                    - cell [ref=e5290]:
+                      - checkbox "Select created_at" [checked] [ref=e5291]
+                    - cell "created_at" [ref=e5292]
+                    - cell "Date" [ref=e5293]
+                    - cell [ref=e5294]:
+                      - generic [ref=e5295]:
+                        - textbox "Null threshold (%)" [ref=e5296]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5297]:
+                      - checkbox "Critical for created_at" [ref=e5298]
+                  - row [ref=e5299]:
+                    - cell [ref=e5300]:
+                      - checkbox "Select credit_limit" [checked] [ref=e5301]
+                    - cell "credit_limit" [ref=e5302]
+                    - cell "Decimal" [ref=e5303]
+                    - cell [ref=e5304]:
+                      - generic [ref=e5305]:
+                        - textbox "Null threshold (%)" [ref=e5306]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5307]:
+                      - checkbox "Critical for credit_limit" [ref=e5308]
+                  - row [ref=e5309]:
+                    - cell [ref=e5310]:
+                      - checkbox "Select segment" [checked] [ref=e5311]
+                    - cell "segment" [ref=e5312]
+                    - cell "String" [ref=e5313]
+                    - cell [ref=e5314]:
+                      - generic [ref=e5315]:
+                        - textbox "Null threshold (%)" [ref=e5316]:
+                          - /placeholder: "0"
+                          - text: "0"
+                        - generic: "%"
+                    - cell [ref=e5317]:
+                      - checkbox "Critical for segment" [ref=e5318]
+      - contentinfo [ref=e4871]:
+        - button "Back" [ref=e4872]
+        - paragraph [ref=e4875]: Step 4 of 8
+        - button "Continue" [active] [ref=e4876]

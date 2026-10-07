@@ -10,13 +10,13 @@ export default function App() {
   const [view, setView] = useState<View>('login')
 
   if (view === 'login') {
-    return <LoginScreen onOpenLayout={setView} />
+    return <LoginScreen onOpenLayout={() => setView('layout-1')} />
   }
 
   return (
     <JobsProvider>
       <AdminProvider>
-        <AppShell layout={view} onLogout={() => setView('login')} />
+        <AppShell layout="layout-1" onLogout={() => setView('login')} />
       </AdminProvider>
     </JobsProvider>
   )

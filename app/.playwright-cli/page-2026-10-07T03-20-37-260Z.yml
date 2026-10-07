@@ -1,0 +1,171 @@
+- generic [ref=e29]:
+  - complementary [ref=e31]:
+    - navigation "Primary" [ref=e38]:
+      - list [ref=e39]:
+        - listitem [ref=e40]:
+          - button "Executive Dashboard" [ref=e41]
+        - listitem [ref=e49]:
+          - button "Connections" [ref=e50]
+        - listitem [ref=e54]:
+          - button "Data Quality" [ref=e55]
+        - listitem [ref=e60]:
+          - button "Matching" [ref=e61]
+        - listitem [ref=e68]:
+          - button "Observability" [ref=e69]
+        - listitem [ref=e73]:
+          - button "Jobs & Tasks" [ref=e74]
+        - listitem [ref=e80]:
+          - button "Administration" [ref=e81]
+  - generic [ref=e86]:
+    - banner [ref=e87]:
+      - generic [ref=e88]:
+        - button "Acme Corp — Production" [ref=e90]
+        - generic [ref=e97]:
+          - button "Notifications, unread" [ref=e98]
+          - button "Settings" [ref=e103]
+          - button "Data Trust Agent" [ref=e108]
+          - button "Alex Rivera, Data Steward" [ref=e112]:
+            - generic [ref=e113]: AR
+            - generic [ref=e114]:
+              - generic [ref=e115]: Alex Rivera
+              - generic [ref=e116]: Data Steward
+          - button "Log out" [ref=e117]
+    - generic [ref=e4482]:
+      - generic [ref=e4484]:
+        - list [ref=e4486]:
+          - listitem [ref=e4487]:
+            - button [ref=e4490]
+            - paragraph [ref=e4496]: Connect
+            - paragraph [ref=e4497]: Where is your data?
+          - listitem [ref=e4498]:
+            - button [disabled] [ref=e4501]
+            - paragraph [ref=e4505]: Choose Table
+            - paragraph [ref=e4506]: What to check?
+          - listitem [ref=e4507]:
+            - button [disabled] [ref=e4510]
+            - paragraph [ref=e4515]: Configure
+            - paragraph [ref=e4516]: Foundation settings
+          - listitem [ref=e4517]:
+            - button [disabled] [ref=e4520]
+            - paragraph [ref=e4524]: Rule Catalog
+            - paragraph [ref=e4525]: Suggested checks
+          - listitem [ref=e4526]:
+            - button [disabled] [ref=e4529]
+            - paragraph [ref=e4534]: Custom Rules
+            - paragraph [ref=e4535]: Reusable rules
+          - listitem [ref=e4536]:
+            - button [disabled] [ref=e4539]
+            - paragraph [ref=e4543]: Preview and Run
+            - paragraph [ref=e4544]: Review then run
+          - listitem [ref=e4545]:
+            - button [disabled] [ref=e4548]
+            - paragraph [ref=e4553]: Notifications
+            - paragraph [ref=e4554]: Stay informed
+          - listitem [ref=e4555]:
+            - button [disabled] [ref=e4558]
+            - paragraph [ref=e4563]: Schedule
+            - paragraph [ref=e4564]: When to run?
+        - banner [ref=e4565]:
+          - generic [ref=e4566]:
+            - heading "Choose a Table" [level=1] [ref=e4901]
+            - paragraph [ref=e4568]: Select which table you want to monitor for data quality
+          - button "Describe with BuckGPT" [ref=e4569]
+        - generic [ref=e4902]:
+          - generic [ref=e4903]:
+            - button "Data Tables 3" [pressed] [ref=e4904]:
+              - text: Data Tables
+              - generic [ref=e4908]: "3"
+            - button [ref=e4909]
+            - button [ref=e4916]
+          - generic [ref=e4920]:
+            - generic [ref=e4922]:
+              - generic [ref=e4923]:
+                - generic [ref=e4924]: Data source type
+                - generic [ref=e4925]: MSSQL
+              - generic [ref=e4926]:
+                - generic [ref=e4927]: Data source
+                - generic [ref=e4928]: Acme ERP
+              - generic [ref=e4929]:
+                - generic [ref=e4930]:
+                  - text: Table name
+                  - generic [aria-hidden] [ref=e4931]: "*"
+                - combobox [ref=e4932]:
+                  - option "Select table"
+                  - option "Customer Master" [selected]
+                  - option "Orders"
+                  - option "Order Lines"
+              - generic [ref=e4933]:
+                - generic [ref=e4934]: Table nickname
+                - textbox "Enter table nickname" [ref=e4935]: Customer Master
+              - generic [ref=e4936]:
+                - generic [ref=e4937]: Suggested validation name
+                - generic [ref=e4938]: Customer_Master_Customer_dq
+                - button "Applied" [ref=e4975]
+              - generic [ref=e4940]:
+                - generic [ref=e4941]: Description
+                - textbox "What this table is used for" [ref=e4942]: Quality checks for Customer Master
+              - generic [ref=e4943]:
+                - generic [ref=e4944]: Tags
+                - generic [ref=e4945]:
+                  - textbox "Add tag…" [ref=e4946]
+                  - button "Add tag" [ref=e4947]
+                - generic [ref=e4976]:
+                  - button "MSSQL Remove MSSQL" [ref=e4977]:
+                    - text: MSSQL
+                    - generic [aria-hidden] [ref=e4978]: ×
+                    - generic [ref=e4979]: Remove MSSQL
+                  - button "Customer Remove Customer" [ref=e4980]:
+                    - text: Customer
+                    - generic [aria-hidden] [ref=e4981]: ×
+                    - generic [ref=e4982]: Remove Customer
+              - generic [ref=e4950]:
+                - generic [ref=e4951]: BuckGPT domain
+                - combobox [ref=e4956]:
+                  - option "Select BuckGPT domain"
+                  - option "Finance"
+                  - option "Customer" [selected]
+                  - option "Inventory"
+                  - option "People"
+                  - option "Operations"
+            - generic [ref=e4957]:
+              - generic [ref=e4958]:
+                - heading "Column Preview" [level=2] [ref=e4959]
+                - generic [ref=e4983]: 10 columns
+              - list [ref=e4984]:
+                - listitem [ref=e4985]:
+                  - generic [ref=e4986]: customer_id
+                  - generic [ref=e4987]: Integer
+                - listitem [ref=e4988]:
+                  - generic [ref=e4989]: customer_name
+                  - generic [ref=e4990]: String
+                - listitem [ref=e4991]:
+                  - generic [ref=e4992]: email
+                  - generic [ref=e4993]: String
+                - listitem [ref=e4994]:
+                  - generic [ref=e4995]: phone
+                  - generic [ref=e4996]: String
+                - listitem [ref=e4997]:
+                  - generic [ref=e4998]: country
+                  - generic [ref=e4999]: String
+                - listitem [ref=e5000]:
+                  - generic [ref=e5001]: region
+                  - generic [ref=e5002]: String
+                - listitem [ref=e5003]:
+                  - generic [ref=e5004]: status
+                  - generic [ref=e5005]: String
+                - listitem [ref=e5006]:
+                  - generic [ref=e5007]: created_at
+                  - generic [ref=e5008]: Date
+                - listitem [ref=e5009]:
+                  - generic [ref=e5010]: credit_limit
+                  - generic [ref=e5011]: Decimal
+                - listitem [ref=e5012]:
+                  - generic [ref=e5013]: segment
+                  - generic [ref=e5014]: String
+          - generic [ref=e4966]:
+            - switch [ref=e4967]
+            - generic [ref=e4974]: Advanced Option
+      - contentinfo [ref=e4871]:
+        - button "Back" [ref=e4872]
+        - paragraph [ref=e4875]: Step 2 of 8
+        - button "Continue" [ref=e4876]

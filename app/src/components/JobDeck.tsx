@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { createPortal } from 'react-dom'
+import { useWorkspaceAi } from '../ai/WorkspaceAiContext.tsx'
 import { kindLabel } from '../data/jobs.ts'
+import { jobBriefFor } from '../data/aiMocks.ts'
 import { JOB_AUTO_COLLAPSE_MS, type LiveJob } from '../jobs/jobStore.ts'
 import { ChevronIcon } from './icons.tsx'
 import StatusBadge from './StatusBadge.tsx'
@@ -18,6 +20,7 @@ export default function JobDeck({
 }) {
   const [expanded, setExpanded] = useState(true)
   const [hovering, setHovering] = useState(false)
+  const { requestRca, enabled } = useWorkspaceAi()
 
   useEffect(() => {
     if (wave > 0) setExpanded(true)
@@ -88,6 +91,20 @@ export default function JobDeck({
                   <div className="min-w-0 flex-1">
                     <p className="truncate font-sans text-sm text-ink">{job.name}</p>
                     <p className="mt-0.5 font-label text-[10px] tracking-[0.14em] text-muted uppercase">{kindLabel(job.kind)}</p>
+                    {jobBriefFor(job.name, job.status === 'failed') ? (
+                      <div className="mt-1">
+                        <p className="text-xs leading-5 text-muted">{jobBriefFor(job.name, job.status === 'failed')?.body}</p>
+                        {enabled ? (
+                          <button
+                            type="button"
+                            className="mt-1 font-sans text-xs font-medium text-indigo"
+                            onClick={() => requestRca(job.name.toLowerCase().includes('ledger') ? 'ledger' : 'campaigns')}
+                          >
+                            Open RCA
+                          </button>
+                        ) : null}
+                      </div>
+                    ) : null}
                   </div>
                   {job.status === 'complete' ? (
                     <StatusBadge tone="success" label="Complete" />

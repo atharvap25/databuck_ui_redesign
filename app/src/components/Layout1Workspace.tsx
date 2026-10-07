@@ -1,6 +1,9 @@
 import { useEffect, useId, useRef, useState } from 'react'
+import { useWorkspaceAi } from '../ai/WorkspaceAiContext.tsx'
 import type { JobKind } from '../data/jobs.ts'
+import { matchingJobs, matchingTitle } from '../data/matchings.ts'
 import { dataSources, duplicateSource, type DataSource } from '../data/sources.ts'
+import { validationRuns } from '../data/validations.ts'
 import ConnectionDetail from './ConnectionDetail.tsx'
 import ConnectionsPanel, { type SourceSelection } from './ConnectionsPanel.tsx'
 import EmptyState from './EmptyState.tsx'
@@ -50,6 +53,45 @@ export default function Layout1Workspace({
   const [matchingId, setMatchingId] = useState(matchingSummaryId)
   const [matchingsCollapsed, setMatchingsCollapsed] = useState(false)
   const [editSignal, setEditSignal] = useState(0)
+  const { setFocus } = useWorkspaceAi()
+
+  useEffect(() => {
+    if (screen === 'data-quality') {
+      const run = validationRuns.find((item) => item.id === validationId)
+      setFocus({
+        screen: 'quality',
+        validationId: run?.id,
+        validationName: run?.validationName,
+        tableName: run?.tableName,
+        dts: run?.score,
+        failedChecks: run?.failedChecks,
+      })
+      return
+    }
+    if (screen === 'matching') {
+      const job = matchingJobs.find((item) => item.id === matchingId)
+      setFocus({
+        screen: 'matching',
+        matchingId: job?.id,
+        matchingName: job ? matchingTitle(job) : undefined,
+        tableName: job?.source.tableName,
+        matchRate: job?.matchRate,
+        unmatched: job?.unmatched,
+      })
+      return
+    }
+    const source = selection
+      ? selection.kind === 'source'
+        ? sources.find((item) => item.id === selection.id)
+        : sources.find((item) => item.tables.some((table) => table.id === selection.id))
+      : null
+    const table = source?.tables.find((item) => selection?.kind === 'table' && item.id === selection.id)
+    setFocus({
+      screen: 'connections',
+      sourceName: source?.name,
+      tableName: table?.nickname,
+    })
+  }, [screen, validationId, matchingId, selection, sources, setFocus])
 
   useEffect(() => {
     setQuery('')

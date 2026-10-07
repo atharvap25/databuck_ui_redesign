@@ -46,12 +46,19 @@ export default function LoginScreen({
     })
   }
 
+  function enterWorkspace() {
+    onOpenLayout('layout-1')
+  }
+
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setErrors({
+    const next = {
       username: fieldError('username', values.username),
       password: fieldError('password', values.password),
-    })
+    }
+    setErrors(next)
+    if (next.username || next.password) return
+    enterWorkspace()
   }
 
   return (
@@ -114,6 +121,7 @@ export default function LoginScreen({
             <div className="mt-6 flex gap-3">
               <button
                 type="button"
+                onClick={enterWorkspace}
                 className="inline-flex h-11 min-h-11 flex-1 items-center justify-center rounded-md border border-line-strong bg-canvas px-2 font-label text-xs font-medium tracking-[0.08em] text-ink uppercase transition-colors duration-150 ease-databuck hover:border-ink hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo active:scale-[0.98] md:h-10 md:min-h-10"
               >
                 Single sign-on
@@ -127,29 +135,7 @@ export default function LoginScreen({
             </div>
           </form>
 
-          <p className="mt-6 text-center font-sans text-xs text-outline">2026 © FirstEigen</p>
-
-          <div className="mt-10 border-t border-line pt-6">
-            <p className="mb-3 text-center font-label text-[0.6875rem] font-medium tracking-[0.14em] text-outline uppercase">
-              Preview workspace
-            </p>
-            <div className="flex gap-2">
-              <button
-                type="button"
-                onClick={() => onOpenLayout('layout-1')}
-                className="inline-flex h-9 flex-1 items-center justify-center rounded-md border border-line bg-canvas px-3 font-sans text-xs font-medium text-muted transition-colors duration-150 ease-databuck hover:border-line-strong hover:bg-surface hover:text-ink focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo active:scale-[0.98]"
-              >
-                Layout 1
-              </button>
-              <button
-                type="button"
-                disabled
-                className="inline-flex h-9 flex-1 cursor-not-allowed items-center justify-center rounded-md border border-line bg-surface px-3 font-sans text-xs font-medium text-outline"
-              >
-                Layout 2
-              </button>
-            </div>
-          </div>
+          <p className="mt-8 text-center font-sans text-xs text-outline">2026 © FirstEigen</p>
         </div>
       </section>
     </main>

@@ -1,15 +1,9 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import {
-  cloneCatalog,
-  firstPair,
-  linkedPairs,
-  pairKey,
-  pairLabel,
-  type WorkspacePair,
-} from '../data/workspaces.ts'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { linkedPairs, pairKey, pairLabel } from '../data/workspaces.ts'
+import { useWorkspaceSession } from '../workspace/WorkspaceSession.tsx'
 import DomainProjectDialog from './DomainProjectDialog.tsx'
+import AlertPopover from './ai/AlertPopover.tsx'
 import Mark from './Mark.tsx'
-import UnderDevelopmentDialog from './UnderDevelopmentDialog.tsx'
 import {
   BackIcon,
   BellIcon,
@@ -32,6 +26,7 @@ export default function Header({
   agentWorkspace = false,
   onLeaveAgent,
   onOpenSettings,
+  aiEnabled = true,
 }: {
   onLogout: () => void
   agentOpen: boolean
@@ -39,11 +34,9 @@ export default function Header({
   agentWorkspace?: boolean
   onLeaveAgent?: () => void
   onOpenSettings?: () => void
+  aiEnabled?: boolean
 }) {
-  const catalog = useMemo(() => cloneCatalog(), [])
-  const [domains, setDomains] = useState(catalog.domains)
-  const [projects, setProjects] = useState(catalog.projects)
-  const [selected, setSelected] = useState<WorkspacePair | null>(() => firstPair(catalog.domains, catalog.projects))
+  const { domains, projects, selected, setSelected, applyCatalog, selectedLabel } = useWorkspaceSession()
   const [menuOpen, setMenuOpen] = useState(false)
   const [manageOpen, setManageOpen] = useState(false)
   const [noticeOpen, setNoticeOpen] = useState(false)
@@ -51,10 +44,7 @@ export default function Header({
   const closeNotice = useCallback(() => setNoticeOpen(false), [])
   const pairs = linkedPairs(domains, projects)
   const selectedMeta = pairs.find((pair) => selected && pairKey(pair) === pairKey(selected)) ?? pairs[0] ?? null
-  const selectedDomain = selectedMeta ? domains.find((domain) => domain.id === selectedMeta.domainId) : null
-  const selectedProject = selectedMeta ? projects.find((project) => project.id === selectedMeta.projectId) : null
-  const triggerLabel =
-    selectedDomain && selectedProject ? pairLabel(selectedDomain.name, selectedProject.name) : 'Select domain-project'
+  const triggerLabel = selectedLabel
 
   useEffect(() => {
     if (!menuOpen) return
@@ -74,14 +64,6 @@ export default function Header({
       document.removeEventListener('keydown', onKeyDown)
     }
   }, [menuOpen])
-
-  function applyCatalog(nextDomains: typeof domains, nextProjects: typeof projects) {
-    setDomains(nextDomains)
-    setProjects(nextProjects)
-    const nextPairs = linkedPairs(nextDomains, nextProjects)
-    const stillSelected = selected && nextPairs.some((pair) => pairKey(pair) === pairKey(selected))
-    if (!stillSelected) setSelected(nextPairs[0] ?? null)
-  }
 
   return (
     <header className="relative z-20 flex h-16 shrink-0 items-center gap-4 border-b border-line bg-canvas px-4">
@@ -188,7 +170,7 @@ export default function Header({
               <BackIcon />
               Back to workspace
             </button>
-          ) : (
+          ) : aiEnabled ? (
           <button
             type="button"
             aria-pressed={agentOpen}
@@ -198,7 +180,7 @@ export default function Header({
             <SparkIcon />
             Data Trust Agent
           </button>
-          )}
+          ) : null}
           <button
             type="button"
             className="inline-flex h-11 shrink-0 items-center gap-2 rounded-md px-2 transition-colors duration-150 ease-databuck hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo"
@@ -222,7 +204,7 @@ export default function Header({
           </div>
         </div>
       </div>
-      {noticeOpen ? <UnderDevelopmentDialog onClose={closeNotice} /> : null}
+      {noticeOpen ? <AlertPopover onClose={closeNotice} /> : null}
       {manageOpen ? (
         <DomainProjectDialog
           domains={domains}

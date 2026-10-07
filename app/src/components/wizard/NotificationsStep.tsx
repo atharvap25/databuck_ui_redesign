@@ -1,5 +1,7 @@
+import { notificationDraft } from '../../data/aiMocks.ts'
 import { alertTriggers, severityLevels, type AlertState } from './model.ts'
 import { cardClass, Field, fieldClass, Glyph, SendGlyph } from './ui.tsx'
+import { GenerateButton, useMockGenerate } from '../ai/AiKit.tsx'
 
 export default function NotificationsStep({
   alerts,
@@ -8,6 +10,8 @@ export default function NotificationsStep({
   alerts: AlertState
   onChange: (alerts: AlertState) => void
 }) {
+  const { busy, run } = useMockGenerate(600)
+
   function patch(partial: Partial<AlertState>) {
     onChange({ ...alerts, ...partial })
   }
@@ -42,6 +46,31 @@ export default function NotificationsStep({
             placeholder="Enter email to Assign Incident"
             onChange={(assignIncident) => patch({ assignIncident })}
           />
+        </div>
+        <div className="mt-5">
+          <div className="flex items-center justify-between gap-3">
+            <Field label="Message">
+              <textarea
+                value={alerts.message}
+                onChange={(event) => patch({ message: event.target.value })}
+                placeholder="Optional alert body"
+                className={`${fieldClass} h-24 py-2`}
+              />
+            </Field>
+          </div>
+          <div className="mt-3">
+            <GenerateButton
+              busy={busy}
+              onClick={() => {
+                run(() => {
+                  const draft = notificationDraft('This validation', 1)
+                  patch({ message: `${draft.subject}. ${draft.body}` })
+                })
+              }}
+            >
+              Draft message
+            </GenerateButton>
+          </div>
         </div>
       </section>
 

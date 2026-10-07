@@ -1,4 +1,5 @@
-import { useId, useRef, useState } from 'react'
+import { useId, useRef, useState, useEffect } from 'react'
+import { useWorkspaceAi } from '../../ai/WorkspaceAiContext.tsx'
 import { PlusIcon, SearchIcon } from '../icons.tsx'
 import { primaryButton } from '../wizard/ui.tsx'
 import { searchFieldClass } from '../jobs/chrome.tsx'
@@ -48,6 +49,11 @@ export default function AdminWorkspace({
   const [creating, setCreating] = useState(false)
   const [accessSection, setAccessSection] = useState<AccessSection>('users')
   const [logFetch, setLogFetch] = useState(0)
+  const { setFocus } = useWorkspaceAi()
+
+  useEffect(() => {
+    setFocus({ screen: 'admin' })
+  }, [setFocus])
 
   const cta =
     tab === 'access'

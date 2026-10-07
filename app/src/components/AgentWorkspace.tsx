@@ -1,8 +1,11 @@
 import { useState } from 'react'
+import { useWorkspaceAi } from '../ai/WorkspaceAiContext.tsx'
+import type { AgentAction } from '../data/aiMocks.ts'
 import {
   agentHistory,
   agentHistoryGroups,
-  appendPreviewTurn,
+  appendUserTurn,
+  settleAgentTurn,
   type AgentMessage,
   type AgentThread,
 } from '../data/agentChat.ts'
@@ -17,12 +20,18 @@ function lastUserSnippet(thread: AgentThread, overlay?: AgentMessage[]) {
 }
 
 export default function AgentWorkspace() {
+  const { focus, requestReview, requestRca } = useWorkspaceAi()
   const [activeId, setActiveId] = useState<string | null>(null)
   const [drafts, setDrafts] = useState<Record<string, AgentMessage[]>>({})
   const active = activeId ? agentHistory.find((thread) => thread.id === activeId) ?? null : null
   const messages = activeId ? (drafts[activeId] ?? active?.messages ?? []) : []
   const started = messages.some((message) => message.role === 'user')
   const threadTitle = active && activeId !== 'draft' ? active.title : null
+
+  function onAction(action: AgentAction) {
+    if (action.id === 'review') requestReview(action.target ?? focus.validationId ?? 'campaigns')
+    if (action.id === 'rca') requestRca(action.target ?? focus.validationId ?? 'campaigns')
+  }
 
   function openNew() {
     setActiveId(null)
@@ -38,12 +47,22 @@ export default function AgentWorkspace() {
     if (!question) return
     const key = activeId ?? 'draft'
     if (!activeId) setActiveId('draft')
+    let pendingId = ''
     setDrafts((current) => {
       const base =
         current[key] ??
         (key === 'draft' ? [] : (agentHistory.find((thread) => thread.id === key)?.messages ?? []))
-      return { ...current, [key]: appendPreviewTurn(base, question) }
+      const next = appendUserTurn(base, question)
+      pendingId = next.pendingId
+      return { ...current, [key]: next.messages }
     })
+    window.setTimeout(() => {
+      setDrafts((current) => {
+        const base = current[key]
+        if (!base) return current
+        return { ...current, [key]: settleAgentTurn(base, pendingId, focus, question) }
+      })
+    }, 700)
   }
 
   return (
@@ -102,7 +121,7 @@ export default function AgentWorkspace() {
 
       <section className="flex min-w-0 flex-1 flex-col bg-canvas">
         {started ? (
-          <ChatThread title={threadTitle} messages={messages} />
+          <ChatThread title={threadTitle} messages={messages} onAction={onAction} />
         ) : (
           <EmptyChat onSend={send} />
         )}
@@ -135,7 +154,15 @@ function EmptyChat({ onSend }: { onSend: (text: string) => void }) {
   )
 }
 
-function ChatThread({ title, messages }: { title: string | null; messages: AgentMessage[] }) {
+function ChatThread({
+  title,
+  messages,
+  onAction,
+}: {
+  title: string | null
+  messages: AgentMessage[]
+  onAction: (action: AgentAction) => void
+}) {
   return (
     <div className="db-scroll min-h-0 flex-1 overflow-y-auto px-6 py-6">
       <div className="mx-auto flex max-w-3xl flex-col gap-4">
@@ -143,7 +170,7 @@ function ChatThread({ title, messages }: { title: string | null; messages: Agent
           <h1 className="font-sans text-base font-semibold tracking-[-0.02em] text-ink">{title}</h1>
         ) : null}
         {messages.map((message) => (
-          <ChatMessage key={message.id} message={message} />
+          <ChatMessage key={message.id} message={message} onAction={onAction} />
         ))}
       </div>
     </div>

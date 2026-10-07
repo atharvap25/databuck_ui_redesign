@@ -1,6 +1,7 @@
 import { useCallback, useState } from 'react'
 import { catalogSummary, suggestCatalog, type CatalogState } from '../data/ruleCatalog.ts'
-import { libraryCustomRules, suggestedCustomRuleIds, type CustomRule } from '../data/customRules.ts'
+import { suggestedCustomRuleIds } from '../data/customRules.ts'
+import { parseWizardIntent, suggestedValidationName, wizardIntents, type WizardIntent } from '../data/aiMocks.ts'
 import { dataSources, type DataSource } from '../data/sources.ts'
 import CatalogStep from './wizard/CatalogStep.tsx'
 import ConfigureStep from './wizard/ConfigureStep.tsx'
@@ -48,7 +49,9 @@ import PreviewStep from './wizard/PreviewStep.tsx'
 import RunOverlay from './wizard/RunOverlay.tsx'
 import ScheduleStep from './wizard/ScheduleStep.tsx'
 import TableStep from './wizard/TableStep.tsx'
-import { Glyph, StepGlyph } from './wizard/ui.tsx'
+import { Glyph, Modal, StepGlyph, fieldClass, secondaryButton } from './wizard/ui.tsx'
+import { AiAction, GenerateButton, GeneratePulse, AiBanner } from './ai/AiKit.tsx'
+import { useWorkspaceSession } from '../workspace/WorkspaceSession.tsx'
 
 const firstSource = firstActiveSource()
 
@@ -65,6 +68,7 @@ export default function ValidationWizard({
   onSourceCreated?: (source: DataSource) => void
   onExit: () => void
 }) {
+  const { rules: customRules, ddms, selected: workspacePair } = useWorkspaceSession()
   const fromConnections = entry === 'connections'
   const fromMatching = entry === 'matching'
   const [step, setStep] = useState(Math.min(Math.max(startStep, 1), steps.length))
@@ -91,13 +95,17 @@ export default function ValidationWizard({
   const [profile, setProfile] = useState<ProfileMode>('profile')
   const [configure, setConfigure] = useState(() => defaultConfigure())
   const [ruleCatalog, setRuleCatalog] = useState<CatalogState>(() => emptyCatalog())
-  const [customRules, setCustomRules] = useState<CustomRule[]>(() => libraryCustomRules)
   const [selectedCustomIds, setSelectedCustomIds] = useState<string[]>([])
+  const [selectedDdmIds, setSelectedDdmIds] = useState<string[]>([])
   const [alerts, setAlerts] = useState(() => defaultAlerts())
   const [schedule, setSchedule] = useState(() => defaultSchedule(fromMatching ? matchingNameFor('', '') : validationNameFor('New_Table')))
   const [visitedAlerts, setVisitedAlerts] = useState(false)
   const [visitedSchedule, setVisitedSchedule] = useState(false)
   const [running, setRunning] = useState(false)
+  const [intentText, setIntentText] = useState('')
+  const [intentBusy, setIntentBusy] = useState(false)
+  const [intentPreview, setIntentPreview] = useState<WizardIntent | null>(null)
+  const [intentOpen, setIntentOpen] = useState(false)
 
   const [matchingStep, setMatchingStep] = useState(1)
   const [matchingMax, setMatchingMax] = useState(1)
@@ -286,15 +294,46 @@ export default function ValidationWizard({
     setTableTags([connectionType, nextDomain])
     setFilterText(table.rowFilter)
     setRuleCatalog(suggestCatalog(nextColumns, table.nickname))
-    setSelectedCustomIds(suggestedCustomRuleIds(nextDomain, table.nickname))
+    setSelectedCustomIds(suggestedCustomRuleIds(customRules, workspacePair, table.nickname))
     setSchedule((current) => ({
       ...current,
-      validationName: validationNameFor(table.nickname),
+      validationName: suggestedValidationName(table.nickname, nextDomain),
     }))
     setConfigure((current) => ({
       ...current,
       dateFormat: nextSchema.some((column) => column.format === 'Date') ? 'YYYY-MM-DD' : current.dateFormat,
     }))
+  }
+
+  function applyIntent(intent: WizardIntent) {
+    const found = catalog
+      .flatMap((source) => source.tables.map((table) => ({ source, table })))
+      .find((item) => item.table.nickname === intent.tableHint)
+    if (found) {
+      setMode('existing')
+      setSourceId(found.source.id)
+      setTableId(found.table.id)
+      const nextSchema = schemaFor(found.table)
+      const nextColumns = catalogColumnsFrom(nextSchema)
+      setNickname(found.table.nickname)
+      setDescription(`Quality checks for ${found.table.nickname}`)
+      setDomain(intent.domain)
+      setTableTags([found.source.type, intent.domain])
+      setRuleCatalog(suggestCatalog(nextColumns, found.table.nickname))
+      setSelectedCustomIds(suggestedCustomRuleIds(customRules, workspacePair, found.table.nickname))
+      setSchedule((current) => ({
+        ...current,
+        mode: 'schedule',
+        frequency: 'daily',
+        startTime: '06:30',
+        validationName: suggestedValidationName(found.table.nickname, intent.domain),
+      }))
+    }
+    setAlerts((current) => ({ ...current, slack: intent.slack, onlyOnFailure: intent.onlyOnFailure }))
+    if (intent.matching) {
+      setPathChoice('matching')
+      setFork('matching')
+    }
   }
 
   function goBack() {
@@ -382,23 +421,13 @@ export default function ValidationWizard({
         <div className="mx-auto flex w-full max-w-6xl flex-col px-6 py-6 lg:px-8 lg:py-8">
           {showStepper ? <Stepper items={activeSteps} step={activeStep} maxReached={activeMax} onJump={goTo} /> : null}
 
-          <header className={`flex items-start justify-between gap-6 ${showStepper ? 'mt-8' : ''}`}>
+          <header className={`flex flex-wrap items-start justify-between gap-3 ${showStepper ? 'mt-8' : ''}`}>
             <div className="min-w-0">
               <h1 className="font-sans text-[1.75rem] leading-9 font-semibold tracking-[-0.03em] text-ink">{page.title}</h1>
               <p className="mt-1 text-sm leading-6 text-muted">{page.subtitle}</p>
             </div>
-            {showConnect ? (
-              <button
-                type="button"
-                title="Not set up yet"
-                className="hidden h-9 shrink-0 items-center gap-2 rounded-md border border-line bg-canvas px-3 font-sans text-sm font-medium text-ink shadow-card transition-colors duration-150 ease-databuck hover:border-line-strong hover:bg-surface focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo sm:inline-flex"
-              >
-                <Glyph>
-                  <circle cx="12" cy="12" r="8" />
-                  <path d="M12 8v4l2.5 1.5" />
-                </Glyph>
-                Configure from History
-              </button>
+            {showQualitySteps && step <= 2 ? (
+              <AiAction onClick={() => setIntentOpen(true)}>Describe with BuckGPT</AiAction>
             ) : null}
           </header>
 
@@ -536,6 +565,9 @@ export default function ValidationWizard({
                 onSqlText={setSqlText}
                 profile={profile}
                 onProfile={setProfile}
+                suggestedName={suggestedValidationName(nickname || 'New_Table', domain)}
+                currentName={schedule.validationName}
+                onApplyName={(name) => setSchedule((current) => ({ ...current, validationName: name }))}
               />
             ) : null}
             {showQualitySteps && step === 3 ? (
@@ -546,6 +578,7 @@ export default function ValidationWizard({
                 onDomain={setDomain}
                 description={description}
                 onDescription={setDescription}
+                schema={schema}
               />
             ) : null}
             {showQualitySteps && step === 4 ? (
@@ -553,14 +586,10 @@ export default function ValidationWizard({
             ) : null}
             {showQualitySteps && step === 5 ? (
               <CustomRulesStep
-                rules={customRules}
                 selectedIds={selectedCustomIds}
                 onSelected={setSelectedCustomIds}
-                onAddRule={(rule) => {
-                  setCustomRules((current) => [rule, ...current])
-                  setSelectedCustomIds((current) => (current.includes(rule.id) ? current : [...current, rule.id]))
-                }}
-                domain={domain}
+                selectedDdmIds={selectedDdmIds}
+                onSelectedDdms={setSelectedDdmIds}
                 tableName={nickname}
                 schema={schema}
               />
@@ -576,6 +605,8 @@ export default function ValidationWizard({
                 catalog={ruleCatalog}
                 customRules={customRules}
                 selectedCustomIds={selectedCustomIds}
+                ddms={ddms}
+                selectedDdmIds={selectedDdmIds}
                 alerts={alerts}
                 schedule={schedule}
                 visitedAlerts={visitedAlerts}
@@ -624,10 +655,79 @@ export default function ValidationWizard({
       {running ? (
         <RunOverlay
           tableName={isMatchingFlow ? matchName || leftTable?.nickname || 'Matching' : nickname}
-          ruleCount={isMatchingFlow ? matchMappings.filter((row) => row.targetColumn).length : summary.total + selectedCustomIds.length}
+          ruleCount={isMatchingFlow ? matchMappings.filter((row) => row.targetColumn).length : summary.total + selectedCustomIds.length + selectedDdmIds.length}
           kind={isMatchingFlow ? 'matching' : 'validation'}
           onFinished={finishRun}
         />
+      ) : null}
+
+      {intentOpen ? (
+        <Modal
+          title="Describe with BuckGPT"
+          onClose={() => setIntentOpen(false)}
+          footer={
+            <GenerateButton
+              busy={intentBusy}
+              onClick={() => {
+                setIntentBusy(true)
+                window.setTimeout(() => {
+                  setIntentPreview(parseWizardIntent(intentText || wizardIntents[0].phrase))
+                  setIntentBusy(false)
+                }, 700)
+              }}
+            >
+              Generate draft
+            </GenerateButton>
+          }
+        >
+          <p className="text-sm text-muted">A phrase prefills this wizard. You still review every step.</p>
+          <textarea
+            value={intentText}
+            onChange={(event) => setIntentText(event.target.value)}
+            placeholder={wizardIntents[0].phrase}
+            className={`${fieldClass} mt-3 h-20 py-2`}
+          />
+          <div className="mt-2 flex flex-wrap gap-2">
+            {wizardIntents.map((item) => (
+              <button
+                key={item.phrase}
+                type="button"
+                onClick={() => setIntentText(item.phrase)}
+                className="rounded-full border border-line px-3 py-1 font-sans text-xs text-ink hover:border-line-strong"
+              >
+                {item.phrase}
+              </button>
+            ))}
+          </div>
+          {intentBusy ? (
+            <div className="mt-3">
+              <GeneratePulse rows={2} />
+            </div>
+          ) : null}
+          {intentPreview && !intentBusy ? (
+            <div className="mt-3">
+              <AiBanner
+                title="Draft"
+                actions={
+                  <button
+                    type="button"
+                    className={secondaryButton}
+                    onClick={() => {
+                      applyIntent(intentPreview)
+                      setIntentPreview(null)
+                      setIntentOpen(false)
+                      if (!intentPreview.matching) goToQuality(2)
+                    }}
+                  >
+                    Apply to wizard
+                  </button>
+                }
+              >
+                {intentPreview.summary}
+              </AiBanner>
+            </div>
+          ) : null}
+        </Modal>
       ) : null}
     </div>
   )

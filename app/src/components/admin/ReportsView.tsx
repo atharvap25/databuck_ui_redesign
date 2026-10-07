@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { dashboardName, dashboards, formatNow, newAdminId, projectLabel, type Report } from '../../data/admin.ts'
+import { reportNarrative } from '../../data/aiMocks.ts'
 import { useAdmin } from '../../admin/adminStore.ts'
 import EmptyState from '../EmptyState.tsx'
 import { DashboardIcon } from '../icons.tsx'
@@ -87,6 +88,9 @@ export default function ReportsView({
               </div>
             </header>
             <div className="db-scroll min-h-0 flex-1 overflow-auto p-6">
+              <p className="mb-4 rounded-lg border border-info/20 bg-info-tint px-4 py-3 text-sm leading-6 text-info-ink">
+                {reportNarrative}
+              </p>
               <p className="mb-3 font-label text-[10px] tracking-[0.14em] text-muted uppercase">Superset embed</p>
               <div className="overflow-hidden rounded-lg border border-line bg-surface">
                 <div className="flex items-center justify-between border-b border-line px-4 py-2.5">

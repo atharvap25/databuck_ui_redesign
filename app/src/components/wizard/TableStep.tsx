@@ -47,6 +47,9 @@ export default function TableStep(props: {
   onSqlText: (value: string) => void
   profile: ProfileMode
   onProfile: (value: ProfileMode) => void
+  suggestedName?: string
+  currentName?: string
+  onApplyName?: (name: string) => void
 }) {
   const descriptionId = useId()
   const filterId = useId()
@@ -98,6 +101,19 @@ export default function TableStep(props: {
                     className={fieldClass}
                   />
                 </Field>
+                {props.suggestedName && props.onApplyName ? (
+                  <div className="sm:col-span-2 flex flex-wrap items-center gap-2 rounded-md border border-line bg-surface px-3 py-2">
+                    <span className="font-sans text-xs text-muted">Suggested validation name</span>
+                    <span className="font-mono text-xs text-ink">{props.suggestedName}</span>
+                    <button
+                      type="button"
+                      className="ml-auto font-sans text-xs font-medium text-indigo"
+                      onClick={() => props.onApplyName?.(props.suggestedName ?? '')}
+                    >
+                      {props.currentName === props.suggestedName ? 'Applied' : 'Use name'}
+                    </button>
+                  </div>
+                ) : null}
                 <Field label="Description">
                   <input
                     id={descriptionId}

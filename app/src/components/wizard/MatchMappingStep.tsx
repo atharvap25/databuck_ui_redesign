@@ -1,8 +1,10 @@
 import { useMemo, useState } from 'react'
+import { mappingHintFor } from '../../data/aiMocks.ts'
 import type { SchemaColumn } from './model.ts'
 import { mappingSqlPreview, type MatchMappingRow } from './model.ts'
 import { cardClass, Glyph, primaryButton, secondaryButton } from './ui.tsx'
 import StatusBadge from '../StatusBadge.tsx'
+import { ConfidencePill, GenerateButton } from '../ai/AiKit.tsx'
 
 const pageSize = 8
 
@@ -27,6 +29,7 @@ export default function MatchMappingStep({
   const [query, setQuery] = useState('')
   const [page, setPage] = useState(1)
   const [saved, setSaved] = useState(false)
+  const targetNames = targetSchema.map((column) => column.name)
 
   const filtered = useMemo(() => {
     const needle = query.trim().toLowerCase()
@@ -96,6 +99,20 @@ export default function MatchMappingStep({
               className="h-9 w-full max-w-xs rounded-md border border-line bg-canvas px-3 font-sans text-sm text-ink placeholder:text-tagline focus:outline-none focus-visible:border-indigo focus-visible:ring-2 focus-visible:ring-indigo"
             />
             <div className="flex flex-wrap gap-2">
+              <GenerateButton
+                onClick={() => {
+                  onRows(
+                    rows.map((row) => {
+                      if (row.targetColumn) return row
+                      const hint = mappingHintFor(row.sourceColumn, targetNames)
+                      if (!hint) return row
+                      return { ...row, targetColumn: hint.target, sourceExpression: hint.transform ?? row.sourceExpression }
+                    }),
+                  )
+                }}
+              >
+                Suggest mappings
+              </GenerateButton>
               <CountPill label="Primary Key" value={pkCount} />
               <CountPill label="Match Field" value={matchCount} />
               <StatusBadge tone={mappedCount > 0 ? 'success' : 'neutral'} label={`${mappedCount} mapped`} />
@@ -116,11 +133,28 @@ export default function MatchMappingStep({
               <tbody>
                 {visible.map((row, index) => {
                   const mapped = Boolean(row.targetColumn)
+                  const hint = mapped ? null : mappingHintFor(row.sourceColumn, targetNames)
                   return (
                     <tr key={row.id} className={`border-b border-line ${index % 2 === 1 ? 'bg-surface' : 'bg-canvas'}`}>
                       <td className="px-4 py-2.5">
                         <span className="font-mono text-xs text-ink">{row.sourceColumn}</span>
                         <span className="ml-2 font-label text-[10px] tracking-[0.08em] text-muted uppercase">{row.sourceType}</span>
+                        {hint ? (
+                          <button
+                            type="button"
+                            className="mt-1 flex items-center gap-1 font-sans text-[11px] text-indigo"
+                            onClick={() =>
+                              patch(row.id, {
+                                targetColumn: hint.target,
+                                sourceExpression: hint.transform ?? row.sourceExpression,
+                                showSourceExpression: Boolean(hint.transform),
+                              })
+                            }
+                          >
+                            Map to {hint.target}
+                            <ConfidencePill value={hint.confidence} />
+                          </button>
+                        ) : null}
                       </td>
                       <td className="px-4 py-2.5">
                         <input

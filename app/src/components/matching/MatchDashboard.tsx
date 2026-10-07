@@ -17,14 +17,16 @@ import {
   type RecordCountRow,
 } from '../../data/matchResults.ts'
 import type { MatchingJob } from '../../data/matchings.ts'
+import { matchBriefingFor, mismatchReason } from '../../data/aiMocks.ts'
 import { ChevronIcon, SearchIcon } from '../icons.tsx'
+import { AiBanner, AiDrawer, aiSecondaryButton } from '../ai/AiKit.tsx'
 import StatusBadge from '../StatusBadge.tsx'
 import DatasetSummary from './DatasetSummary.tsx'
 import MatchingChart from './MatchingChart.tsx'
 import RecordBreakdown from './RecordBreakdown.tsx'
 import { matchViz } from './viz.ts'
 
-type ViewId =
+export type ViewId =
   | 'dashboard'
   | 'row-mismatches'
   | 'column-mismatches'
@@ -37,7 +39,7 @@ type ViewId =
   | 'details'
   | 'groups'
 
-type ViewDef = { id: ViewId; label: string }
+export type ViewDef = { id: ViewId; label: string }
 
 const migrationViews: ViewDef[] = [
   { id: 'dashboard', label: 'Dashboard' },
@@ -111,28 +113,35 @@ const drillForView: Partial<Record<ViewId, { kind: DrillKind; title: string; emp
   },
 }
 
-export default function MatchDashboard({ job }: { job: MatchingJob }) {
+export function viewsForJob(job: MatchingJob): ViewDef[] {
+  return viewsFor[matchKind(job)]
+}
+
+export default function MatchDashboard({ job, view }: { job: MatchingJob; view: ViewId }) {
   const kind = matchKind(job)
-  const views = viewsFor[kind]
-  const [view, setView] = useState<ViewId>('dashboard')
+  const [explain, setExplain] = useState<{ key: string; reason: string } | null>(null)
+  const [acceptedFuzzy, setAcceptedFuzzy] = useState(false)
   const snap = useMemo(() => matchSnapshot(job), [job])
   const breakdown = useMemo(() => recordBreakdown(snap), [snap])
   const columns = useMemo(() => columnStats(job, snap), [job, snap])
+  const brief = matchBriefingFor(job.id)
 
   useEffect(() => {
-    setView('dashboard')
+    setExplain(null)
+    setAcceptedFuzzy(false)
   }, [job.id])
 
   const drill = drillForView[view]
 
   return (
-    <div className="@container flex flex-col gap-5">
-      <ViewRail views={views} current={view} onChange={setView} />
+    <div className="@container relative flex flex-col gap-5">
 
       {view === 'dashboard' && kind === 'aggregate' ? <AggregateDashboard job={job} /> : null}
 
       {view === 'dashboard' && kind !== 'aggregate' ? (
         <>
+          <AiBanner title="Key recommendation">{brief.keyHint}</AiBanner>
+          <p className="text-sm text-muted">{brief.impact}</p>
           <div className="grid items-stretch gap-4 @[52rem]:grid-cols-[minmax(0,1.4fr)_minmax(18rem,0.85fr)]">
             <MatchingChart job={job} snap={snap} />
             <RecordBreakdown rows={breakdown} />
@@ -149,6 +158,7 @@ export default function MatchDashboard({ job }: { job: MatchingJob }) {
           title={drill.title}
           empty={drill.empty}
           snap={snap}
+          onExplain={(key, index, note) => setExplain({ key, reason: mismatchReason(note, index) })}
         />
       ) : null}
 
@@ -163,6 +173,19 @@ export default function MatchDashboard({ job }: { job: MatchingJob }) {
       ) : null}
 
       {view === 'fuzzy' ? (
+        <>
+          <AiBanner
+            title="Fuzzy matches"
+            actions={
+              <button type="button" className={aiSecondaryButton} onClick={() => setAcceptedFuzzy(true)}>
+                {acceptedFuzzy ? 'Accepted' : 'Accept as match'}
+              </button>
+            }
+          >
+            {acceptedFuzzy
+              ? 'These pairs are marked as matches for this prototype session.'
+              : 'These pairs look like the same customer. Accept is visual only.'}
+          </AiBanner>
         <ColumnTable
           title="Fuzzy matched"
           sourceName={job.source.tableName}
@@ -170,42 +193,16 @@ export default function MatchDashboard({ job }: { job: MatchingJob }) {
           rows={columns.filter((row) => row.fuzzy > 0)}
           mode="fuzzy"
         />
+        </>
       ) : null}
 
       {view === 'details' ? <SegmentTable job={job} /> : null}
       {view === 'groups' ? <GroupsTable job={job} /> : null}
-    </div>
-  )
-}
-
-function ViewRail({
-  views,
-  current,
-  onChange,
-}: {
-  views: ViewDef[]
-  current: ViewId
-  onChange: (id: ViewId) => void
-}) {
-  return (
-    <div role="tablist" aria-label="Result views" className="flex flex-wrap gap-1">
-        {views.map((item) => {
-          const selected = item.id === current
-          return (
-            <button
-              key={item.id}
-              type="button"
-              role="tab"
-              aria-selected={selected}
-              onClick={() => onChange(item.id)}
-              className={`cursor-pointer rounded-md px-3 py-1.5 font-label text-[11px] font-medium tracking-[0.08em] uppercase transition-colors duration-150 ease-databuck focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo ${
-                selected ? 'bg-secondary-fixed text-indigo' : 'text-muted hover:bg-surface hover:text-ink'
-              }`}
-            >
-              {item.label}
-            </button>
-          )
-        })}
+      {explain ? (
+        <AiDrawer title={`Explain ${explain.key}`} onClose={() => setExplain(null)}>
+          <p className="text-sm leading-6 text-ink">{explain.reason}</p>
+        </AiDrawer>
+      ) : null}
     </div>
   )
 }
@@ -558,12 +555,14 @@ function DrillTable({
   title,
   empty,
   snap,
+  onExplain,
 }: {
   job: MatchingJob
   kind: DrillKind
   title: string
   empty: string
   snap: ReturnType<typeof matchSnapshot>
+  onExplain?: (key: string, index: number, note: string) => void
 }) {
   const searchId = useId()
   const [query, setQuery] = useState('')
@@ -606,7 +605,7 @@ function DrillTable({
           <table className="w-full min-w-[36rem] text-left">
             <thead>
               <tr>
-                {['Key', 'Source value', 'Target value', 'Note'].map((label) => (
+                {['Key', 'Source value', 'Target value', 'Note', ''].map((label) => (
                   <th key={label} className={headClass}>
                     {label}
                   </th>
@@ -620,6 +619,17 @@ function DrillTable({
                   <td className="px-3 py-2.5 font-mono text-xs text-ink">{row.sourceValue}</td>
                   <td className="px-3 py-2.5 font-mono text-xs text-ink">{row.targetValue}</td>
                   <td className="px-3 py-2.5 font-sans text-sm text-muted">{row.note}</td>
+                  <td className="px-3 py-2.5 text-right">
+                    {onExplain ? (
+                      <button
+                        type="button"
+                        className="font-sans text-xs font-medium text-indigo"
+                        onClick={() => onExplain(row.key, index, row.note)}
+                      >
+                        Explain
+                      </button>
+                    ) : null}
+                  </td>
                 </tr>
               ))}
             </tbody>

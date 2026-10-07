@@ -1,0 +1,430 @@
+- generic [ref=e34]:
+  - complementary [ref=e36]:
+    - navigation "Primary" [ref=e43]:
+      - list [ref=e44]:
+        - listitem [ref=e45]:
+          - button "Executive Dashboard" [ref=e46]
+        - listitem [ref=e54]:
+          - button "Connections" [ref=e55]
+        - listitem [ref=e59]:
+          - button "Data Quality" [ref=e60]
+        - listitem [ref=e65]:
+          - button "Matching" [ref=e66]
+        - listitem [ref=e73]:
+          - button "Observability" [ref=e74]
+        - listitem [ref=e78]:
+          - button "Jobs & Tasks" [ref=e79]
+        - listitem [ref=e85]:
+          - button "Administration" [ref=e86]
+  - generic [ref=e91]:
+    - banner [ref=e92]:
+      - generic [ref=e93]:
+        - button "Acme Corp — Production" [ref=e95]
+        - generic [ref=e102]:
+          - button "Notifications, unread" [ref=e103]
+          - button "Settings" [ref=e108]
+          - button "Data Trust Agent" [ref=e113]
+          - button "Alex Rivera, Data Steward" [ref=e117]:
+            - generic [ref=e118]: AR
+            - generic [ref=e119]:
+              - generic [ref=e120]: Alex Rivera
+              - generic [ref=e121]: Data Steward
+          - button "Log out" [ref=e122]
+    - generic [ref=e301]:
+      - generic [ref=e302]:
+        - heading "Data Quality" [level=1] [ref=e303]
+        - generic [ref=e304]:
+          - generic [ref=e305]: Search
+          - combobox "Search" [ref=e306]
+        - generic [ref=e307]:
+          - group "Date range" [ref=e308]:
+            - textbox "Start date" [ref=e311]
+            - generic [aria-hidden] [ref=e312]: –
+            - textbox "End date" [ref=e313]
+          - button "Export" [ref=e314]
+          - button "New Validation" [ref=e317]
+      - generic [ref=e319]:
+        - complementary [ref=e320]:
+          - generic [ref=e321]:
+            - generic [ref=e322]:
+              - heading "Validations" [level=2] [ref=e324]
+              - button "Collapse validations" [ref=e325]
+            - group "Table kind" [ref=e329]:
+              - button "Direct table" [pressed] [ref=e330]
+              - button "Derived table" [ref=e331]
+              - button "Reference data" [ref=e332]
+            - generic [ref=e333]:
+              - button "Summary Portfolio overview" [ref=e334] [cursor=pointer]:
+                - generic [ref=e341]:
+                  - generic [ref=e342]: Summary
+                  - generic [ref=e343]: Portfolio overview
+              - list [ref=e344]:
+                - listitem [ref=e345]:
+                  - button "Customer Master 98.4% VAL-0001 Customer_Master_Validation MSSQL · erp.dbo" [ref=e346] [cursor=pointer]:
+                    - generic [ref=e351]:
+                      - generic [ref=e352]:
+                        - generic [ref=e353]: Customer Master
+                        - generic [ref=e354]: 98.4%
+                      - generic [ref=e355]: VAL-0001
+                      - generic [ref=e356]: Customer_Master_Validation
+                      - generic [ref=e357]:
+                        - text: MSSQL
+                        - generic [ref=e358]: · erp.dbo
+                - listitem [ref=e359]:
+                  - button "Orders 91.9% VAL-0002 Orders_Validation MSSQL · erp.dbo" [ref=e360] [cursor=pointer]:
+                    - generic [ref=e365]:
+                      - generic [ref=e366]:
+                        - generic [ref=e367]: Orders
+                        - generic [ref=e368]: 91.9%
+                      - generic [ref=e369]: VAL-0002
+                      - generic [ref=e370]: Orders_Validation
+                      - generic [ref=e371]:
+                        - text: MSSQL
+                        - generic [ref=e372]: · erp.dbo
+                - listitem [ref=e373]:
+                  - button "Order Lines 86.6% VAL-0003 Order_Lines_Validation MSSQL · erp.dbo 4 checks failed" [ref=e374] [cursor=pointer]:
+                    - generic [ref=e379]:
+                      - generic [ref=e380]:
+                        - generic [ref=e381]: Order Lines
+                        - generic [ref=e382]: 86.6%
+                      - generic [ref=e383]: VAL-0003
+                      - generic [ref=e384]: Order_Lines_Validation
+                      - generic [ref=e385]:
+                        - text: MSSQL
+                        - generic [ref=e386]: · erp.dbo
+                    - generic [ref=e387]: 4 checks failed
+                - listitem [ref=e388]:
+                  - button "Shipments 99.7% VAL-0004 Shipments_Validation BigQuery · acme.analytics" [ref=e389] [cursor=pointer]:
+                    - generic [ref=e394]:
+                      - generic [ref=e395]:
+                        - generic [ref=e396]: Shipments
+                        - generic [ref=e397]: 99.7%
+                      - generic [ref=e398]: VAL-0004
+                      - generic [ref=e399]: Shipments_Validation
+                      - generic [ref=e400]:
+                        - text: BigQuery
+                        - generic [ref=e401]: · acme.analytics
+                - listitem [ref=e402]:
+                  - button "AR Invoices 88.3% VAL-0005 AR_Invoices_Validation MSSQL · finance.dbo 1 check failed" [ref=e403] [cursor=pointer]:
+                    - generic [ref=e408]:
+                      - generic [ref=e409]:
+                        - generic [ref=e410]: AR Invoices
+                        - generic [ref=e411]: 88.3%
+                      - generic [ref=e412]: VAL-0005
+                      - generic [ref=e413]: AR_Invoices_Validation
+                      - generic [ref=e414]:
+                        - text: MSSQL
+                        - generic [ref=e415]: · finance.dbo
+                    - generic [ref=e416]: 1 check failed
+                - listitem [ref=e417]:
+                  - button "AR Payments 84.6% VAL-0006 AR_Payments_Validation MSSQL · finance.dbo 1 check failed" [ref=e418] [cursor=pointer]:
+                    - generic [ref=e423]:
+                      - generic [ref=e424]:
+                        - generic [ref=e425]: AR Payments
+                        - generic [ref=e426]: 84.6%
+                      - generic [ref=e427]: VAL-0006
+                      - generic [ref=e428]: AR_Payments_Validation
+                      - generic [ref=e429]:
+                        - text: MSSQL
+                        - generic [ref=e430]: · finance.dbo
+                    - generic [ref=e431]: 1 check failed
+                - listitem [ref=e432]:
+                  - button "Workers 100.0% VAL-0007 Workers_Validation MSSQL · hr.dbo" [ref=e433] [cursor=pointer]:
+                    - generic [ref=e438]:
+                      - generic [ref=e439]:
+                        - generic [ref=e440]: Workers
+                        - generic [ref=e441]: 100.0%
+                      - generic [ref=e442]: VAL-0007
+                      - generic [ref=e443]: Workers_Validation
+                      - generic [ref=e444]:
+                        - text: MSSQL
+                        - generic [ref=e445]: · hr.dbo
+                - listitem [ref=e446]:
+                  - button "Balances 96.2% VAL-0008 Balances_Validation DatabricksDeltaLake · inventory.gold" [ref=e447] [cursor=pointer]:
+                    - generic [ref=e452]:
+                      - generic [ref=e453]:
+                        - generic [ref=e454]: Balances
+                        - generic [ref=e455]: 96.2%
+                      - generic [ref=e456]: VAL-0008
+                      - generic [ref=e457]: Balances_Validation
+                      - generic [ref=e458]:
+                        - text: DatabricksDeltaLake
+                        - generic [ref=e459]: · inventory.gold
+                - listitem [ref=e460]:
+                  - button "General Ledger 0.0% VAL-0009 General_Ledger_Validation Teradata · edw_prod 6 checks failed" [active] [ref=e461] [cursor=pointer]:
+                    - generic [ref=e466]:
+                      - generic [ref=e467]:
+                        - generic [ref=e468]: General Ledger
+                        - generic [ref=e469]: 0.0%
+                      - generic [ref=e470]: VAL-0009
+                      - generic [ref=e471]: General_Ledger_Validation
+                      - generic [ref=e472]:
+                        - text: Teradata
+                        - generic [ref=e473]: · edw_prod
+                    - generic [ref=e474]: 6 checks failed
+                - listitem [ref=e475]:
+                  - button "Returns 90.4% VAL-0012 Returns_Validation BigQuery · acme.analytics" [ref=e476] [cursor=pointer]:
+                    - generic [ref=e481]:
+                      - generic [ref=e482]:
+                        - generic [ref=e483]: Returns
+                        - generic [ref=e484]: 90.4%
+                      - generic [ref=e485]: VAL-0012
+                      - generic [ref=e486]: Returns_Validation
+                      - generic [ref=e487]:
+                        - text: BigQuery
+                        - generic [ref=e488]: · acme.analytics
+                - listitem [ref=e489]:
+                  - button "Journals 76.5% VAL-0014 Journals_Validation Teradata · edw_prod 3 checks failed" [ref=e490] [cursor=pointer]:
+                    - generic [ref=e495]:
+                      - generic [ref=e496]:
+                        - generic [ref=e497]: Journals
+                        - generic [ref=e498]: 76.5%
+                      - generic [ref=e499]: VAL-0014
+                      - generic [ref=e500]: Journals_Validation
+                      - generic [ref=e501]:
+                        - text: Teradata
+                        - generic [ref=e502]: · edw_prod
+                    - generic [ref=e503]: 3 checks failed
+            - generic [ref=e504]:
+              - paragraph [ref=e505]: 11 validations
+              - generic [ref=e506]:
+                - button "Prev" [disabled] [ref=e507]
+                - button "1" [ref=e508]
+                - button "Next" [disabled] [ref=e509]
+        - generic [ref=e518]:
+          - tablist [ref=e519]:
+            - tab "Check Summary" [selected] [ref=e520] [cursor=pointer]
+            - tab "Rule Catalog" [ref=e521] [cursor=pointer]
+            - tab "Custom Rules" [ref=e522] [cursor=pointer]
+            - tab "Profile" [ref=e523] [cursor=pointer]
+            - tab "Configure" [ref=e524] [cursor=pointer]
+          - banner [ref=e525]:
+            - generic [ref=e526]:
+              - img "DTS score 0.0 percent" [ref=e527]:
+                - generic [ref=e530]: 0.0%
+              - generic [ref=e531]:
+                - heading "General Ledger" [level=2] [ref=e532]
+                - paragraph [ref=e533]:
+                  - text: Teradata
+                  - generic [ref=e534]: · edw_prod
+              - generic [ref=e535]:
+                - generic [ref=e536]:
+                  - paragraph [ref=e537]: Validation ID
+                  - paragraph [ref=e538]: VAL-0009
+                - generic [ref=e539]:
+                  - paragraph [ref=e540]: Validation name
+                  - paragraph [ref=e541]: General_Ledger_Validation
+                - generic [ref=e542]:
+                  - paragraph [ref=e543]: Run
+                  - paragraph [ref=e544]: "5"
+                - generic [ref=e545]:
+                  - paragraph [ref=e546]: Ran on
+                  - paragraph [ref=e547]: 10 Sep 2026
+                - generic [ref=e548]:
+                  - paragraph [ref=e549]: Records
+                  - paragraph [ref=e550]: 30,659
+                - generic [ref=e551]:
+                  - generic [ref=e552]: 8 passed
+                  - generic [ref=e555]: 6 failed
+            - generic [ref=e558]:
+              - button "Buck's Review" [ref=e559]
+              - button "Root Cause Analysis" [ref=e563]
+              - button "Run" [ref=e567]
+          - generic [ref=e570]:
+            - complementary [ref=e571]:
+              - generic [ref=e573]:
+                - paragraph [ref=e574]: Run versus prior
+                - generic [ref=e578]: DTS 0.0% · 6 failed checks. Nulls and load timing drove the change versus the prior run.
+            - complementary [ref=e579]:
+              - generic [ref=e581]:
+                - paragraph [ref=e582]: Exception cluster
+                - generic [ref=e586]: 15 of 24 exceptions share the same load batch. Most General Ledger failures land after 18:00 on 10 Sep 2026. Treat them as one incident, not 6 separate rule bugs.
+            - generic [ref=e587]:
+              - generic [ref=e588]:
+                - generic [ref=e589]:
+                  - generic [ref=e590]:
+                    - heading "Data Quality Score Trend" [level=3] [ref=e591]
+                    - paragraph [ref=e592]: +0.0% vs. start of range
+                  - group "Trend range" [ref=e593]:
+                    - button "7D" [pressed] [ref=e594]
+                    - button "30D" [ref=e595]
+                    - button "90D" [ref=e596]
+                - img "Score trend" [ref=e597]:
+                  - generic [ref=e606]: 18.0%
+                - generic [ref=e607]:
+                  - generic [ref=e608]: 16 Jun
+                  - generic [ref=e609]: 17 Jun
+                  - generic [ref=e610]: 18 Jun
+                  - generic [ref=e611]: 19 Jun
+                  - generic [ref=e612]: 20 Jun
+                  - generic [ref=e613]: 21 Jun
+                  - generic [ref=e614]: 22 Jun
+                - generic [ref=e615]:
+                  - generic [ref=e616]:
+                    - text: Current
+                    - generic [ref=e617]: 18.00%
+                  - generic [ref=e618]:
+                    - text: High
+                    - generic [ref=e619]: 18.0%
+                  - generic [ref=e620]:
+                    - text: Low
+                    - generic [ref=e621]: 18.0%
+                  - generic [ref=e622]: "Range: 7D"
+              - generic [ref=e623]:
+                - generic [ref=e624]:
+                  - generic [ref=e625]:
+                    - heading "Sensitive Data" [level=3] [ref=e626]
+                    - paragraph [ref=e627]: Column-level labels for General Ledger
+                  - paragraph [ref=e628]:
+                    - generic [ref=e629]: 33%
+                    - generic [ref=e630]: Sensitive
+                - generic [ref=e631]:
+                  - generic [ref=e636]:
+                    - generic [ref=e637]: 33%
+                    - text: Sensitive
+                  - list [ref=e638]:
+                    - listitem [ref=e639]:
+                      - generic [ref=e641]: name
+                      - generic [ref=e642]: Direct PII
+                      - generic [ref=e643]: 94% conf.
+                    - listitem [ref=e645]:
+                      - generic [ref=e647]: status
+                      - generic [ref=e648]: Public
+                      - generic [ref=e649]: 72% conf.
+                    - listitem [ref=e651]:
+                      - generic [ref=e653]: amount
+                      - generic [ref=e654]: Financial
+                      - generic [ref=e655]: 90% conf.
+                    - listitem [ref=e657]:
+                      - generic [ref=e659]: created_at
+                      - generic [ref=e660]: Internal
+                      - generic [ref=e661]: 64% conf.
+                    - listitem [ref=e663]:
+                      - generic [ref=e665]: region
+                      - generic [ref=e666]: Public
+                      - generic [ref=e667]: 72% conf.
+                    - listitem [ref=e669]:
+                      - generic [ref=e671]: quantity
+                      - generic [ref=e672]: Internal
+                      - generic [ref=e673]: 64% conf.
+                - button "Ask agent to summarize" [ref=e675]
+            - generic [ref=e676]:
+              - table [ref=e677]:
+                - caption [ref=e678]: Essential checks
+                - rowgroup [ref=e679]:
+                  - row [ref=e680]:
+                    - columnheader "Essential" [ref=e681]
+                  - row [ref=e682]:
+                    - columnheader "Check name" [ref=e683]
+                    - columnheader "DTS" [ref=e684]
+                    - columnheader "Trend" [ref=e685]
+                    - columnheader "Columns" [ref=e686]
+                    - columnheader "Critical failures" [ref=e687]
+                    - columnheader "Defects" [ref=e688]
+                - rowgroup [ref=e689]:
+                  - button "Duplicate Check" [ref=e690] [cursor=pointer]:
+                    - cell "Duplicate Check" [ref=e691]:
+                      - generic "Finds repeated values across the selected columns." [ref=e692]: Duplicate Check
+                    - cell "40.0%" [ref=e693]
+                    - cell "+3.0" [ref=e698]
+                    - cell "3" [ref=e703]
+                    - cell "1" [ref=e704]
+                    - cell "208" [ref=e705]
+                  - button "Regex Pattern Check" [ref=e706] [cursor=pointer]:
+                    - cell "Regex Pattern Check" [ref=e707]:
+                      - generic "Tests values against the expected pattern." [ref=e708]: Regex Pattern Check
+                    - cell "44.0%" [ref=e709]
+                    - cell "0.0" [ref=e714]
+                    - cell "1" [ref=e718]
+                    - cell "5" [ref=e719]
+                    - cell "32" [ref=e720]
+                  - button "Date Consistency Check" [ref=e721] [cursor=pointer]:
+                    - cell "Date Consistency Check" [ref=e722]:
+                      - generic "Finds dates that fall outside a valid range." [ref=e723]: Date Consistency Check
+                    - cell "26.0%" [ref=e724]
+                    - cell "+3.4" [ref=e729]
+                    - cell "1" [ref=e734]
+                    - cell "2" [ref=e735]
+                    - cell "194" [ref=e736]
+                  - button "Data Type Check" [ref=e737] [cursor=pointer]:
+                    - cell "Data Type Check" [ref=e738]:
+                      - generic "Confirms values match the declared type." [ref=e739]: Data Type Check
+                    - cell "50.0%" [ref=e740]
+                    - cell "+3.4" [ref=e745]
+                    - cell "1" [ref=e750]
+                    - cell "1" [ref=e751]
+                    - cell "158" [ref=e752]
+                  - button "Max Length Check" [ref=e753] [cursor=pointer]:
+                    - cell "Max Length Check" [ref=e754]:
+                      - generic "Flags values longer than the column limit." [ref=e755]: Max Length Check
+                    - cell "38.0%" [ref=e756]
+                    - cell "−3.2" [ref=e761]
+                    - cell "1" [ref=e766]
+                    - cell "4" [ref=e767]
+                    - cell "26" [ref=e768]
+              - table [ref=e769]:
+                - caption [ref=e770]: Advanced checks
+                - rowgroup [ref=e771]:
+                  - row [ref=e772]:
+                    - columnheader "Advanced" [ref=e773]
+                  - row [ref=e774]:
+                    - columnheader "Check name" [ref=e775]
+                    - columnheader "DTS" [ref=e776]
+                    - columnheader "Trend" [ref=e777]
+                    - columnheader "Columns" [ref=e778]
+                    - columnheader "Critical failures" [ref=e779]
+                    - columnheader "Defects" [ref=e780]
+                - rowgroup [ref=e781]:
+                  - button "Value Anomaly" [ref=e782] [cursor=pointer]:
+                    - cell "Value Anomaly" [ref=e783]:
+                      - generic "Finds values that sit far from the usual range." [ref=e784]: Value Anomaly
+                    - cell "64.0%" [ref=e785]
+                    - cell "0.0" [ref=e790]
+                    - cell "3" [ref=e794]
+                    - cell "5" [ref=e795]
+                    - cell "112" [ref=e796]
+                  - button "Data Distribution Metric Check" [ref=e797] [cursor=pointer]:
+                    - cell "Data Distribution Metric Check" [ref=e798]:
+                      - generic "Tracks whether the distribution stays stable." [ref=e799]: Data Distribution Metric Check
+                    - cell "98.0%" [ref=e800]
+                    - cell "+3.2" [ref=e805]
+                    - cell "5" [ref=e810]
+                    - cell "0" [ref=e811]
+                    - cell "0" [ref=e812]
+                  - button "Distribution Check" [ref=e813] [cursor=pointer]:
+                    - cell "Distribution Check" [ref=e814]:
+                      - generic "Checks the spread of values in a column." [ref=e815]: Distribution Check
+                    - cell "97.0%" [ref=e816]
+                    - cell "−3.0" [ref=e821]
+                    - cell "6" [ref=e826]
+                    - cell "0" [ref=e827]
+                    - cell "0" [ref=e828]
+              - table [ref=e829]:
+                - caption [ref=e830]: Custom rules
+                - rowgroup [ref=e831]:
+                  - row [ref=e832]:
+                    - columnheader "Custom" [ref=e833]
+                  - row [ref=e834]:
+                    - columnheader "Check name" [ref=e835]
+                    - columnheader "DTS" [ref=e836]
+                    - columnheader "Trend" [ref=e837]
+                    - columnheader "Columns" [ref=e838]
+                    - columnheader "Critical failures" [ref=e839]
+                    - columnheader "Defects" [ref=e840]
+                - rowgroup [ref=e841]:
+                  - button "Custom rules" [ref=e842] [cursor=pointer]:
+                    - cell "Custom rules 6 rules · 6 passed · 0 failed amount_positive_check product_region_valid future_sale_date duplicate_sale_id currency_amount_combo discount_auth_check" [ref=e843]:
+                      - generic "amount_positive_check (passed), product_region_valid (passed), future_sale_date (passed), duplicate_sale_id (passed), currency_amount_combo (passed), discount_auth_check (passed)" [ref=e844]: Custom rules
+                      - generic [ref=e845]: 6 rules · 6 passed · 0 failed
+                      - generic "amount_positive_check (passed), product_region_valid (passed), future_sale_date (passed), duplicate_sale_id (passed), currency_amount_combo (passed), discount_auth_check (passed)" [ref=e846]:
+                        - generic [ref=e847]: amount_positive_check
+                        - generic [ref=e850]: product_region_valid
+                        - generic [ref=e853]: future_sale_date
+                        - generic [ref=e856]: duplicate_sale_id
+                        - generic [ref=e859]: currency_amount_combo
+                        - generic [ref=e862]: discount_auth_check
+                    - cell "96.5%" [ref=e865]
+                    - cell "−0.8" [ref=e870]
+                    - cell "19" [ref=e875]
+                    - cell "0" [ref=e876]
+                    - cell "0" [ref=e877]

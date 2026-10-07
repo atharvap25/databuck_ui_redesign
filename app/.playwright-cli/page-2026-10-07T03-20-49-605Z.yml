@@ -1,0 +1,140 @@
+- generic [ref=e29]:
+  - complementary [ref=e31]:
+    - navigation "Primary" [ref=e38]:
+      - list [ref=e39]:
+        - listitem [ref=e40]:
+          - button "Executive Dashboard" [ref=e41]
+        - listitem [ref=e49]:
+          - button "Connections" [ref=e50]
+        - listitem [ref=e54]:
+          - button "Data Quality" [ref=e55]
+        - listitem [ref=e60]:
+          - button "Matching" [ref=e61]
+        - listitem [ref=e68]:
+          - button "Observability" [ref=e69]
+        - listitem [ref=e73]:
+          - button "Jobs & Tasks" [ref=e74]
+        - listitem [ref=e80]:
+          - button "Administration" [ref=e81]
+  - generic [ref=e86]:
+    - banner [ref=e87]:
+      - generic [ref=e88]:
+        - button "Acme Corp — Production" [ref=e90]
+        - generic [ref=e97]:
+          - button "Notifications, unread" [ref=e98]
+          - button "Settings" [ref=e103]
+          - button "Data Trust Agent" [ref=e108]
+          - button "Alex Rivera, Data Steward" [ref=e112]:
+            - generic [ref=e113]: AR
+            - generic [ref=e114]:
+              - generic [ref=e115]: Alex Rivera
+              - generic [ref=e116]: Data Steward
+          - button "Log out" [ref=e117]
+    - generic [ref=e4482]:
+      - generic [ref=e4484]:
+        - list [ref=e4486]:
+          - listitem [ref=e4487]:
+            - button [ref=e4490]
+            - paragraph [ref=e4496]: Connect
+            - paragraph [ref=e4497]: Where is your data?
+          - listitem [ref=e4498]:
+            - button [ref=e4501]
+            - paragraph [ref=e4505]: Choose Table
+            - paragraph [ref=e4506]: What to check?
+          - listitem [ref=e4507]:
+            - button [disabled] [ref=e4510]
+            - paragraph [ref=e4515]: Configure
+            - paragraph [ref=e4516]: Foundation settings
+          - listitem [ref=e4517]:
+            - button [disabled] [ref=e4520]
+            - paragraph [ref=e4524]: Rule Catalog
+            - paragraph [ref=e4525]: Suggested checks
+          - listitem [ref=e4526]:
+            - button [disabled] [ref=e4529]
+            - paragraph [ref=e4534]: Custom Rules
+            - paragraph [ref=e4535]: Reusable rules
+          - listitem [ref=e4536]:
+            - button [disabled] [ref=e4539]
+            - paragraph [ref=e4543]: Preview and Run
+            - paragraph [ref=e4544]: Review then run
+          - listitem [ref=e4545]:
+            - button [disabled] [ref=e4548]
+            - paragraph [ref=e4553]: Notifications
+            - paragraph [ref=e4554]: Stay informed
+          - listitem [ref=e4555]:
+            - button [disabled] [ref=e4558]
+            - paragraph [ref=e4563]: Schedule
+            - paragraph [ref=e4564]: When to run?
+        - banner [ref=e4565]:
+          - generic [ref=e4566]:
+            - heading "Configure Validation" [level=1] [ref=e5017]
+            - paragraph [ref=e4568]: Set the foundation for how this validation measures quality
+        - generic [ref=e5018]:
+          - complementary [ref=e5019]:
+            - generic [ref=e5021]:
+              - paragraph [ref=e5022]: Anomaly hint
+              - generic [ref=e5026]: Anomaly detection recommended — 2 numeric columns present (customer_id, credit_limit).
+          - generic [ref=e5027]:
+            - heading [level=2] [ref=e5028]
+            - generic [ref=e5033]:
+              - generic [ref=e5034]:
+                - generic [ref=e5035]: Type of Application
+                - combobox [ref=e5036]:
+                  - option "Bulk Load" [selected]
+                  - option "Incremental"
+                  - option "Streaming"
+                  - option "On Demand"
+              - generic [ref=e5037]:
+                - generic [ref=e5038]: Date Format
+                - textbox "e.g. YYYY-MM-DD" [ref=e5039]: YYYY-MM-DD
+              - generic [ref=e5040]:
+                - generic [ref=e5041]: Record Count Anomaly Type
+                - combobox [ref=e5042]:
+                  - option "Record Count Anomaly" [selected]
+                  - option "Volume Anomaly"
+                  - option "None"
+              - generic [ref=e5043]:
+                - generic [ref=e5044]: Std Dev from Mean
+                - textbox [ref=e5045]: "3.0"
+              - generic [ref=e5046]:
+                - generic [ref=e5047]: Validity Threshold
+                - textbox [ref=e5048]: "1.0"
+              - generic [ref=e5049]:
+                - generic [ref=e5050]:
+                  - text: Data Domain
+                  - generic [aria-hidden] [ref=e5051]: "*"
+                - combobox [ref=e5052]:
+                  - option "Select domain"
+                  - option "Finance"
+                  - option "Customer" [selected]
+                  - option "Inventory"
+                  - option "People"
+                  - option "Operations"
+              - generic [ref=e5053]:
+                - generic [ref=e5054]: Priority
+                - combobox [ref=e5055]:
+                  - option "Low"
+                  - option "Medium" [selected]
+                  - option "High"
+                  - option "Critical"
+              - generic [ref=e5056]:
+                - generic [ref=e5057]: Description
+                - textbox "Enter description" [ref=e5058]: Quality checks for Customer Master
+              - generic [ref=e5059]:
+                - generic [ref=e5060]: Sigma Calculation Days
+                - textbox "Enter number of days" [ref=e5061]: "30"
+              - generic [ref=e5064]:
+                - generic [ref=e5065]: Data Cyclicality
+                - generic [ref=e5066]:
+                  - button "None" [pressed] [ref=e5067]
+                  - button "Daily" [ref=e5068]
+                  - button "Weekly" [ref=e5069]
+                  - button "Monthly" [ref=e5070]
+                  - button "Day of Week" [ref=e5071]
+              - generic [ref=e5072]:
+                - switch "Enable Reprofiling" [ref=e5073]
+                - paragraph [ref=e5077]: When on, Databuck refreshes the table profile on each run before applying checks.
+      - contentinfo [ref=e4871]:
+        - button "Back" [ref=e4872]
+        - paragraph [ref=e4875]: Step 3 of 8
+        - button "Continue" [active] [ref=e4876]

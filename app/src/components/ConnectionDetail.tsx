@@ -6,6 +6,7 @@ import {
   typeLabels,
   type ConnectionField,
 } from '../data/connectionFields.ts'
+import { onboardSuggestionsFor, schemaDigestFor } from '../data/aiMocks.ts'
 import {
   tableMetadata,
   tableMetrics,
@@ -17,6 +18,7 @@ import type { SourceSelection } from './ConnectionsPanel.tsx'
 import EmptyState from './EmptyState.tsx'
 import { BackIcon, DatabaseIcon, InboxIcon, TableIcon } from './icons.tsx'
 import IconBox from './IconBox.tsx'
+import { AiBanner } from './ai/AiKit.tsx'
 import StatusBadge from './StatusBadge.tsx'
 import TableProfile from './TableProfile.tsx'
 import {
@@ -461,6 +463,10 @@ function TablesTab({ source }: { source: DataSource }) {
   }
 
   return (
+    <div className="flex flex-col gap-4">
+      {onboardSuggestionsFor(source) ? (
+        <AiBanner title="Tables to onboard">{onboardSuggestionsFor(source)?.body}</AiBanner>
+      ) : null}
     <ul className="divide-y divide-line rounded-lg border border-line">
       {source.tables.map((item) => (
         <li key={item.id}>
@@ -478,6 +484,7 @@ function TablesTab({ source }: { source: DataSource }) {
         </li>
       ))}
     </ul>
+    </div>
   )
 }
 
@@ -587,6 +594,7 @@ function TableOverview({ table }: { table: SourceTable }) {
 
   return (
     <div className="flex flex-col gap-6">
+      {schemaDigestFor(table) ? <AiBanner title="Schema change">{schemaDigestFor(table)}</AiBanner> : null}
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {cards.map((card) => (
           <Metric key={card.label} label={card.label} value={card.value} />
